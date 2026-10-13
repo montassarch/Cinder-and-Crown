@@ -1,0 +1,27 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/player/player.gd" id="1_player"]
+[ext_resource type="Script" path="res://src/core/health.gd" id="2_health"]
+
+[node name="Player" type="CharacterBody2D"]
+script = ExtResource("1_player")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+unique_name_in_owner = true
+
+[node name="Placeholder" type="ColorRect" parent="."]
+unique_name_in_owner = true
+color = Color(0.85, 0.42, 0.22, 1)
+
+[node name="Health" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("2_health")
+
+[node name="Hurtbox" type="Area2D" parent="."]
+unique_name_in_owner = true
+collision_layer = 2
+collision_mask = 4
+monitorable = true
+
+[node name="HurtboxShape" type="CollisionShape2D" parent="Hurtbox"]
+unique_name_in_owner = true
