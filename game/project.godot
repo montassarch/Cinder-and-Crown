@@ -1,5 +1,10 @@
 ; Engine configuration file.
-; Cinder & Crown — see Design/Overview.md and Design/Plans/ for the plan.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
 
 config_version=5
 
@@ -7,8 +12,8 @@ config_version=5
 
 config/name="Cinder & Crown"
 config/description="A Dead Cells-style 2D action roguelite."
-config/features=PackedStringArray("4.7", "GL Compatibility")
 run/main_scene="res://levels/sandbox.tscn"
+config/features=PackedStringArray("4.7", "GL Compatibility")
 
 [autoload]
 
@@ -18,15 +23,11 @@ HitStop="*res://src/core/hit_stop.gd"
 
 [display]
 
-; 384x216 integer-scales x5 to 1920x1080 and x~6.67 to 1440p.
-; Raising this and GameConfig.TILE_SIZE together is the documented path
-; toward Dead Cells-scale art. See the plan's Global Constraints.
 window/size/viewport_width=384
 window/size/viewport_height=216
 window/size/window_width_override=1152
 window/size/window_height_override=648
 window/stretch/mode="canvas_items"
-window/stretch/aspect="keep"
 
 [editor_plugins]
 
@@ -76,10 +77,6 @@ swap_weapon={
 , Object(InputEventJoypadButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"button_index":3,"pressure":0.0,"pressed":false,"script":null)
 ]
 }
-
-[physics]
-
-common/physics_ticks_per_second=60
 
 [rendering]
 
