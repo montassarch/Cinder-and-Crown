@@ -1,0 +1,34 @@
+# ---- Godot 4 ----
+.godot/
+*.translation
+
+# Exports / builds
+build/
+export/
+*.exe
+*.pck
+*.pdb
+*.apk
+*.aab
+*.zip
+*.dmg
+.web_export/
+
+# Godot editor-local
+export_presets.cfg
+*.import.bak
+
+# ---- Obsidian ----
+# Vault settings are shared; per-machine UI state is not.
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.obsidian/cache
+.trash/
+
+# ---- Superpowers scratch ----
+.superpowers/
+
+# ---- OS ----
+Thumbs.db
+desktop.ini
+.DS_Store
