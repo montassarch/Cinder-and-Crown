@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://src/level/sandbox.gd" id="1_sandbox"]
 [ext_resource type="PackedScene" path="res://src/player/player.tscn" id="2_player"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" path="res://src/ui/sandbox_menu.tscn" id="4_menu"]
 [ext_resource type="PackedScene" path="res://src/input/touch_controls.tscn" id="5_touch"]
 [ext_resource type="Script" path="res://src/ui/debug_overlay.gd" id="6_debug"]
+[ext_resource type="PackedScene" path="res://src/ui/controls_help.tscn" id="7_help"]
 
 [node name="Sandbox" type="Node2D"]
 script = ExtResource("1_sandbox")
@@ -49,6 +50,9 @@ script = ExtResource("6_debug")
 unique_name_in_owner = true
 
 [node name="SandboxMenu" parent="." instance=ExtResource("4_menu")]
+unique_name_in_owner = true
+
+[node name="ControlsHelp" parent="." instance=ExtResource("7_help")]
 unique_name_in_owner = true
 
 [node name="TouchControls" parent="." instance=ExtResource("5_touch")]
