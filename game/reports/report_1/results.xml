@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites id="2026-10-13" name="report_1" tests="4" failures="0" skipped="0" flaky="0" time="0.000">
+	<testsuite id="0" name="test_game_config" package="tests" timestamp="2026-10-13T17:50:06" hostname="localhost" tests="4" failures="0" errors="0" skipped="0" flaky="0" time="0.150">
+		<testcase name="test_tile_size_is_sixteen" classname="test_game_config" time="0.018">
+		</testcase>
+		<testcase name="test_base_resolution_integer_scales_to_1080p" classname="test_game_config" time="0.019">
+		</testcase>
+		<testcase name="test_tiles_converts_to_pixels" classname="test_game_config" time="0.024">
+		</testcase>
+		<testcase name="test_tiles_v_converts_both_axes" classname="test_game_config" time="0.018">
+		</testcase>
+	</testsuite>
+</testsuites>

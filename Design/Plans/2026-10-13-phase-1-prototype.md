@@ -23,7 +23,7 @@
 - **Input:** keyboard, gamepad and touch are equal first-class paths from Task 3 onward. No gameplay script may call `Input.*` directly; all input goes through `InputRouter`.
 - **Combat model (Dead Cells):** two weapons swapped freely, no stamina, roll grants invincibility frames, hit-stop on impact, enemies telegraph before striking.
 - **Tests:** GdUnit4, logic only. Game feel is verified by the human playing it. No test asserts "this feels good."
-- **Test command:** `godot --headless --path game -s addons/gdUnit4/bin/GdUnitCmdTool.gd -a tests` (exact invocation confirmed in Task 1).
+- **Test command:** `<godot> --headless --path game -s addons/gdUnit4/bin/GdUnitCmdTool.gd --ignoreHeadlessMode -a tests` — confirmed working in Task 1. `--ignoreHeadlessMode` is required: GdUnit4 otherwise aborts with exit 103, because Godot delivers no `InputEvent`s headlessly. Phase 1's tests inject values directly, so the guard does not apply — but see Task 3, which must expose a seam for physical input rather than calling `Input.*` inline.
 - **Godot binary:** `C:\Users\LAPTOP\AppData\Local\Microsoft\WinGet\Packages\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\Godot_v4.7.2-stable_win64_console.exe` (winget could not create the `godot` PATH alias without admin).
 - **Placeholder art:** flat `ColorRect`/`Polygon2D` shapes sized in tiles. No sprite assets in Phase 1.
 - **Hosting is out of scope for the agent.** Task 9 builds exports locally and stops. Publishing to GitHub Pages or Netlify leaves the machine and requires the human's explicit go-ahead.
@@ -143,8 +143,11 @@ Expected: PASS, 4 of 4.
 
 - [ ] **Step 7: Verify the project imports clean**
 
-Run: `<godot> --headless --path game --quit`
-Expected: exit 0, and no line containing `ERROR` or `SCRIPT ERROR` in the output.
+Run: `timeout 110 <godot> --headless --path game --import`
+Expected: exit 0, and no line starting with `ERROR`, `SCRIPT ERROR` or `WARNING`.
+
+Do **not** use `--quit` — with no `run/main_scene` set it hangs forever, since
+headless Godot has nothing to run. `--quit` only becomes usable from Task 7.
 
 - [ ] **Step 8: Commit**
 
@@ -303,8 +306,12 @@ func test_jump_after_coyote_time_expires_is_refused() -> void
 func test_roll_cannot_be_interrupted_before_duration_elapses() -> void
 func test_roll_returns_to_idle_after_duration() -> void
 func test_attack_from_idle_enters_attack() -> void
-func test_hurt_overrides_every_state_except_roll() -> void
-	# roll's i-frames are the point of the move; a hit landing mid-roll is ignored
+func test_hurt_overrides_every_state_including_roll() -> void
+	# Invincibility is gated in Player, not here: the hurtbox ignores damage
+	# while is_invincible(), so ctx.hurt is only ever true when the player is
+	# genuinely vulnerable -- including the roll's first 0.04s and last 0.06s,
+	# which fall outside IFRAME_WINDOW. The table stays one rule with no
+	# exceptions, and IFRAME_WINDOW stays the single source of truth.
 func test_falling_when_airborne_without_upward_velocity() -> void
 ```
 
@@ -326,8 +333,8 @@ Expected: PASS, 10 of 10.
 
 - [ ] **Step 6: Verify the project still imports clean**
 
-Run: `<godot> --headless --path game --quit`
-Expected: exit 0, no `SCRIPT ERROR`.
+Run: `timeout 110 <godot> --headless --path game --import`
+Expected: exit 0, no `SCRIPT ERROR`. (Not `--quit` — see Task 1 step 7.)
 
 - [ ] **Step 7: Commit**
 
