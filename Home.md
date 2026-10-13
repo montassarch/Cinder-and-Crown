@@ -11,9 +11,12 @@ A Dead Cells-style 2D action roguelite. Start as a simple sandbox prototype, the
 - Story/Dialogue, Story/Quests: Phase 3
 
 ## Status
-Phase 1 built and reviewed. 179 tests passing; sandbox and generated level
-both playable. Export builds blocked on installing Godot export templates
-(1.2 GB) from inside the editor.
+**Phase 1 complete.** All nine tasks done, 179 tests passing, reviewed by a
+fresh reviewer with its critical and important findings fixed. Windows and
+web builds both export and verify. Unmerged on `phase-1-prototype`.
+
+Open: play it and judge the feel; decide whether to host the web build for
+iPhone testing.
 
 ## Decisions
 - **Engine:** Godot 4.7.2, standard build (no C#)

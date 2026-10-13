@@ -86,10 +86,14 @@ appearing exactly once in the codebase is a cheap standing check** — it found
 
 ## Known gaps
 
-**Blocked:** Windows and web builds are unverified. Export templates are
-1.2 GB and the connection to GitHub ran at ~43 KB/s, so they are installed
-from inside Godot instead. iPhone testing waits on a hosted web build, which
-needs explicit go-ahead since it leaves the machine.
+**Builds verified.** Windows 105 MB, web 39 MB, both with zero test, addon
+or report files packed. The web build was served locally over HTTP and every
+asset returned 200, including the Apple touch icon iOS uses for Add to Home
+Screen.
+
+**iPhone testing is the one thing left.** It needs the web build hosted at a
+URL, which leaves the machine, so it waits on an explicit decision about
+where to put it.
 
 **Deferred minors**, none urgent:
 
@@ -114,3 +118,35 @@ needs explicit go-ahead since it leaves the machine.
   alternative is a setter existing only for tests.
 - No explicit host interface for `HUD.bind()`; `Sandbox` and `RunLevel` each
   satisfy it informally.
+
+## A fourth mistake, found while building
+
+Godot's `ConfigFile` uses `;` as its comment character, **not `#`**. The
+explanatory `#` comments I put inside the Web preset's options made Godot
+abandon the rest of that section, so `variant/thread_support=false` was never
+read.
+
+It still produced a single-threaded build — because `false` is Godot's
+default. So the thing I committed, documented in the README, and described
+here as the setting protecting the iPhone target was **inert**. The file
+looked like it carried a decision and did not.
+
+It surfaced only because a second setting in the same section was also being
+ignored and showed up wrong in the generated output. Now proven rather than
+assumed: with `thread_support=true` the export produces the threaded WASM,
+and with `false` it produces the no-threads one, byte-identical to
+`web_nothreads_release.zip`.
+
+The general shape is the same as the other three: **a thing that looks
+load-bearing and isn't.** A test that pins nothing, a field nothing reads, a
+config line nothing parses. Worth checking that a setting takes effect, not
+just that it is written down.
+
+## Phase 2 notes
+
+- Mobile VRAM compression is off on the Web preset. It requires
+  `rendering/textures/vram_compression/import_etc2_astc` in project
+  settings, and with no texture assets yet it was only causing the export to
+  fail. Turn both on when real art arrives.
+- `Player.STARTING_WEAPONS` should become part of a class resource, which the
+  roadmap already schedules.
