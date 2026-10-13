@@ -13,6 +13,7 @@ config/features=PackedStringArray("4.7", "GL Compatibility")
 
 GameConfig="*res://src/core/game_config.gd"
 InputRouter="*res://src/input/input_router.gd"
+HitStop="*res://src/core/hit_stop.gd"
 
 [display]
 

@@ -38,9 +38,14 @@ const ROLL_DURATION: float = 0.32
 ## rather than a free escape.
 const IFRAME_WINDOW: Vector2 = Vector2(0.04, 0.26)
 
-## Placeholder attack length. Task 5 replaces this with the equipped
-## weapon's attack_duration, since reach and speed are weapon properties.
+## Fallback attack length, used only when no weapon is equipped. The real
+## duration comes from the equipped WeaponData, because reach and speed are
+## weapon properties -- a slow spear must not swing at a fast blade's rate.
 const ATTACK_DURATION: float = 0.3
+
+## Two weapons, swapped freely: no stamina, no lockout, per the Dead Cells
+## combat model. Swapping mid-swing is legal and withdraws the hitbox.
+const WEAPON_SLOTS: int = 2
 
 const HURT_DURATION: float = 0.25
 const HURT_KNOCKBACK_TILES: float = 4.0
@@ -50,8 +55,14 @@ const MAX_HEALTH: int = 100
 ## Placeholder body, 1x2 tiles. Replaced when real art exists.
 const BODY_SIZE_TILES: Vector2 = Vector2(1.0, 2.0)
 
+signal weapon_changed(slot: int, data: WeaponData)
+
 var state: PlayerStateMachine.State = PlayerStateMachine.State.IDLE
 var facing: float = 1.0
+
+## One WeaponData per slot; null means an empty slot.
+var slots: Array[WeaponData] = [null, null]
+var active_slot: int = 0
 
 var _state_time: float = 0.0
 var _coyote_time: float = 0.0
@@ -59,6 +70,7 @@ var _hurt_pending: bool = false
 var _hurt_source: Vector2 = Vector2.ZERO
 
 @onready var health: Health = %Health
+@onready var weapon: Weapon = %Weapon
 
 
 ## True while the roll's invincibility window is open.
@@ -79,14 +91,51 @@ static func jump_velocity() -> float:
 	return -sqrt(2.0 * GameConfig.tiles(GRAVITY_TILES) * GameConfig.tiles(JUMP_HEIGHT_TILES))
 
 
+## Starting loadout. Paths rather than preloads so the two shipped weapons
+## stay data: swapping these for different .tres files needs no code change.
+const STARTING_WEAPONS: Array[String] = [
+	"res://data/weapons/rusty_blade.tres",
+	"res://data/weapons/ember_spear.tres",
+]
+
+
 func _ready() -> void:
 	health.configure(MAX_HEALTH)
 	health.died.connect(func() -> void: died.emit())
 	_size_placeholder_body()
 
+	for slot: int in range(mini(STARTING_WEAPONS.size(), WEAPON_SLOTS)):
+		var data: WeaponData = load(STARTING_WEAPONS[slot])
+		if data != null:
+			equip_slot(slot, data)
+
 
 func is_invincible() -> bool:
 	return is_invincible_at(state, _state_time)
+
+
+## Puts a weapon in a slot. Equipping the active slot swaps it in live,
+## which cancels any swing in progress.
+func equip_slot(slot: int, data: WeaponData) -> void:
+	if slot < 0 or slot >= WEAPON_SLOTS:
+		return
+	slots[slot] = data
+	if slot == active_slot:
+		weapon.equip(data)
+	weapon_changed.emit(slot, data)
+
+
+## Switches to the other slot. Always permitted -- there is no stamina and
+## no lockout, so this can land inside an active hit window, and Weapon
+## withdraws the hitbox when it does.
+func swap_weapon() -> void:
+	active_slot = (active_slot + 1) % WEAPON_SLOTS
+	weapon.equip(slots[active_slot])
+	weapon_changed.emit(active_slot, slots[active_slot])
+
+
+func active_weapon_data() -> WeaponData:
+	return slots[active_slot]
 
 
 ## The only way damage reaches the player. Invincibility is filtered here,
@@ -103,6 +152,10 @@ func take_hit(amount: int, from_position: Vector2) -> void:
 func _physics_process(delta: float) -> void:
 	_state_time += delta
 	_coyote_time = 0.0 if is_on_floor() else _coyote_time + delta
+
+	if InputRouter.swap_weapon_pressed():
+		InputRouter.consume_swap_weapon()
+		swap_weapon()
 
 	var next_state: PlayerStateMachine.State = PlayerStateMachine.next_state(state, {
 		&"on_floor": is_on_floor(),
@@ -129,7 +182,10 @@ func _duration_of(of_state: PlayerStateMachine.State) -> float:
 		PlayerStateMachine.State.ROLL:
 			return ROLL_DURATION
 		PlayerStateMachine.State.ATTACK:
-			return ATTACK_DURATION
+			# From the weapon, not a constant: the swing's length is what
+			# makes a spear feel slow and a blade feel quick.
+			var data := active_weapon_data()
+			return data.attack_duration if data != null else ATTACK_DURATION
 		PlayerStateMachine.State.HURT:
 			return HURT_DURATION
 		_:
@@ -152,6 +208,8 @@ func _enter(new_state: PlayerStateMachine.State) -> void:
 			velocity.x = facing * GameConfig.tiles(ROLL_SPEED_TILES)
 		PlayerStateMachine.State.ATTACK:
 			InputRouter.consume_attack()
+			weapon.face(facing)
+			weapon.start_attack()
 		PlayerStateMachine.State.HURT:
 			var away := 1.0 if global_position.x >= _hurt_source.x else -1.0
 			velocity.x = away * GameConfig.tiles(HURT_KNOCKBACK_TILES)
@@ -167,6 +225,10 @@ func _apply(delta: float) -> void:
 	var axis := InputRouter.move_axis()
 	if absf(axis) > PlayerStateMachine.MOVE_DEADZONE:
 		facing = signf(axis)
+		# Not re-faced mid-swing: turning the hitbox around after commit
+		# would let the player cover both sides with one attack.
+		if state != PlayerStateMachine.State.ATTACK:
+			weapon.face(facing)
 
 	match state:
 		PlayerStateMachine.State.IDLE:

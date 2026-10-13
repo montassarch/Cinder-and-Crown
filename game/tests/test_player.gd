@@ -78,6 +78,59 @@ func test_speeds_are_expressed_in_tiles_not_pixels() -> void:
 	assert_float(GameConfig.tiles(Player.ROLL_SPEED_TILES)).is_equal(224.0)
 
 
+# --- weapon slots ---
+
+func _spawn_player() -> Player:
+	var player: Player = auto_free(
+		(load("res://src/player/player.tscn") as PackedScene).instantiate()
+	)
+	add_child(player)
+	return player
+
+
+func test_player_starts_with_both_slots_filled() -> void:
+	var player := _spawn_player()
+	assert_object(player.slots[0]).is_not_null()
+	assert_object(player.slots[1]).is_not_null()
+	assert_int(player.active_slot).is_equal(0)
+
+
+func test_swap_weapon_alternates_between_the_two_slots() -> void:
+	var player := _spawn_player()
+	var first := player.active_weapon_data()
+	player.swap_weapon()
+	assert_object(player.active_weapon_data()).is_not_same(first)
+	player.swap_weapon()
+	assert_object(player.active_weapon_data()).is_same(first)
+
+
+func test_attack_duration_comes_from_the_equipped_weapon() -> void:
+	# The carried note from Task 4: a slow spear must not swing at a fast
+	# blade's rate. If this reads ATTACK_DURATION, the weapon data is
+	# being ignored.
+	var player := _spawn_player()
+	var blade_duration: float = player.active_weapon_data().attack_duration
+	player.swap_weapon()
+	var spear_duration: float = player.active_weapon_data().attack_duration
+	assert_float(spear_duration).is_not_equal(blade_duration)
+	assert_float(player._duration_of(SM.State.ATTACK)).is_equal(spear_duration)
+
+
+func test_swapping_equips_the_weapon_on_the_weapon_node() -> void:
+	var player := _spawn_player()
+	player.swap_weapon()
+	assert_object(player.weapon.data).is_same(player.slots[1])
+
+
+func test_equipping_an_inactive_slot_does_not_change_the_live_weapon() -> void:
+	var player := _spawn_player()
+	var live := player.weapon.data
+	var other := WeaponData.new()
+	player.equip_slot(1, other)
+	assert_object(player.weapon.data).is_same(live)
+	assert_object(player.slots[1]).is_same(other)
+
+
 # --- scene wiring ---
 
 func test_player_scene_instantiates_and_readies() -> void:
