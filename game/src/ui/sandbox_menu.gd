@@ -43,6 +43,9 @@ func _build_enemy_buttons() -> void:
 		if data == null:
 			continue
 		var button := Button.new()
+		# Not focusable: a focused button is activated by ui_accept, so Space
+		# would both jump and press whatever button happened to hold focus.
+		button.focus_mode = Control.FOCUS_NONE
 		button.text = "+ %s" % data.display_name
 		button.pressed.connect(func() -> void: _sandbox.spawn_enemy(data))
 		_enemy_list.add_child(button)
@@ -65,6 +68,7 @@ func _build_weapon_buttons() -> void:
 		row.add_child(label)
 		for slot: int in range(Player.WEAPON_SLOTS):
 			var button := Button.new()
+			button.focus_mode = Control.FOCUS_NONE
 			button.text = "slot %d" % (slot + 1)
 			button.pressed.connect(
 				func() -> void: _sandbox.player.equip_slot(slot, data)

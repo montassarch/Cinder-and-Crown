@@ -7,6 +7,7 @@ layer = 6
 script = ExtResource("1_menu")
 
 [node name="CollapseButton" type="Button" parent="."]
+focus_mode = 0
 unique_name_in_owner = true
 anchors_preset = 1
 anchor_left = 1.0
@@ -48,6 +49,7 @@ layout_mode = 2
 theme_override_constants/separation = 1
 
 [node name="ClearButton" type="Button" parent="Panel/Margin/Root"]
+focus_mode = 0
 unique_name_in_owner = true
 layout_mode = 2
 text = "clear all"
@@ -68,11 +70,13 @@ theme_override_constants/separation = 1
 layout_mode = 2
 
 [node name="ResetButton" type="Button" parent="Panel/Margin/Root"]
+focus_mode = 0
 unique_name_in_owner = true
 layout_mode = 2
 text = "reset player"
 
 [node name="DebugToggle" type="CheckButton" parent="Panel/Margin/Root"]
+focus_mode = 0
 unique_name_in_owner = true
 layout_mode = 2
 text = "show boxes"
@@ -81,6 +85,7 @@ text = "show boxes"
 layout_mode = 2
 
 [node name="RunButton" type="Button" parent="Panel/Margin/Root"]
+focus_mode = 0
 unique_name_in_owner = true
 layout_mode = 2
 text = "generated level"

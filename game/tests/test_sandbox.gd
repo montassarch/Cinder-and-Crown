@@ -222,3 +222,42 @@ func test_room_scene_width_matches_its_data_width() -> void:
 				room.display_name, instance.width_tiles, room.size_tiles.x
 			]
 		).is_equal(float(room.size_tiles.x))
+
+
+# --- UI must not steal gameplay keys ---
+
+func _all_buttons(node: Node, found: Array[Node] = []) -> Array[Node]:
+	if node is BaseButton:
+		found.append(node)
+	for child: Node in node.get_children():
+		_all_buttons(child, found)
+	return found
+
+
+func test_no_ui_button_accepts_keyboard_focus() -> void:
+	# Reported from play: pressing Space jumped AND toggled the menu.
+	# Godot's BaseButton takes focus, and ui_accept (Space/Enter) fires the
+	# focused button -- so every gameplay key that overlaps ui_accept also
+	# presses whatever button happens to be focused. The fix is that no
+	# in-game button is focusable at all; they are pointer/touch targets.
+	var sandbox := _spawn_sandbox()
+	await get_tree().process_frame
+
+	var buttons := _all_buttons(sandbox)
+	assert_int(buttons.size()).override_failure_message(
+		"found no buttons to check -- the menu did not build"
+	).is_greater(0)
+
+	for button: Node in buttons:
+		assert_int((button as BaseButton).focus_mode).override_failure_message(
+			"%s accepts focus, so Space/Enter can trigger it" % button.name
+		).is_equal(Control.FOCUS_NONE)
+
+
+func test_no_ui_button_is_currently_focused() -> void:
+	var sandbox := _spawn_sandbox()
+	await get_tree().process_frame
+	for button: Node in _all_buttons(sandbox):
+		assert_bool((button as BaseButton).has_focus()).override_failure_message(
+			"%s holds focus at startup" % button.name
+		).is_false()
