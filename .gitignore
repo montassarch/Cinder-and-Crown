@@ -15,7 +15,9 @@ export/
 .web_export/
 
 # Godot editor-local
-export_presets.cfg
+# NOTE: export_presets.cfg is deliberately NOT ignored. It carries
+# thread_support=false for the web build, without which the iPhone target
+# breaks silently -- it would still work on desktop.
 *.import.bak
 
 # ---- Obsidian ----
