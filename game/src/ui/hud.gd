@@ -38,11 +38,16 @@ func _on_health_changed(current: int, max_health: int) -> void:
 
 
 func _refresh_slots() -> void:
+	# One slot per line, not joined on one.
+	#
+	# Both names side by side ran past the HUD's width and collided with
+	# the sandbox menu's heading, rendering as "[Emb<spawn>ear]". Stacking
+	# them keeps the widest line to a single weapon name, and the marker
+	# still shows which hand is live, since swapping is the core verb.
 	var player: Player = _sandbox.player
-	var names: Array[String] = []
+	var lines: Array[String] = []
 	for slot: int in range(Player.WEAPON_SLOTS):
 		var data: WeaponData = player.slots[slot]
-		var label := data.display_name if data != null else "empty"
-		# The active hand is marked, since swapping is the core verb here.
-		names.append("[%s]" % label if slot == player.active_slot else " %s " % label)
-	_slots_label.text = " | ".join(names)
+		var weapon_name := data.display_name if data != null else "empty"
+		lines.append(("> " if slot == player.active_slot else "  ") + weapon_name)
+	_slots_label.text = "\n".join(lines)

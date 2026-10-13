@@ -30,6 +30,7 @@ text = "100 / 100"
 [node name="SlotsLabel" type="Label" parent="Root"]
 unique_name_in_owner = true
 layout_mode = 2
+clip_text = true
 text = "slots"
 
 [node name="EnemiesLabel" type="Label" parent="Root"]

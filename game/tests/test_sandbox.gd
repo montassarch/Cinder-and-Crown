@@ -261,3 +261,41 @@ func test_no_ui_button_is_currently_focused() -> void:
 		assert_bool((button as BaseButton).has_focus()).override_failure_message(
 			"%s holds focus at startup" % button.name
 		).is_false()
+
+
+# --- UI must not obscure the game ---
+
+func test_menu_starts_collapsed_so_the_play_area_is_clear() -> void:
+	# Seen on video: the panel is ~158x188 against a 384x216 viewport --
+	# 87% of the height -- so with it open the player is barely visible.
+	# It is a workbench drawer, not a permanent fixture.
+	var sandbox := _spawn_sandbox()
+	await get_tree().process_frame
+	var panel := sandbox.get_node("%SandboxMenu").get_node("%Panel") as Control
+	assert_bool(panel.visible).override_failure_message(
+		"the sandbox menu covers the play area on startup"
+	).is_false()
+
+
+func test_hud_weapon_text_fits_inside_the_hud() -> void:
+	# Seen on video: "Rusty Blade | [Emb<spawn>ear]" -- the slot label
+	# overflowed its container and collided with the menu panel's heading.
+	var sandbox := _spawn_sandbox()
+	await get_tree().process_frame
+	var hud := sandbox.get_node("%HUD")
+	var label := hud.get_node("%SlotsLabel") as Label
+	var root := hud.get_node("Root") as Control
+
+	var widest := 0.0
+	for line: String in label.text.split("\n"):
+		var w: float = label.get_theme_font("font").get_string_size(
+			line, HORIZONTAL_ALIGNMENT_LEFT, -1,
+			label.get_theme_font_size("font_size")
+		).x
+		widest = maxf(widest, w)
+
+	assert_float(widest).override_failure_message(
+		"slot text is %.0fpx wide in a %.0fpx HUD: '%s'" % [
+			widest, root.size.x, label.text
+		]
+	).is_less_equal(root.size.x)
