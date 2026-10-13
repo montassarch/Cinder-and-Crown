@@ -1,0 +1,73 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/input/touch_controls.gd" id="1_touch"]
+
+[node name="TouchControls" type="CanvasLayer"]
+layer = 10
+script = ExtResource("1_touch")
+
+[node name="StickBase" type="Panel" parent="."]
+unique_name_in_owner = true
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = -72.0
+offset_right = 72.0
+offset_bottom = -24.0
+grow_vertical = 0
+modulate = Color(1, 1, 1, 0.25)
+
+[node name="StickKnob" type="Panel" parent="."]
+unique_name_in_owner = true
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 36.0
+offset_top = -60.0
+offset_right = 60.0
+offset_bottom = -36.0
+grow_vertical = 0
+modulate = Color(1, 1, 1, 0.45)
+
+[node name="Buttons" type="VBoxContainer" parent="."]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -104.0
+offset_top = -104.0
+offset_right = -16.0
+offset_bottom = -16.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_constants/separation = 4
+
+[node name="AttackButton" type="Button" parent="Buttons"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+modulate = Color(1, 1, 1, 0.7)
+text = "ATK"
+
+[node name="JumpButton" type="Button" parent="Buttons"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+modulate = Color(1, 1, 1, 0.7)
+text = "JMP"
+
+[node name="RollButton" type="Button" parent="Buttons"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+modulate = Color(1, 1, 1, 0.7)
+text = "ROLL"
+
+[node name="SwapButton" type="Button" parent="Buttons"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+modulate = Color(1, 1, 1, 0.7)
+text = "SWAP"
