@@ -32,3 +32,6 @@ export_presets.cfg
 Thumbs.db
 desktop.ini
 .DS_Store
+
+# GdUnit4 test reports
+game/reports/
