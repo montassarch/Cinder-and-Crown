@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/enemies/enemy_data.gd" id="1_enemy_data"]
+
+[resource]
+script = ExtResource("1_enemy_data")
+display_name = "Cinder Bat"
+max_health = 12
+move_speed_tiles = 6.0
+attack_damage = 5
+attack_range_tiles = 0.9
+telegraph_seconds = 0.3
+recovery_seconds = 0.25
+behaviour = 1
+body_size_tiles = Vector2(1.0, 0.8)
+tint = Color(0.9, 0.45, 0.2, 1)

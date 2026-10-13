@@ -1,0 +1,28 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/enemies/enemy.gd" id="1_enemy"]
+[ext_resource type="Script" path="res://src/core/health.gd" id="2_health"]
+
+[node name="Enemy" type="CharacterBody2D"]
+collision_layer = 8
+collision_mask = 1
+script = ExtResource("1_enemy")
+
+[node name="EnemyShape" type="CollisionShape2D" parent="."]
+unique_name_in_owner = true
+
+[node name="Placeholder" type="ColorRect" parent="."]
+unique_name_in_owner = true
+
+[node name="Health" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("2_health")
+
+[node name="Hurtbox" type="Area2D" parent="."]
+unique_name_in_owner = true
+collision_layer = 2
+collision_mask = 4
+monitorable = true
+
+[node name="EnemyHurtboxShape" type="CollisionShape2D" parent="Hurtbox"]
+unique_name_in_owner = true

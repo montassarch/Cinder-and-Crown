@@ -20,6 +20,13 @@ const TILE_SIZE: int = 16
 const BASE_WIDTH: int = 384
 const BASE_HEIGHT: int = 216
 
+## Downward acceleration in tiles/second^2.
+##
+## A property of the world, not of the player: enemies fall by it too, and
+## so will any projectile or dropped item. It lives here so there is one
+## gravity in the game rather than one per falling thing.
+const GRAVITY_TILES: float = 56.0
+
 
 ## Converts a distance in tiles to pixels.
 static func tiles(n: float) -> float:

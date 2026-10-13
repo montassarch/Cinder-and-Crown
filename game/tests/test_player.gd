@@ -61,7 +61,7 @@ func test_jump_velocity_reaches_the_configured_height() -> void:
 	# JUMP_HEIGHT_TILES. If someone replaces the derivation with a magic
 	# number, this fails.
 	var v := absf(Player.jump_velocity())
-	var gravity := GameConfig.tiles(Player.GRAVITY_TILES)
+	var gravity := GameConfig.tiles(GameConfig.GRAVITY_TILES)
 	var apex_pixels := (v * v) / (2.0 * gravity)
 	assert_float(apex_pixels).is_equal_approx(
 		GameConfig.tiles(Player.JUMP_HEIGHT_TILES), 0.01

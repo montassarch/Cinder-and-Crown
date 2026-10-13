@@ -22,7 +22,8 @@ const RUN_SPEED_TILES: float = 9.0
 ## from this and GRAVITY_TILES, so raising one does not silently break the
 ## other.
 const JUMP_HEIGHT_TILES: float = 3.2
-const GRAVITY_TILES: float = 56.0
+## Gravity lives on GameConfig: it is a world property, shared by enemies
+## and anything else that falls. Referenced here, not redefined.
 
 ## Air control, as a fraction of RUN_SPEED. Dead Cells gives near-full air
 ## control; a lower value here would make the platforming feel floaty.
@@ -88,7 +89,7 @@ static func is_invincible_at(at_state: PlayerStateMachine.State, state_time: flo
 ## GRAVITY_TILES. Derived rather than tuned, so the two constants cannot
 ## drift apart.
 static func jump_velocity() -> float:
-	return -sqrt(2.0 * GameConfig.tiles(GRAVITY_TILES) * GameConfig.tiles(JUMP_HEIGHT_TILES))
+	return -sqrt(2.0 * GameConfig.tiles(GameConfig.GRAVITY_TILES) * GameConfig.tiles(JUMP_HEIGHT_TILES))
 
 
 ## Starting loadout. Paths rather than preloads so the two shipped weapons
@@ -220,7 +221,7 @@ func _enter(new_state: PlayerStateMachine.State) -> void:
 
 func _apply(delta: float) -> void:
 	if not is_on_floor():
-		velocity.y += GameConfig.tiles(GRAVITY_TILES) * delta
+		velocity.y += GameConfig.tiles(GameConfig.GRAVITY_TILES) * delta
 
 	var axis := InputRouter.move_axis()
 	if absf(axis) > PlayerStateMachine.MOVE_DEADZONE:
