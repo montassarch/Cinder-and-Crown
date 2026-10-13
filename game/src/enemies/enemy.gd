@@ -13,7 +13,18 @@ extends CharacterBody2D
 signal attack_released(damage: int)
 signal died
 
+## How much further the strike reaches than the range that triggered it.
+## A little slack, so stepping back on the last frame is not a guaranteed
+## dodge -- that is what the roll is for.
+const ATTACK_REACH_SLACK: float = 1.3
+
+## Knockback taken when hit, in tiles/second.
+const HIT_KNOCKBACK_TILES: float = 3.0
+
 var data: EnemyData
+
+## What this enemy pursues. Set by whoever spawns it; null means idle.
+var target: Node2D = null
 
 var _telegraphing: bool = false
 var _telegraph_elapsed: float = 0.0
@@ -29,8 +40,22 @@ func configure(new_data: EnemyData) -> void:
 
 func _ready() -> void:
 	health.died.connect(_on_died)
+	attack_released.connect(_on_attack_released)
 	if data != null:
 		configure(data)
+
+
+## Takes a hit from the player's weapon. Mirrors Player.take_hit so both
+## sides of combat go through one named entry point rather than reaching
+## into each other's Health.
+func take_hit(amount: int, from_position: Vector2) -> int:
+	if not health.is_alive():
+		return 0
+	var absorbed := health.take_damage(amount)
+	if absorbed > 0:
+		var away := signf(global_position.x - from_position.x)
+		velocity.x = (away if away != 0.0 else 1.0) * GameConfig.tiles(HIT_KNOCKBACK_TILES)
+	return absorbed
 
 
 func is_telegraphing() -> bool:
@@ -70,13 +95,74 @@ func advance(delta: float) -> void:
 		attack_released.emit(data.attack_damage)
 
 
+## Chooses this frame's velocity and whether to start winding up.
+##
+## Separated from _physics_process, like advance(), so the movement rules
+## are testable without a running scene.
+func decide(delta: float) -> void:
+	if data == null or not health.is_alive():
+		velocity = Vector2.ZERO
+		return
+
+	var flying := data.behaviour == EnemyData.Behaviour.FLYER
+
+	if _telegraphing:
+		# Holding still is most of what makes a wind-up readable. An enemy
+		# that keeps closing while telegraphing cannot be reacted to.
+		velocity.x = 0.0
+		if flying:
+			velocity.y = 0.0
+		else:
+			velocity.y += GameConfig.tiles(GameConfig.GRAVITY_TILES) * delta
+		return
+
+	if target == null:
+		velocity.x = 0.0
+		if flying:
+			velocity.y = 0.0
+		else:
+			velocity.y += GameConfig.tiles(GameConfig.GRAVITY_TILES) * delta
+		return
+
+	var to_target := target.global_position - global_position
+	var distance_tiles := to_target.length() / float(GameConfig.TILE_SIZE)
+	var speed := GameConfig.tiles(data.move_speed_tiles)
+
+	if distance_tiles <= data.attack_range_tiles:
+		begin_telegraph()
+		velocity.x = 0.0
+		if flying:
+			velocity.y = 0.0
+	elif flying:
+		# Moves on both axes by choice and never accumulates gravity, so a
+		# bat hovers rather than sinking between decisions.
+		velocity = to_target.normalized() * speed
+	else:
+		velocity.x = signf(to_target.x) * speed
+
+	if not flying:
+		velocity.y += GameConfig.tiles(GameConfig.GRAVITY_TILES) * delta
+
+
 func _physics_process(delta: float) -> void:
 	advance(delta)
-	if data == null or not health.is_alive():
-		return
-	if data.behaviour != EnemyData.Behaviour.FLYER:
-		velocity.y += GameConfig.tiles(GameConfig.GRAVITY_TILES) * delta
+	decide(delta)
 	move_and_slide()
+
+
+## Lands the strike if the target is still close enough. The enemy commits
+## to the wind-up before knowing whether it will connect, which is what
+## gives the player something to dodge.
+func _on_attack_released(damage: int) -> void:
+	if target == null or data == null:
+		return
+	var distance_tiles := global_position.distance_to(
+		target.global_position
+	) / float(GameConfig.TILE_SIZE)
+	if distance_tiles > data.attack_range_tiles * ATTACK_REACH_SLACK:
+		return
+	if target.has_method(&"take_hit"):
+		target.take_hit(damage, global_position)
 
 
 func _on_died() -> void:

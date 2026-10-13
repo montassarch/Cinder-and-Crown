@@ -1,0 +1,38 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/ui/hud.gd" id="1_hud"]
+
+[node name="HUD" type="CanvasLayer"]
+layer = 5
+script = ExtResource("1_hud")
+
+[node name="Root" type="VBoxContainer" parent="."]
+anchors_preset = 0
+offset_left = 6.0
+offset_top = 4.0
+offset_right = 160.0
+offset_bottom = 44.0
+theme_override_constants/separation = 1
+
+[node name="HealthBar" type="ProgressBar" parent="Root"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(96, 6)
+layout_mode = 2
+max_value = 100.0
+value = 100.0
+show_percentage = false
+
+[node name="HealthLabel" type="Label" parent="Root"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "100 / 100"
+
+[node name="SlotsLabel" type="Label" parent="Root"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "slots"
+
+[node name="EnemiesLabel" type="Label" parent="Root"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "enemies: 0"

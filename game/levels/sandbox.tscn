@@ -1,0 +1,117 @@
+[gd_scene load_steps=12 format=3]
+
+[ext_resource type="Script" path="res://src/level/sandbox.gd" id="1_sandbox"]
+[ext_resource type="PackedScene" path="res://src/player/player.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://src/ui/hud.tscn" id="3_hud"]
+[ext_resource type="PackedScene" path="res://src/ui/sandbox_menu.tscn" id="4_menu"]
+[ext_resource type="PackedScene" path="res://src/input/touch_controls.tscn" id="5_touch"]
+[ext_resource type="Script" path="res://src/ui/debug_overlay.gd" id="6_debug"]
+
+[sub_resource type="RectangleShape2D" id="Shape_floor"]
+size = Vector2(768, 32)
+
+[sub_resource type="RectangleShape2D" id="Shape_wall"]
+size = Vector2(16, 216)
+
+[sub_resource type="RectangleShape2D" id="Shape_plat_a"]
+size = Vector2(96, 8)
+
+[sub_resource type="RectangleShape2D" id="Shape_plat_b"]
+size = Vector2(80, 8)
+
+[sub_resource type="RectangleShape2D" id="Shape_plat_c"]
+size = Vector2(112, 8)
+
+[node name="Sandbox" type="Node2D"]
+script = ExtResource("1_sandbox")
+
+[node name="World" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 0
+
+[node name="Floor" type="CollisionShape2D" parent="World"]
+position = Vector2(384, 192)
+shape = SubResource("Shape_floor")
+
+[node name="WallLeft" type="CollisionShape2D" parent="World"]
+position = Vector2(-8, 108)
+shape = SubResource("Shape_wall")
+
+[node name="WallRight" type="CollisionShape2D" parent="World"]
+position = Vector2(776, 108)
+shape = SubResource("Shape_wall")
+
+[node name="PlatformA" type="CollisionShape2D" parent="World"]
+position = Vector2(260, 136)
+shape = SubResource("Shape_plat_a")
+
+[node name="PlatformB" type="CollisionShape2D" parent="World"]
+position = Vector2(430, 96)
+shape = SubResource("Shape_plat_b")
+
+[node name="PlatformC" type="CollisionShape2D" parent="World"]
+position = Vector2(610, 140)
+shape = SubResource("Shape_plat_c")
+
+[node name="Visuals" type="Node2D" parent="."]
+
+[node name="FloorRect" type="ColorRect" parent="Visuals"]
+offset_left = 0.0
+offset_top = 176.0
+offset_right = 768.0
+offset_bottom = 208.0
+color = Color(0.18, 0.16, 0.2, 1)
+
+[node name="PlatARect" type="ColorRect" parent="Visuals"]
+offset_left = 212.0
+offset_top = 132.0
+offset_right = 308.0
+offset_bottom = 140.0
+color = Color(0.26, 0.22, 0.28, 1)
+
+[node name="PlatBRect" type="ColorRect" parent="Visuals"]
+offset_left = 390.0
+offset_top = 92.0
+offset_right = 470.0
+offset_bottom = 100.0
+color = Color(0.26, 0.22, 0.28, 1)
+
+[node name="PlatCRect" type="ColorRect" parent="Visuals"]
+offset_left = 554.0
+offset_top = 136.0
+offset_right = 666.0
+offset_bottom = 144.0
+color = Color(0.26, 0.22, 0.28, 1)
+
+[node name="PlayerSpawn" type="Marker2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(80, 150)
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+unique_name_in_owner = true
+position = Vector2(80, 150)
+
+[node name="Camera2D" type="Camera2D" parent="Player"]
+limit_left = 0
+limit_top = 0
+limit_right = 768
+limit_bottom = 216
+position_smoothing_enabled = true
+position_smoothing_speed = 8.0
+
+[node name="Enemies" type="Node2D" parent="."]
+unique_name_in_owner = true
+
+[node name="DebugOverlay" type="Node2D" parent="."]
+unique_name_in_owner = true
+visible = false
+z_index = 100
+script = ExtResource("6_debug")
+
+[node name="HUD" parent="." instance=ExtResource("3_hud")]
+unique_name_in_owner = true
+
+[node name="SandboxMenu" parent="." instance=ExtResource("4_menu")]
+unique_name_in_owner = true
+
+[node name="TouchControls" parent="." instance=ExtResource("5_touch")]

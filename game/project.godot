@@ -8,6 +8,7 @@ config_version=5
 config/name="Cinder & Crown"
 config/description="A Dead Cells-style 2D action roguelite."
 config/features=PackedStringArray("4.7", "GL Compatibility")
+run/main_scene="res://levels/sandbox.tscn"
 
 [autoload]
 

@@ -105,6 +105,8 @@ func _ready() -> void:
 	health.died.connect(func() -> void: died.emit())
 	_size_placeholder_body()
 
+	weapon.hit_landed.connect(_on_weapon_hit)
+
 	for slot: int in range(mini(STARTING_WEAPONS.size(), WEAPON_SLOTS)):
 		var data: WeaponData = load(STARTING_WEAPONS[slot])
 		if data != null:
@@ -176,6 +178,18 @@ func _physics_process(delta: float) -> void:
 	_apply(delta)
 	move_and_slide()
 	_hurt_pending = false
+
+
+## Applies a landed swing's damage.
+##
+## Routed through Damage.compute even though the multiplier is 1.0 and
+## defense 0 today, so that when classes add a damage multiplier or enemies
+## gain armour there is one place it flows through rather than a raw
+## subtraction here.
+func _on_weapon_hit(target: Node, damage: int) -> void:
+	if not target.has_method(&"take_hit"):
+		return
+	target.take_hit(Damage.compute(damage, 1.0, 0), global_position)
 
 
 func _duration_of(of_state: PlayerStateMachine.State) -> float:
