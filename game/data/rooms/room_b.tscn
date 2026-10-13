@@ -1,30 +1,26 @@
 [gd_scene load_steps=2 format=3]
 
-[sub_resource type="RectangleShape2D" id="Shape_floor"]
-size = Vector2(448, 32)
+[ext_resource type="Script" path="res://src/level/room.gd" id="1_room"]
 
+; Geometry is built at runtime from width_tiles by room.gd. Nothing here is
+; authored in pixels, so a TILE_SIZE change scales the room with the player.
 [node name="Room" type="Node2D"]
+script = ExtResource("1_room")
+width_tiles = 28.0
 
 [node name="Solid" type="StaticBody2D" parent="."]
+unique_name_in_owner = true
 collision_layer = 1
 collision_mask = 0
 
-[node name="Floor" type="CollisionShape2D" parent="Solid"]
-position = Vector2(224, 192)
-shape = SubResource("Shape_floor")
-
-[node name="FloorRect" type="ColorRect" parent="."]
-offset_left = 0.0
-offset_top = 176.0
-offset_right = 448.0
-offset_bottom = 208.0
-color = Color(0.17, 0.17, 0.22, 1)
+[node name="Visuals" type="Node2D" parent="."]
+unique_name_in_owner = true
 
 [node name="EnemySpawns" type="Node2D" parent="."]
 
 [node name="EnemyA" type="Marker2D" parent="EnemySpawns"]
-position = Vector2(140, 150)
 
 [node name="EnemyB" type="Marker2D" parent="EnemySpawns"]
-position = Vector2(340, 150)
+
+[node name="EnemyC" type="Marker2D" parent="EnemySpawns"]
 

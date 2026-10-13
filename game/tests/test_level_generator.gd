@@ -216,3 +216,63 @@ func test_offsets_are_measured_in_tiles_not_pixels() -> void:
 	var level: Array[RoomData] = [_room(RoomData.Kind.SPAWN)]
 	level[0].size_tiles = Vector2i(10, 14)
 	assert_float(RunLevelScript.total_width(level)).is_equal(10.0 * GameConfig.TILE_SIZE)
+
+
+# --- regressions from the final review ---
+
+func test_generator_pool_is_discovered_by_scanning_not_a_fixed_list() -> void:
+	# Final review I9. RunLevel held hardcoded ROOM_PATHS and ENEMY_PATHS,
+	# so a new room .tres could never reach the generator and a new enemy
+	# appeared in the sandbox but never in a generated level -- the same
+	# file behaving differently in two places. Both now scan data/.
+	var scanned: Array[RoomData] = Content.rooms()
+	assert_int(scanned.size()).is_greater_equal(4)
+	assert_int(scanned.size()).is_equal(
+		Content.list_resources(Content.ROOM_DIR).size()
+	)
+	for room: RoomData in scanned:
+		assert_object(room.scene).is_not_null()
+
+
+func test_scanned_rooms_still_generate_a_valid_level() -> void:
+	var level := LG.generate(Content.rooms(), 5, 2026)
+	assert_int(level.size()).is_equal(5)
+	assert_int(level[0].kind).is_equal(RoomData.Kind.SPAWN)
+	assert_int(level[4].kind).is_equal(RoomData.Kind.EXIT)
+
+
+func test_enemy_types_for_generated_levels_come_from_scanning() -> void:
+	var scanned: Array[EnemyData] = Content.enemies()
+	assert_int(scanned.size()).is_greater_equal(3)
+	assert_int(scanned.size()).is_equal(
+		Content.list_resources(Content.ENEMY_DIR).size()
+	)
+
+
+func test_exit_room_carries_an_exit_point_marker() -> void:
+	# Final review I15. ExitPoint was authored and nothing read it, so
+	# reaching the Iron Gate did nothing at all. RunLevel now reads it, so
+	# the marker has to actually be there.
+	var exit_rooms: Array[RoomData] = []
+	for room: RoomData in Content.rooms():
+		if room.kind == RoomData.Kind.EXIT:
+			exit_rooms.append(room)
+	assert_int(exit_rooms.size()).is_greater_equal(1)
+
+	for room: RoomData in exit_rooms:
+		var instance: Node = auto_free(room.scene.instantiate())
+		add_child(instance)
+		assert_object(instance.get_node_or_null("ExitPoint")).override_failure_message(
+			"%s is an EXIT room with no ExitPoint marker" % room.display_name
+		).is_not_null()
+
+
+func test_spawn_room_carries_a_spawn_point_marker() -> void:
+	for room: RoomData in Content.rooms():
+		if room.kind != RoomData.Kind.SPAWN:
+			continue
+		var instance: Node = auto_free(room.scene.instantiate())
+		add_child(instance)
+		assert_object(instance.get_node_or_null("SpawnPoint")).override_failure_message(
+			"%s is a SPAWN room with no SpawnPoint marker" % room.display_name
+		).is_not_null()

@@ -74,8 +74,14 @@ func test_speeds_are_expressed_in_tiles_not_pixels() -> void:
 	# The project's hard rule: gameplay constants are tile-space. A run
 	# speed of 9 tiles/s is 144 px/s at TILE_SIZE 16 -- and becomes
 	# something else, correctly, if TILE_SIZE changes.
-	assert_float(GameConfig.tiles(Player.RUN_SPEED_TILES)).is_equal(144.0)
-	assert_float(GameConfig.tiles(Player.ROLL_SPEED_TILES)).is_equal(224.0)
+	# Derived, not literal: hardcoding 144.0 would make this test fail on
+	# the very change it exists to protect.
+	assert_float(GameConfig.tiles(Player.RUN_SPEED_TILES)).is_equal(
+		Player.RUN_SPEED_TILES * GameConfig.TILE_SIZE
+	)
+	assert_float(GameConfig.tiles(Player.ROLL_SPEED_TILES)).is_equal(
+		Player.ROLL_SPEED_TILES * GameConfig.TILE_SIZE
+	)
 
 
 # --- weapon slots ---
@@ -197,3 +203,67 @@ func test_roll_covers_a_learnable_fixed_distance() -> void:
 	var distance_tiles := Player.ROLL_SPEED_TILES * Player.ROLL_DURATION
 	assert_float(distance_tiles).is_greater(3.0)
 	assert_float(distance_tiles).is_less(6.0)
+
+
+# --- regressions from the final review ---
+
+func test_attack_duration_is_snapshotted_when_the_swing_starts() -> void:
+	# Final review I3. _duration_of(ATTACK) read the CURRENTLY equipped
+	# weapon, so swapping mid-swing retroactively changed how long the
+	# swing you were already committed to lasts. Blade->Spear rooted the
+	# player for 0.42s with no hitbox; Spear->Blade ended ATTACK instantly,
+	# making swap a free cancel of the spear's recovery tail.
+	var player := _spawn_player()
+	var blade_duration: float = player.active_weapon_data().attack_duration
+	player._enter(SM.State.ATTACK)
+	player.swap_weapon()
+	assert_float(player._duration_of(SM.State.ATTACK)).is_equal(blade_duration)
+
+
+func test_swapping_mid_swing_ends_the_commitment_with_the_swing() -> void:
+	var player := _spawn_player()
+	player._enter(SM.State.ATTACK)
+	player.swap_weapon()
+	assert_float(player._state_time).is_greater_equal(
+		player._duration_of(SM.State.ATTACK)
+	)
+
+
+func test_leaving_attack_cancels_the_swing() -> void:
+	# Final review I4. Nothing cancelled the weapon when the player left
+	# ATTACK, so a staggered player's hit window still opened -- dealing
+	# full damage while being knocked backwards, with the live hitbox
+	# sweeping through space the swing never covered.
+	var player := _spawn_player()
+	player._enter(SM.State.ATTACK)
+	assert_bool(player.weapon.is_attacking()).is_true()
+	player._enter(SM.State.HURT)
+	assert_bool(player.weapon.is_attacking()).is_false()
+
+
+func test_rolling_out_of_an_attack_cancels_the_swing() -> void:
+	var player := _spawn_player()
+	player._enter(SM.State.ATTACK)
+	player._enter(SM.State.ROLL)
+	assert_bool(player.weapon.is_attacking()).is_false()
+
+
+func test_equipping_null_leaves_an_empty_slot_without_erroring() -> void:
+	# Final review I8. equip() dereferenced data.hitbox_size_tiles
+	# unguarded, so equip_slot(slot, null) crashed -- reachable from a
+	# one-entry STARTING_WEAPONS, which the data-driven rule permits, and
+	# from equip_slot's own documented "null means an empty slot".
+	var player := _spawn_player()
+	player.equip_slot(0, null)
+	assert_object(player.active_weapon_data()).is_null()
+	player.weapon.start_attack()
+	assert_bool(player.weapon.is_attacking()).is_false()
+	assert_bool(player.weapon.is_hitbox_active()).is_false()
+
+
+func test_swapping_to_an_empty_slot_does_not_error() -> void:
+	var player := _spawn_player()
+	player.slots[1] = null
+	player.swap_weapon()
+	assert_object(player.weapon.data).is_null()
+	assert_bool(player.weapon.is_hitbox_active()).is_false()

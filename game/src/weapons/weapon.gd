@@ -43,7 +43,9 @@ func _ready() -> void:
 func equip(new_data: WeaponData) -> void:
 	cancel_attack()
 	data = new_data
-	if _hitbox_shape != null:
+	# null is a legitimate empty slot, per Player.equip_slot. Dereferencing
+	# it here crashed the first swap whenever a slot was left unfilled.
+	if _hitbox_shape != null and data != null:
 		_shape_hitbox()
 
 
@@ -100,6 +102,18 @@ func advance(delta: float) -> void:
 ## range.
 func try_hit(target: Node) -> bool:
 	if not is_hitbox_active():
+		return false
+	# Never hit whoever is holding this weapon.
+	#
+	# The hitbox masks the hurtbox layer, and the wielder's own hurtbox sits
+	# right at the hitbox's inner edge -- so polling overlaps found the
+	# player themselves and routed their swing into their own health, 8 HP
+	# a swing with the blade and 15 with the spear, plus a stagger from
+	# their own weapon.
+	#
+	# Guarded here rather than in the polling loop so every caller is
+	# covered, and so this holds when enemies get weapons of their own.
+	if target == owner:
 		return false
 	if target in _hit_this_swing:
 		return false

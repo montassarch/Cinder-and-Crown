@@ -79,7 +79,19 @@ static func next_state(current: State, ctx: Dictionary) -> State:
 		return State.JUMP
 
 	if not on_floor:
-		return State.FALL if float(ctx[&"vertical_velocity"]) > 0.0 else State.JUMP
+		# JUMP means *actually rising*; everything else airborne is a fall.
+		#
+		# The polarity matters more than it looks. On the first frame after
+		# walking off a ledge, move_and_slide has already zeroed velocity.y
+		# against the floor that just vanished -- so airborne-with-zero is
+		# far more often "just stepped off" than "mid-jump". Defaulting that
+		# to JUMP fired the full jump impulse nobody asked for and pushed
+		# coyote_time past its own window, so the coyote forgiveness this
+		# file implements could never fire either.
+		#
+		# The cost is that a real jump's apex reads FALL for at most one
+		# frame, which is harmless: both states apply identical air control.
+		return State.JUMP if float(ctx[&"vertical_velocity"]) < 0.0 else State.FALL
 
 	if absf(float(ctx[&"move_axis"])) > MOVE_DEADZONE:
 		return State.RUN

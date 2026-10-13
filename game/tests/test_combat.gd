@@ -208,3 +208,67 @@ func test_dead_enemy_stops_moving() -> void:
 
 	enemy.decide(0.016)
 	assert_float(enemy.velocity.x).is_equal(0.0)
+
+
+# --- regressions from the final review ---
+
+func test_a_swing_cannot_damage_the_player_who_made_it() -> void:
+	# Final review C1. The weapon hitbox masks layer 2 and the player's own
+	# hurtbox IS on layer 2, overlapping the hitbox's inner edge. The poll
+	# resolved area.owner to the Player, who has take_hit, so every swing
+	# cost 8 HP with the blade or 15 with the spear and staggered the
+	# player with their own weapon. Seven spear swings killed you outright.
+	var player := _spawn_player()
+	player.weapon.start_attack()
+	player.weapon.advance(player.active_weapon_data().hit_window.x + 0.01)
+	assert_bool(player.weapon.is_hitbox_active()).is_true()
+	assert_bool(player.weapon.try_hit(player)).is_false()
+	assert_int(player.health.current).is_equal(Player.MAX_HEALTH)
+
+
+func test_swinging_through_physics_leaves_the_player_unharmed() -> void:
+	# The integration path, not just the guard: real overlap polling over
+	# real physics frames, which is how the bug actually reached the player.
+	var player := _spawn_player()
+	for _swing: int in range(4):
+		player.weapon.cancel_attack()
+		player.weapon.start_attack()
+		for _frame: int in range(12):
+			await get_tree().physics_frame
+	assert_int(player.health.current).is_equal(Player.MAX_HEALTH)
+
+
+func test_a_swing_still_damages_an_enemy_after_the_self_hit_guard() -> void:
+	# The guard must exclude only the wielder, not disable hitting things.
+	var player := _spawn_player()
+	var enemy := _spawn_enemy("res://data/enemies/shambler.tres")
+	var before := enemy.health.current
+	player.weapon.start_attack()
+	player.weapon.advance(player.active_weapon_data().hit_window.x + 0.01)
+	assert_bool(player.weapon.try_hit(enemy)).is_true()
+	assert_int(enemy.health.current).is_less(before)
+
+
+func test_knockback_is_read_from_the_weapon_data() -> void:
+	# Final review I6. knockback_tiles was authored per weapon and read
+	# nowhere -- Enemy.take_hit used a hardcoded constant, so both weapons
+	# knocked back identically. A designer tuning the field saw nothing.
+	var player := _spawn_player()
+	var blade: WeaponData = load("res://data/weapons/rusty_blade.tres")
+	var spear: WeaponData = load("res://data/weapons/ember_spear.tres")
+	assert_float(blade.knockback_tiles).is_not_equal(spear.knockback_tiles)
+
+	var velocities: Array[float] = []
+	for data: WeaponData in [blade, spear]:
+		var enemy := _spawn_enemy("res://data/enemies/crown_brute.tres")
+		enemy.global_position = player.global_position + Vector2(GameConfig.tiles(1.0), 0.0)
+		player.equip_slot(player.active_slot, data)
+		player.weapon.start_attack()
+		player.weapon.advance(data.hit_window.x + 0.01)
+		player.weapon.try_hit(enemy)
+		velocities.append(absf(enemy.velocity.x))
+
+	assert_float(velocities[0]).override_failure_message(
+		"both weapons knocked back the same amount"
+	).is_not_equal(velocities[1])
+	assert_float(velocities[1]).is_greater(velocities[0])

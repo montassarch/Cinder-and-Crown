@@ -170,3 +170,84 @@ func test_enemy_is_sized_in_tiles_from_data() -> void:
 	var expected := GameConfig.tiles_v(2.0, 3.0)
 	var shape := enemy.get_node("%EnemyShape") as CollisionShape2D
 	assert_vector((shape.shape as RectangleShape2D).size).is_equal(expected)
+
+
+# --- regressions from the final review ---
+
+func test_enemy_waits_out_recovery_before_winding_up_again() -> void:
+	# Final review I5. recovery_seconds was authored in all three enemies
+	# and read nowhere, so an enemy in contact re-telegraphed the frame
+	# after striking. A Crown Brute was an unbroken 22-damage-per-second
+	# machine with no punish window -- and the recovery pause is precisely
+	# the window the player is meant to counter into.
+	var data := _make_data(0.3)
+	data.recovery_seconds = 0.5
+	var enemy := _spawn(data)
+
+	enemy.begin_telegraph()
+	enemy.advance(0.31)
+	assert_bool(enemy.is_telegraphing()).is_false()
+
+	enemy.begin_telegraph()
+	assert_bool(enemy.is_telegraphing()).override_failure_message(
+		"enemy re-telegraphed inside its recovery window"
+	).is_false()
+
+	enemy.advance(0.51)
+	enemy.begin_telegraph()
+	assert_bool(enemy.is_telegraphing()).is_true()
+
+
+func test_recovery_is_reported_while_it_runs() -> void:
+	var data := _make_data(0.3)
+	data.recovery_seconds = 0.5
+	var enemy := _spawn(data)
+	enemy.begin_telegraph()
+	enemy.advance(0.31)
+	assert_bool(enemy.is_recovering()).is_true()
+	enemy.advance(0.51)
+	assert_bool(enemy.is_recovering()).is_false()
+
+
+func test_charger_commits_to_a_rush_when_it_strikes() -> void:
+	# Final review I7. CHARGER and CHASER took the identical code path, so
+	# the enum promised three strategies and delivered two. The old test
+	# asserted three distinct integers appeared in three data files, which
+	# still passed with no implementation at all.
+	var data := _make_data(0.3)
+	data.behaviour = EnemyData.Behaviour.CHARGER
+	data.move_speed_tiles = 2.0
+	var enemy := _spawn(data)
+	var target: Node2D = auto_free(Node2D.new())
+	add_child(target)
+	target.global_position = enemy.global_position + Vector2(GameConfig.tiles(8.0), 0.0)
+	enemy.target = target
+
+	enemy.begin_telegraph()
+	enemy.advance(0.31)
+	enemy.decide(0.016)
+
+	assert_bool(enemy.is_rushing()).is_true()
+	assert_float(absf(enemy.velocity.x)).override_failure_message(
+		"a charger's rush is no faster than its walk"
+	).is_greater(GameConfig.tiles(data.move_speed_tiles))
+
+
+func test_chaser_does_not_rush() -> void:
+	var data := _make_data(0.3)
+	data.behaviour = EnemyData.Behaviour.CHASER
+	var enemy := _spawn(data)
+	enemy.begin_telegraph()
+	enemy.advance(0.31)
+	assert_bool(enemy.is_rushing()).is_false()
+
+
+func test_rush_ends_after_its_duration() -> void:
+	var data := _make_data(0.3)
+	data.behaviour = EnemyData.Behaviour.CHARGER
+	var enemy := _spawn(data)
+	enemy.begin_telegraph()
+	enemy.advance(0.31)
+	assert_bool(enemy.is_rushing()).is_true()
+	enemy.advance(Enemy.RUSH_SECONDS + 0.01)
+	assert_bool(enemy.is_rushing()).is_false()

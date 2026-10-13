@@ -192,3 +192,38 @@ func test_already_hurt_is_not_restarted_by_the_same_hit() -> void:
 		&"state_finished": true,
 	}))
 	assert_int(next).is_equal(SM.State.IDLE)
+
+
+# --- regressions from the final review ---
+
+func test_stepping_off_a_ledge_falls_rather_than_jumping() -> void:
+	# Final review C2. On the first airborne frame after walking off a
+	# ledge, move_and_slide has zeroed velocity.y against the floor that
+	# just disappeared. Treating airborne-with-zero-velocity as JUMP fired
+	# the full jump impulse nobody asked for, and pushed coyote_time past
+	# its window so the coyote forgiveness could never fire either.
+	var next: int = SM.next_state(SM.State.RUN, _ctx({
+		&"on_floor": false,
+		&"vertical_velocity": 0.0,
+		&"coyote_time": 0.016,
+	}))
+	assert_int(next).is_equal(SM.State.FALL)
+
+
+func test_apex_of_a_jump_is_not_mistaken_for_a_launch() -> void:
+	var next: int = SM.next_state(SM.State.JUMP, _ctx({
+		&"on_floor": false,
+		&"vertical_velocity": 0.0,
+	}))
+	assert_int(next).is_equal(SM.State.FALL)
+
+
+func test_only_actual_upward_motion_reads_as_jump() -> void:
+	for velocity: float in [-300.0, -1.0]:
+		assert_int(SM.next_state(SM.State.JUMP, _ctx({
+			&"on_floor": false, &"vertical_velocity": velocity,
+		}))).is_equal(SM.State.JUMP)
+	for velocity: float in [0.0, 1.0, 300.0]:
+		assert_int(SM.next_state(SM.State.JUMP, _ctx({
+			&"on_floor": false, &"vertical_velocity": velocity,
+		}))).is_equal(SM.State.FALL)

@@ -67,8 +67,19 @@ var active_slot: int = 0
 
 var _state_time: float = 0.0
 var _coyote_time: float = 0.0
+
+## The attack duration captured when the current swing started.
+##
+## A commitment must not change length after you are inside it. Reading the
+## live weapon instead meant swapping mid-swing rewrote the lockout:
+## blade-to-spear rooted the player for 0.42s with no hitbox, and
+## spear-to-blade ended the state instantly, making swap a free cancel of
+## the spear's recovery tail -- deleting exactly the commitment this combat
+## model is built on.
+var _attack_duration: float = ATTACK_DURATION
 var _hurt_pending: bool = false
 var _hurt_source: Vector2 = Vector2.ZERO
+var _hurt_knockback: float = HURT_KNOCKBACK_TILES
 
 @onready var health: Health = %Health
 @onready var weapon: Weapon = %Weapon
@@ -125,6 +136,7 @@ func equip_slot(slot: int, data: WeaponData) -> void:
 	slots[slot] = data
 	if slot == active_slot:
 		weapon.equip(data)
+		_end_swing_commitment()
 	weapon_changed.emit(slot, data)
 
 
@@ -134,7 +146,18 @@ func equip_slot(slot: int, data: WeaponData) -> void:
 func swap_weapon() -> void:
 	active_slot = (active_slot + 1) % WEAPON_SLOTS
 	weapon.equip(slots[active_slot])
+	_end_swing_commitment()
 	weapon_changed.emit(active_slot, slots[active_slot])
+
+
+## Releases the player from a swing whose weapon just left their hand.
+##
+## Weapon.equip already withdrew the hitbox, so staying locked in ATTACK
+## would root the player with no attack happening -- up to 0.4s of being
+## punished for swapping.
+func _end_swing_commitment() -> void:
+	if state == PlayerStateMachine.State.ATTACK:
+		_state_time = _attack_duration
 
 
 func active_weapon_data() -> WeaponData:
@@ -143,13 +166,20 @@ func active_weapon_data() -> WeaponData:
 
 ## The only way damage reaches the player. Invincibility is filtered here,
 ## which is why PlayerStateMachine can treat ctx.hurt as unconditional.
-func take_hit(amount: int, from_position: Vector2) -> void:
+## Signature deliberately matches Enemy.take_hit, including the return, so
+## both sides of combat are interchangeable through the duck-typed
+## has_method(&"take_hit") call that routes damage.
+func take_hit(amount: int, from_position: Vector2, knockback_tiles: float = -1.0) -> int:
 	if is_invincible():
-		return
-	if health.take_damage(amount) <= 0:
-		return
+		return 0
+	var absorbed := health.take_damage(amount)
+	if absorbed <= 0:
+		return 0
 	_hurt_pending = true
 	_hurt_source = from_position
+	if knockback_tiles >= 0.0:
+		_hurt_knockback = knockback_tiles
+	return absorbed
 
 
 func _physics_process(delta: float) -> void:
@@ -189,7 +219,9 @@ func _physics_process(delta: float) -> void:
 func _on_weapon_hit(target: Node, damage: int) -> void:
 	if not target.has_method(&"take_hit"):
 		return
-	target.take_hit(Damage.compute(damage, 1.0, 0), global_position)
+	var data := active_weapon_data()
+	var knockback := data.knockback_tiles if data != null else -1.0
+	target.take_hit(Damage.compute(damage, 1.0, 0), global_position, knockback)
 
 
 func _duration_of(of_state: PlayerStateMachine.State) -> float:
@@ -197,8 +229,11 @@ func _duration_of(of_state: PlayerStateMachine.State) -> float:
 		PlayerStateMachine.State.ROLL:
 			return ROLL_DURATION
 		PlayerStateMachine.State.ATTACK:
-			# From the weapon, not a constant: the swing's length is what
-			# makes a spear feel slow and a blade feel quick.
+			# Mid-swing, the snapshot taken when it started. Outside a
+			# swing, the equipped weapon -- its length is what makes a
+			# spear feel slow and a blade feel quick.
+			if state == PlayerStateMachine.State.ATTACK:
+				return _attack_duration
 			var data := active_weapon_data()
 			return data.attack_duration if data != null else ATTACK_DURATION
 		PlayerStateMachine.State.HURT:
@@ -208,6 +243,12 @@ func _duration_of(of_state: PlayerStateMachine.State) -> float:
 
 
 func _enter(new_state: PlayerStateMachine.State) -> void:
+	# Leaving a swing cancels it. Without this a staggered player's hit
+	# window still opened: full damage dealt while being knocked backwards,
+	# with the live hitbox sweeping through space the swing never covered.
+	if state == PlayerStateMachine.State.ATTACK and new_state != PlayerStateMachine.State.ATTACK:
+		weapon.cancel_attack()
+
 	state = new_state
 	_state_time = 0.0
 
@@ -223,12 +264,17 @@ func _enter(new_state: PlayerStateMachine.State) -> void:
 			velocity.x = facing * GameConfig.tiles(ROLL_SPEED_TILES)
 		PlayerStateMachine.State.ATTACK:
 			InputRouter.consume_attack()
+			var attack_data := active_weapon_data()
+			_attack_duration = (
+				attack_data.attack_duration if attack_data != null else ATTACK_DURATION
+			)
 			weapon.face(facing)
 			weapon.start_attack()
 		PlayerStateMachine.State.HURT:
 			var away := 1.0 if global_position.x >= _hurt_source.x else -1.0
-			velocity.x = away * GameConfig.tiles(HURT_KNOCKBACK_TILES)
-			velocity.y = -GameConfig.tiles(HURT_KNOCKBACK_TILES) * 0.5
+			velocity.x = away * GameConfig.tiles(_hurt_knockback)
+			velocity.y = -GameConfig.tiles(_hurt_knockback) * 0.5
+			_hurt_knockback = HURT_KNOCKBACK_TILES
 
 	state_changed.emit(new_state)
 

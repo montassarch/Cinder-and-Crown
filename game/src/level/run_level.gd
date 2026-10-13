@@ -12,24 +12,21 @@ extends Node2D
 
 @export var room_count: int = 5
 
-const ROOM_PATHS: Array[String] = [
-	"res://data/rooms/room_spawn.tres",
-	"res://data/rooms/room_a.tres",
-	"res://data/rooms/room_b.tres",
-	"res://data/rooms/room_exit.tres",
-]
+# Rooms and enemy types are discovered by scanning data/, never listed
+# here. A fixed list meant a new room could not reach the generator at all
+# and a new enemy appeared in the sandbox but never in a generated level --
+# the same file behaving differently in two places.
 
-## Enemy types the generator may place. Data, not code: adding a type here
-## is one line, and removing the list entirely in favour of scanning the
-## folder is the Phase 2 version.
-const ENEMY_PATHS: Array[String] = [
-	"res://data/enemies/shambler.tres",
-	"res://data/enemies/cinder_bat.tres",
-	"res://data/enemies/crown_brute.tres",
-]
+## Emitted when the player reaches the exit, and when they die, carrying
+## the seed so a layout worth revisiting can be rebuilt.
+signal run_completed(seed_value: int)
+signal run_died(seed_value: int)
 
 var used_seed: int = 0
 var rooms: Array[RoomData] = []
+
+## World x of the exit marker. 0 means "not placed yet or already taken".
+var _exit_x: float = 0.0
 
 @onready var player: Player = %Player
 @onready var _rooms_parent: Node2D = %Rooms
@@ -60,13 +57,7 @@ static func total_width(level: Array[RoomData]) -> float:
 func _ready() -> void:
 	used_seed = level_seed if level_seed != 0 else randi()
 
-	var pool: Array[RoomData] = []
-	for path: String in ROOM_PATHS:
-		var data: RoomData = load(path)
-		if data != null:
-			pool.append(data)
-
-	rooms = LevelGenerator.generate(pool, room_count, used_seed)
+	rooms = LevelGenerator.generate(Content.rooms(), room_count, used_seed)
 	if rooms.is_empty():
 		push_warning("Room pool cannot build a level; nothing placed.")
 		return
@@ -76,6 +67,7 @@ func _ready() -> void:
 	# Same contract the sandbox honours: the parent wires the HUD, because a
 	# child's _ready runs first and cannot reach up for `player` safely.
 	(%HUD as CanvasLayer).bind(self)
+	player.died.connect(_on_player_died)
 	print("Cinder & Crown — level seed %d, %d rooms" % [used_seed, rooms.size()])
 
 
@@ -93,6 +85,32 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_tree().change_scene_to_file("res://levels/sandbox.tscn")
 
 
+func _physics_process(_delta: float) -> void:
+	# Reaching the exit is what makes this a level rather than a corridor.
+	# The ExitPoint marker existed and nothing read it, so a player who
+	# fought through five rooms arrived at the Iron Gate and stood there.
+	if _exit_x > 0.0 and player.global_position.x >= _exit_x:
+		_exit_x = 0.0
+		run_completed.emit(used_seed)
+		restart(0)
+
+
+## Rebuilds the level. A seed of 0 picks a new one.
+##
+## Used both by the exit and by death, so neither leaves the player stuck:
+## without this, dying in a generated level dropped them to 0 HP and then
+## handed control back permanently immortal, since Health refuses damage
+## to something already dead.
+func restart(new_seed: int) -> void:
+	level_seed = new_seed
+	get_tree().reload_current_scene()
+
+
+func _on_player_died() -> void:
+	run_died.emit(used_seed)
+	restart(used_seed)
+
+
 func _place_rooms() -> void:
 	var offsets := room_offsets(rooms)
 	for i: int in range(rooms.size()):
@@ -104,6 +122,10 @@ func _place_rooms() -> void:
 			var spawn := instance.get_node_or_null("SpawnPoint") as Marker2D
 			if spawn != null:
 				player.global_position = spawn.global_position
+		elif rooms[i].kind == RoomData.Kind.EXIT:
+			var exit_marker := instance.get_node_or_null("ExitPoint") as Marker2D
+			if exit_marker != null:
+				_exit_x = exit_marker.global_position.x
 
 	var camera := player.get_node_or_null("Camera2D") as Camera2D
 	if camera != null:
@@ -116,11 +138,7 @@ func _populate_enemies() -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = used_seed
 
-	var types: Array[EnemyData] = []
-	for path: String in ENEMY_PATHS:
-		var data: EnemyData = load(path)
-		if data != null:
-			types.append(data)
+	var types := Content.enemies()
 	if types.is_empty():
 		return
 

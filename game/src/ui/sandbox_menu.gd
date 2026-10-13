@@ -7,8 +7,10 @@ extends CanvasLayer
 ## .tres into either folder and it appears here with no rebuild. If this
 ## menu ever needs editing to show a new weapon, the system has regressed.
 
-const ENEMY_DIR := "res://data/enemies"
-const WEAPON_DIR := "res://data/weapons"
+# Directories come from Content, the one place that knows where content
+# lives, so this menu and the level generator can never disagree.
+const ENEMY_DIR := Content.ENEMY_DIR
+const WEAPON_DIR := Content.WEAPON_DIR
 
 var _sandbox: Node2D = null
 
@@ -30,19 +32,9 @@ func bind(sandbox: Node2D) -> void:
 	%RunButton.pressed.connect(_on_run_pressed)
 
 
-## Lists resource files in a directory, tolerating the renaming that export
-## does: .tres can become .res, and either can gain a .remap suffix.
+## Delegates to Content so there is exactly one scanner in the project.
 static func list_resources(dir_path: String) -> Array[String]:
-	var found: Array[String] = []
-	var dir := DirAccess.open(dir_path)
-	if dir == null:
-		return found
-	for file_name: String in dir.get_files():
-		var clean := file_name.trim_suffix(".remap")
-		if clean.get_extension() in ["tres", "res"]:
-			found.append(dir_path.path_join(clean))
-	found.sort()
-	return found
+	return Content.list_resources(dir_path)
 
 
 func _build_enemy_buttons() -> void:
