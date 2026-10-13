@@ -27,6 +27,7 @@ func bind(sandbox: Node2D) -> void:
 	%ResetButton.pressed.connect(_sandbox.reset_player)
 	%DebugToggle.toggled.connect(_on_debug_toggled)
 	%CollapseButton.pressed.connect(_on_collapse)
+	%RunButton.pressed.connect(_on_run_pressed)
 
 
 ## Lists resource files in a directory, tolerating the renaming that export
@@ -88,3 +89,7 @@ func _on_collapse() -> void:
 	var panel := %Panel as Control
 	panel.visible = not panel.visible
 	(%CollapseButton as Button).text = "menu" if not panel.visible else "hide"
+
+
+func _on_run_pressed() -> void:
+	get_tree().change_scene_to_file("res://levels/run_level.tscn")
