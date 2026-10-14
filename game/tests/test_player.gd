@@ -182,3 +182,16 @@ func test_hero_sprite_runs_when_the_player_runs_and_faces_the_way_it_moves() -> 
 	InputRouter.set_virtual_axis(0.0)
 	assert_str(visual.animation).is_equal("run")
 	assert_bool(visual.flip_h).is_true()
+
+func test_hero_sprite_swings_when_attacking_and_rolls_when_rolling() -> void:
+	await _land()
+	var visual: PlayerVisual = _player.get_node("Visual")
+	InputRouter.set_virtual_button(&"attack", true)
+	await _frames(3)
+	InputRouter.set_virtual_button(&"attack", false)
+	assert_str(visual.animation).is_equal("attack")
+	await _frames(40)
+	InputRouter.set_virtual_button(&"roll", true)
+	await _frames(3)
+	InputRouter.set_virtual_button(&"roll", false)
+	assert_str(visual.animation).is_equal("roll")
