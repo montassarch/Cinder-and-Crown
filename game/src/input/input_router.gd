@@ -3,7 +3,7 @@ extends Node
 ## InputMap; touch arrives through the set_virtual_* calls. Gameplay never reads Input.*.
 
 const BUFFER_SECONDS: float = 0.12
-const BUFFERED_ACTIONS: Array[StringName] = [&"jump", &"attack", &"roll"]
+const BUFFERED_ACTIONS: Array[StringName] = [&"jump", &"attack", &"roll", &"skill1", &"skill2"]
 
 var _virtual_axis: float = 0.0
 var _virtual_held: Dictionary = {}
@@ -53,6 +53,15 @@ func consume_roll() -> void:
 
 ## True once per press. The physical half is an edge; the touch half is a flag that
 ## is consumed by this read, so a tap swaps once however often it is polled.
+## Ability buttons: slot 1 = Storm Blade, slot 2 = Crimson Rend.
+func skill_buffered(slot: int) -> bool:
+	return _is_buffered(StringName("skill%d" % slot))
+
+
+func consume_skill(slot: int) -> void:
+	_stamps.erase(StringName("skill%d" % slot))
+
+
 func swap_weapon_pressed() -> bool:
 	var virtual_tap := _virtual_swap
 	_virtual_swap = false

@@ -203,3 +203,33 @@ func test_flyer_holds_still_while_recovering() -> void:
 	await _frames(10)
 	assert_vector(enemy.velocity).is_equal(Vector2.ZERO)
 	assert_vector(enemy.global_position).is_equal_approx(held_at, Vector2(0.01, 0.01))
+
+func test_stun_cancels_a_telegraphed_attack() -> void:
+	var data := _fast_data()
+	data.telegraph_seconds = 0.1
+	data.recovery_seconds = 5.0
+	var enemy := _spawn(data)
+	var released := []
+	enemy.attack_released.connect(func(damage: int) -> void: released.append(damage))
+	enemy.begin_telegraph()
+	enemy.stun(0.5)
+	assert_bool(enemy.is_stunned()).is_true()
+	assert_bool(enemy.is_telegraphing()).is_false()
+	await await_millis(250)
+	assert_array(released).is_empty()
+
+func test_a_stunned_enemy_recovers_and_can_fight_again() -> void:
+	var enemy := _spawn(_fast_data())
+	enemy.stun(0.1)
+	enemy.begin_telegraph()
+	assert_bool(enemy.is_telegraphing()).is_false()
+	await await_millis(250)
+	assert_bool(enemy.is_stunned()).is_false()
+	enemy.begin_telegraph()
+	assert_bool(enemy.is_telegraphing()).is_true()
+
+func test_a_dead_enemy_cannot_be_stunned() -> void:
+	var enemy := _spawn(_fast_data())
+	enemy.take_hit(999, enemy.global_position.x - 10.0)
+	enemy.stun(1.0)
+	assert_bool(enemy.is_stunned()).is_false()

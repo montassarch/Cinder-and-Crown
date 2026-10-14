@@ -3,6 +3,10 @@ extends CharacterBody2D
 ## Physics layers: 1 world, 2 player body, 3 enemy body, 4 player hurtbox, 5 enemy hurtbox.
 
 signal died
+## An ability button was pressed without enough mana (the HUD flashes the mana bar).
+signal mana_denied
+## Storm Blade's bolt has struck the sword (for the lightning effect).
+signal storm_struck
 
 const State := PlayerStateMachine.PlayerState
 
@@ -31,6 +35,24 @@ const COMBO_STEPS: int = 3
 ## The last hit of the combo is a heavier, slower swing.
 const FINISHER_DURATION_SCALE: float = 1.8
 
+# Mana and abilities (all times in seconds).
+const MANA_MAX: float = 100.0
+const MANA_REGEN: float = 2.0
+const MANA_PER_HIT: float = 6.0
+## Storm Blade: raise the sword, a bolt charges it; charged hits deal more and may stun.
+const STORM_COST: float = 40.0
+const STORM_CAST_SECONDS: float = 0.6
+const STORM_STRIKE_AT: float = 0.4
+const STORM_SECONDS: float = 8.0
+const STORM_FADE_SECONDS: float = 2.0
+const STORM_BONUS_DAMAGE: int = 3
+const STORM_STUN_CHANCE: float = 0.3
+const STORM_STUN_SECONDS: float = 1.2
+## Crimson Rend: a vertical slash that launches a travelling wave of red lightning.
+const REND_COST: float = 30.0
+const REND_CAST_SECONDS: float = 0.45
+const REND_RELEASE_SECONDS: float = 0.16
+
 ## Slot 0 and 1 loadout. Set in the scene; the sandbox menu can reassign at runtime.
 @export var starting_weapons: Array[WeaponData] = []
 
@@ -48,6 +70,9 @@ var _last_attack_end: float = -1000.0
 ## A tap during a swing, kept until the swing ends (input buffering alone would expire it).
 var _attack_queued: bool = false
 var _attack_scale: float = 1.0
+var _mana: Mana
+var _storm_left: float = 0.0
+var _cast_fired: bool = false
 
 @onready var _weapon: Weapon = $Weapon
 @onready var _health: Health = $Health
@@ -68,6 +93,13 @@ func _ready() -> void:
 	for slot in mini(WEAPON_SLOTS, starting_weapons.size()):
 		_weapons[slot] = starting_weapons[slot]
 	_weapon.equip(_weapons[_active_slot])
+	_mana = Mana.new()
+	_mana.name = "Mana"
+	_mana.max_mana = MANA_MAX
+	_mana.regen_per_second = MANA_REGEN
+	add_child(_mana)
+	_mana.refill()
+	_weapon.hit_landed.connect(func(_target: Node, _damage: int) -> void: _mana.gain(MANA_PER_HIT))
 
 
 func _physics_process(delta: float) -> void:
@@ -82,6 +114,9 @@ func _physics_process(delta: float) -> void:
 		InputRouter.consume_attack()
 	if InputRouter.swap_weapon_pressed():
 		swap_weapons()
+	_mana.advance(delta)
+	_tick_storm(delta)
+	_refuse_unaffordable_skills()
 	_coyote = COYOTE_TIME if is_on_floor() else maxf(0.0, _coyote - delta)
 
 	var hurt_now := _hurt_pending
@@ -90,6 +125,7 @@ func _physics_process(delta: float) -> void:
 	if next != _state or (next == State.HURT and hurt_now):
 		_enter_state(next)
 
+	_fire_cast_moment()
 	_apply_velocity(delta)
 	move_and_slide()
 	_update_visual()
@@ -99,11 +135,23 @@ func _update_visual() -> void:
 	var action := ROLL_DURATION
 	if _state == State.ATTACK and _weapon.data != null:
 		action = _weapon.data.attack_duration * _attack_scale
+	elif _state == State.STORM:
+		action = STORM_CAST_SECONDS
+	elif _state == State.REND:
+		action = REND_CAST_SECONDS
 	_visual.show_state(_state, _facing, GameConfig.tiles(BODY_SIZE_TILES.y) / 2.0, action, _combo_step, not _health.is_alive())
 
 
 func state() -> State:
 	return _state
+
+
+func mana() -> Mana:
+	return _mana
+
+
+func storm_seconds_left() -> float:
+	return _storm_left
 
 
 ## Back to a fresh life at `at`: full health, standing, nothing held over.
@@ -116,6 +164,9 @@ func reset(at: Vector2) -> void:
 	_coyote = 0.0
 	_hurt_pending = false
 	_health.setup(_health.max_health)
+	_mana.refill()
+	_storm_left = 0.0
+	_apply_storm_to_weapon()
 
 
 func set_weapon(slot: int, data: WeaponData) -> void:
@@ -175,6 +226,11 @@ func _build_context(hurt_now: bool) -> Dictionary:
 		"jump_buffered": InputRouter.jump_buffered(),
 		"attack_buffered": InputRouter.attack_buffered() or _attack_queued,
 		"attack_cancelable": _weapon.is_recovering(),
+		"skill1_buffered": InputRouter.skill_buffered(1),
+		"skill2_buffered": InputRouter.skill_buffered(2),
+		"storm_ready": _mana.can_afford(STORM_COST),
+		"rend_ready": _mana.can_afford(REND_COST),
+		"cast_duration": STORM_CAST_SECONDS if _state == State.STORM else REND_CAST_SECONDS,
 		"roll_buffered": InputRouter.roll_buffered(),
 		"state_time": _state_time,
 		"coyote_time": _coyote,
@@ -207,6 +263,14 @@ func _enter_state(next: State) -> void:
 			_weapon.set_facing(_facing)
 			_attack_scale = FINISHER_DURATION_SCALE if _combo_step == COMBO_STEPS - 1 else 1.0
 			_weapon.start_attack(_attack_scale)
+		State.STORM:
+			InputRouter.consume_skill(1)
+			_mana.spend(STORM_COST)
+			_cast_fired = false
+		State.REND:
+			InputRouter.consume_skill(2)
+			_mana.spend(REND_COST)
+			_cast_fired = false
 		State.HURT:
 			velocity.x = _hit_direction * GameConfig.tiles(HURT_KNOCKBACK_SPEED)
 
@@ -221,6 +285,8 @@ func _apply_velocity(delta: float) -> void:
 			velocity.x = _facing * GameConfig.tiles(ROLL_SPEED)
 		State.HURT:
 			velocity.x = move_toward(velocity.x, 0.0, GameConfig.tiles(HURT_KNOCKBACK_DECAY) * delta)
+		State.STORM, State.REND:
+			velocity.x = 0.0
 		State.ATTACK:
 			velocity.x = axis * GameConfig.tiles(RUN_SPEED) * ATTACK_MOVE_FACTOR
 		_:
@@ -229,3 +295,43 @@ func _apply_velocity(delta: float) -> void:
 	velocity.y += GameConfig.tiles(GRAVITY) * delta
 	if _state == State.JUMP and velocity.y < 0.0 and not InputRouter.jump_held():
 		velocity.y *= JUMP_RELEASE_FACTOR
+
+
+## Count down the Storm Blade charge and keep the sword's modifiers in step with it.
+func _tick_storm(delta: float) -> void:
+	if _storm_left > 0.0:
+		_storm_left = maxf(0.0, _storm_left - delta)
+		_apply_storm_to_weapon()
+
+
+func _apply_storm_to_weapon() -> void:
+	var charged := _storm_left > 0.0
+	_weapon.bonus_damage = STORM_BONUS_DAMAGE if charged else 0
+	_weapon.stun_chance = STORM_STUN_CHANCE if charged else 0.0
+	_weapon.stun_seconds = STORM_STUN_SECONDS if charged else 0.0
+
+
+## A pressed ability without the mana for it: drop the press and tell the HUD.
+func _refuse_unaffordable_skills() -> void:
+	for slot in [1, 2]:
+		var cost := STORM_COST if slot == 1 else REND_COST
+		if InputRouter.skill_buffered(slot) and not _mana.can_afford(cost):
+			InputRouter.consume_skill(slot)
+			mana_denied.emit()
+
+
+## The moment inside a cast where the effect happens: the bolt lands, or the wave leaves.
+func _fire_cast_moment() -> void:
+	if _cast_fired:
+		return
+	if _state == State.STORM and _state_time >= STORM_STRIKE_AT:
+		_cast_fired = true
+		_storm_left = STORM_SECONDS
+		_apply_storm_to_weapon()
+		storm_struck.emit()
+	elif _state == State.REND and _state_time >= REND_RELEASE_SECONDS:
+		_cast_fired = true
+		var wave := RendWave.new()
+		wave.direction = _facing
+		get_parent().add_child(wave)
+		wave.global_position = global_position + Vector2(_facing * GameConfig.tiles(1.0), GameConfig.tiles(BODY_SIZE_TILES.y) / 2.0)

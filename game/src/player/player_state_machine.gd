@@ -9,8 +9,11 @@ extends RefCounted
 ##   vel_y         vertical velocity in tiles/s, negative = rising
 ##   attack_duration  seconds the current attack lasts
 ##   attack_cancelable  the swing's hit has landed; a jump may cut its recovery short
+##   skill1_buffered / skill2_buffered  an ability button was pressed (1 Storm Blade, 2 Crimson Rend)
+##   storm_ready / rend_ready  there is enough mana for that ability
+##   cast_duration  seconds the current ability cast lasts
 
-enum PlayerState { IDLE, RUN, JUMP, FALL, ROLL, ATTACK, HURT }
+enum PlayerState { IDLE, RUN, JUMP, FALL, ROLL, ATTACK, HURT, STORM, REND }
 
 const ROLL_DURATION: float = 0.32
 const HURT_DURATION: float = 0.25
@@ -43,6 +46,11 @@ static func next_state(current: PlayerState, ctx: Dictionary) -> PlayerState:
 					return PlayerState.JUMP
 				return PlayerState.ATTACK
 			return _settled_state(ctx)
+		PlayerState.STORM, PlayerState.REND:
+			# A cast is committed: nothing but a hit (handled above) cuts it short.
+			if state_time < ctx.get("cast_duration", 0.0):
+				return current
+			return _settled_state(ctx)
 		PlayerState.JUMP:
 			if ctx.get("vel_y", 0.0) < 0.0:
 				return PlayerState.JUMP
@@ -58,6 +66,10 @@ static func _free_state(ctx: Dictionary) -> PlayerState:
 		return PlayerState.ROLL
 	if ctx.get("jump_buffered", false) and (on_floor or ctx.get("coyote_time", 0.0) > 0.0):
 		return PlayerState.JUMP
+	if on_floor and ctx.get("skill1_buffered", false) and ctx.get("storm_ready", false):
+		return PlayerState.STORM
+	if ctx.get("skill2_buffered", false) and ctx.get("rend_ready", false):
+		return PlayerState.REND
 	if ctx.get("attack_buffered", false):
 		return PlayerState.ATTACK
 	return _settled_state(ctx)

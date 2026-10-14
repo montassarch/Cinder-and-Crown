@@ -79,3 +79,22 @@ func test_weapon_damages_a_real_enemy_through_its_hurtbox() -> void:
 	_weapon.start_attack()
 	await _frames(40)
 	assert_int(enemy.health().current).is_equal(30 - load("res://data/weapons/rusty_blade.tres").damage)
+
+func test_bonus_damage_adds_to_every_hit() -> void:
+	_weapon.bonus_damage = 3
+	_weapon.start_attack()
+	await _frames(40)
+	assert_int(_dummy.hits[0][0]).is_equal(load("res://data/weapons/rusty_blade.tres").damage + 3)
+
+func test_a_certain_stun_chance_stuns_the_target() -> void:
+	_weapon.stun_chance = 1.0
+	_weapon.stun_seconds = 1.2
+	_weapon.start_attack()
+	await _frames(40)
+	assert_array(_dummy.stuns).is_equal([1.2])
+
+func test_no_stun_chance_never_stuns() -> void:
+	_weapon.stun_chance = 0.0
+	_weapon.start_attack()
+	await _frames(40)
+	assert_array(_dummy.stuns).is_empty()
