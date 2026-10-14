@@ -8,6 +8,7 @@ extends RefCounted
 ##   coyote_time   seconds of coyote jump remaining (> 0 means a jump is still allowed)
 ##   vel_y         vertical velocity in tiles/s, negative = rising
 ##   attack_duration  seconds the current attack lasts
+##   attack_cancelable  the swing's hit has landed; a jump may cut its recovery short
 
 enum PlayerState { IDLE, RUN, JUMP, FALL, ROLL, ATTACK, HURT }
 
@@ -37,6 +38,9 @@ static func next_state(current: PlayerState, ctx: Dictionary) -> PlayerState:
 			if state_time < ctx.get("attack_duration", 0.0):
 				if ctx.get("roll_buffered", false) and ctx.get("on_floor", false):
 					return PlayerState.ROLL
+				if ctx.get("attack_cancelable", false) and ctx.get("jump_buffered", false) \
+						and (ctx.get("on_floor", false) or ctx.get("coyote_time", 0.0) > 0.0):
+					return PlayerState.JUMP
 				return PlayerState.ATTACK
 			return _settled_state(ctx)
 		PlayerState.JUMP:

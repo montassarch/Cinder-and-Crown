@@ -78,6 +78,11 @@ func is_hitbox_active() -> bool:
 	return _attacking and data != null and _elapsed >= data.hit_window.x and _elapsed < data.hit_window.y
 
 
+## The hit has come and gone; the rest of the swing is follow-through.
+func is_recovering() -> bool:
+	return _attacking and data != null and _elapsed >= data.hit_window.y
+
+
 func hitbox_size() -> Vector2:
 	return (_shape.shape as RectangleShape2D).size
 

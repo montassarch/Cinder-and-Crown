@@ -101,3 +101,14 @@ func test_equip_sizes_the_hitbox_from_tiles() -> void:
 	assert_vector(weapon.hitbox_center()).is_equal(GameConfig.tiles_v(1.5, 0.0))
 	weapon.set_facing(-1.0)
 	assert_vector(weapon.hitbox_center()).is_equal(GameConfig.tiles_v(-1.5, 0.0))
+
+func test_weapon_is_recovering_only_after_its_hit_window_closes() -> void:
+	var weapon := _weapon()
+	weapon.equip(_data(0.5, Vector2(0.2, 0.3)))
+	weapon.start_attack()
+	weapon.advance(0.1)
+	assert_bool(weapon.is_recovering()).is_false()
+	weapon.advance(0.25)
+	assert_bool(weapon.is_recovering()).is_true()
+	weapon.cancel_attack()
+	assert_bool(weapon.is_recovering()).is_false()

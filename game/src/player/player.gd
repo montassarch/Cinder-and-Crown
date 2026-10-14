@@ -25,6 +25,9 @@ const BODY_SIZE_TILES := Vector2(1.0, 2.0)
 ## Used only while no weapon is equipped.
 const DEFAULT_ATTACK_DURATION: float = 0.3
 const WEAPON_SLOTS: int = 2
+## Attacks started within this many seconds of the last one ending continue the combo.
+const COMBO_WINDOW: float = 0.4
+const COMBO_STEPS: int = 3
 
 ## Slot 0 and 1 loadout. Set in the scene; the sandbox menu can reassign at runtime.
 @export var starting_weapons: Array[WeaponData] = []
@@ -37,6 +40,11 @@ var _hit_direction: float = 0.0
 var _facing: float = 1.0
 var _weapons: Array[WeaponData] = [null, null]
 var _active_slot: int = 0
+var _combo_step: int = 0
+var _clock: float = 0.0
+var _last_attack_end: float = -1000.0
+## A tap during a swing, kept until the swing ends (input buffering alone would expire it).
+var _attack_queued: bool = false
 
 @onready var _weapon: Weapon = $Weapon
 @onready var _health: Health = $Health
@@ -65,6 +73,10 @@ func _physics_process(delta: float) -> void:
 		_update_visual()
 		return
 	_state_time += delta
+	_clock += delta
+	if _state == State.ATTACK and InputRouter.attack_buffered():
+		_attack_queued = true
+		InputRouter.consume_attack()
 	if InputRouter.swap_weapon_pressed():
 		swap_weapons()
 	_coyote = COYOTE_TIME if is_on_floor() else maxf(0.0, _coyote - delta)
@@ -85,7 +97,7 @@ func _update_visual() -> void:
 	if _state == State.ATTACK and _weapon.data != null:
 		action = _weapon.data.attack_duration
 	var shown := State.HURT if not _health.is_alive() else _state
-	_visual.show_state(shown, _facing, GameConfig.tiles(BODY_SIZE_TILES.y) / 2.0, action)
+	_visual.show_state(shown, _facing, GameConfig.tiles(BODY_SIZE_TILES.y) / 2.0, action, _combo_step)
 
 
 func state() -> State:
@@ -112,6 +124,10 @@ func set_weapon(slot: int, data: WeaponData) -> void:
 
 func weapon_in_slot(slot: int) -> WeaponData:
 	return _weapons[slot]
+
+
+func combo_step() -> int:
+	return _combo_step
 
 
 func active_slot() -> int:
@@ -155,7 +171,8 @@ func _build_context(hurt_now: bool) -> Dictionary:
 		"on_floor": is_on_floor(),
 		"move_axis": InputRouter.move_axis(),
 		"jump_buffered": InputRouter.jump_buffered(),
-		"attack_buffered": InputRouter.attack_buffered(),
+		"attack_buffered": InputRouter.attack_buffered() or _attack_queued,
+		"attack_cancelable": _weapon.is_recovering(),
 		"roll_buffered": InputRouter.roll_buffered(),
 		"state_time": _state_time,
 		"coyote_time": _coyote,
@@ -168,6 +185,9 @@ func _build_context(hurt_now: bool) -> Dictionary:
 func _enter_state(next: State) -> void:
 	if _state == State.ATTACK and next != State.ATTACK:
 		_weapon.cancel_attack()
+		_last_attack_end = _clock
+		if next in [State.JUMP, State.ROLL, State.HURT]:
+			_attack_queued = false
 	_state = next
 	_state_time = 0.0
 	match next:
@@ -179,6 +199,9 @@ func _enter_state(next: State) -> void:
 			InputRouter.consume_roll()
 		State.ATTACK:
 			InputRouter.consume_attack()
+			_attack_queued = false
+			var chained := _clock - _last_attack_end <= COMBO_WINDOW
+			_combo_step = (_combo_step + 1) % COMBO_STEPS if chained else 0
 			_weapon.set_facing(_facing)
 			_weapon.start_attack()
 		State.HURT:

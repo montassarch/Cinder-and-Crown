@@ -164,14 +164,16 @@ func test_jump_height_grows_with_how_long_jump_is_held() -> void:
 	assert_float(long_hold).is_greater(medium + 0.3)
 
 func test_hero_sprite_plays_the_animation_for_each_state() -> void:
-	# SPIKE: the animated hero follows the state machine.
-	assert_str(PlayerVisual.animation_for(State.IDLE)).is_equal("idle")
-	assert_str(PlayerVisual.animation_for(State.RUN)).is_equal("run")
-	assert_str(PlayerVisual.animation_for(State.JUMP)).is_equal("jump")
-	assert_str(PlayerVisual.animation_for(State.FALL)).is_equal("fall")
-	assert_str(PlayerVisual.animation_for(State.ROLL)).is_equal("roll")
-	assert_str(PlayerVisual.animation_for(State.ATTACK)).is_equal("attack")
-	assert_str(PlayerVisual.animation_for(State.HURT)).is_equal("hurt")
+	# SPIKE: the animated hero follows the state machine; attacks follow the combo step.
+	assert_str(PlayerVisual.animation_for(State.IDLE, 0)).is_equal("idle")
+	assert_str(PlayerVisual.animation_for(State.RUN, 0)).is_equal("run")
+	assert_str(PlayerVisual.animation_for(State.JUMP, 0)).is_equal("jump")
+	assert_str(PlayerVisual.animation_for(State.FALL, 0)).is_equal("fall")
+	assert_str(PlayerVisual.animation_for(State.ROLL, 0)).is_equal("roll")
+	assert_str(PlayerVisual.animation_for(State.HURT, 0)).is_equal("hurt")
+	assert_str(PlayerVisual.animation_for(State.ATTACK, 0)).is_equal("slash")
+	assert_str(PlayerVisual.animation_for(State.ATTACK, 1)).is_equal("uppercut")
+	assert_str(PlayerVisual.animation_for(State.ATTACK, 2)).is_equal("slam")
 
 func test_hero_sprite_runs_when_the_player_runs_and_faces_the_way_it_moves() -> void:
 	await _land()
@@ -189,9 +191,44 @@ func test_hero_sprite_swings_when_attacking_and_rolls_when_rolling() -> void:
 	InputRouter.set_virtual_button(&"attack", true)
 	await _frames(3)
 	InputRouter.set_virtual_button(&"attack", false)
-	assert_str(visual.animation).is_equal("attack")
+	assert_str(visual.animation).is_equal("slash")
 	await _frames(40)
 	InputRouter.set_virtual_button(&"roll", true)
 	await _frames(3)
 	InputRouter.set_virtual_button(&"roll", false)
 	assert_str(visual.animation).is_equal("roll")
+
+func _tap_attack() -> void:
+	InputRouter.set_virtual_button(&"attack", true)
+	await _frames(1)
+	InputRouter.set_virtual_button(&"attack", false)
+
+func test_quick_attacks_chain_slash_uppercut_slam_then_restart() -> void:
+	await _land()
+	var steps := []
+	for i in 4:
+		await _tap_attack()
+		await _frames(3)
+		steps.append(_player.combo_step())
+		await _frames(int(Player.COMBO_WINDOW * 60.0 * 0.5) + int(0.3 * 60.0))
+	assert_array(steps).is_equal([0, 1, 2, 0])
+
+func test_a_pause_resets_the_combo_to_the_first_swing() -> void:
+	await _land()
+	await _tap_attack()
+	await _frames(25)
+	await _tap_attack()
+	await _frames(3)
+	assert_int(_player.combo_step()).is_equal(1)
+	await _frames(int((0.3 + Player.COMBO_WINDOW) * 60.0) + 20)
+	await _tap_attack()
+	await _frames(3)
+	assert_int(_player.combo_step()).is_equal(0)
+
+func test_a_tap_early_in_a_swing_is_remembered_for_the_next_one() -> void:
+	await _land()
+	await _tap_attack()
+	await _frames(3)
+	await _tap_attack()                     # well before this swing ends: plain input buffering would drop it
+	await _frames(30)
+	assert_int(_player.combo_step()).is_equal(1)

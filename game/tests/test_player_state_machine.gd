@@ -78,3 +78,11 @@ func test_roll_requires_the_floor() -> void:
 
 func test_hurt_ends_after_hurt_duration() -> void:
 	assert_int(PlayerStateMachine.next_state(State.HURT, _ctx({"state_time": PlayerStateMachine.HURT_DURATION}))).is_equal(State.IDLE)
+
+func test_jump_cancels_an_attack_once_its_hit_has_landed() -> void:
+	var ctx := _ctx({"state_time": 0.2, "attack_duration": 0.3, "jump_buffered": true, "attack_cancelable": true})
+	assert_int(PlayerStateMachine.next_state(State.ATTACK, ctx)).is_equal(State.JUMP)
+
+func test_jump_cannot_cancel_an_attack_before_its_hit_lands() -> void:
+	var ctx := _ctx({"state_time": 0.05, "attack_duration": 0.3, "jump_buffered": true, "attack_cancelable": false})
+	assert_int(PlayerStateMachine.next_state(State.ATTACK, ctx)).is_equal(State.ATTACK)
