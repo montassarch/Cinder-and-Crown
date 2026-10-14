@@ -162,3 +162,23 @@ func test_jump_height_grows_with_how_long_jump_is_held() -> void:
 	var long_hold: float = await _peak_rise_tiles(8)
 	assert_float(medium).is_greater(tap + 0.3)
 	assert_float(long_hold).is_greater(medium + 0.3)
+
+func test_hero_sprite_plays_the_animation_for_each_state() -> void:
+	# SPIKE: the animated hero follows the state machine.
+	assert_str(PlayerVisual.animation_for(State.IDLE)).is_equal("idle")
+	assert_str(PlayerVisual.animation_for(State.RUN)).is_equal("run")
+	assert_str(PlayerVisual.animation_for(State.JUMP)).is_equal("jump")
+	assert_str(PlayerVisual.animation_for(State.FALL)).is_equal("fall")
+	assert_str(PlayerVisual.animation_for(State.ROLL)).is_equal("roll")
+	assert_str(PlayerVisual.animation_for(State.ATTACK)).is_equal("attack")
+	assert_str(PlayerVisual.animation_for(State.HURT)).is_equal("hurt")
+
+func test_hero_sprite_runs_when_the_player_runs_and_faces_the_way_it_moves() -> void:
+	await _land()
+	var visual: PlayerVisual = _player.get_node("Visual")
+	assert_str(visual.animation).is_equal("idle")
+	InputRouter.set_virtual_axis(-1.0)
+	await _frames(6)
+	InputRouter.set_virtual_axis(0.0)
+	assert_str(visual.animation).is_equal("run")
+	assert_bool(visual.flip_h).is_true()

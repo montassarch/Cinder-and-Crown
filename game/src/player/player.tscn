@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://src/player/player.gd" id="1_player"]
 [ext_resource type="Script" path="res://src/core/health.gd" id="2_health"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" path="res://src/weapons/weapon_data.gd" id="4_wdata"]
 [ext_resource type="Resource" path="res://data/weapons/rusty_blade.tres" id="5_blade"]
 [ext_resource type="Resource" path="res://data/weapons/ember_spear.tres" id="6_spear"]
+[ext_resource type="Script" path="res://src/player/player_visual.gd" id="7_visual"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
 
@@ -25,6 +26,9 @@ offset_right = 16.0
 offset_bottom = 32.0
 mouse_filter = 2
 color = Color(0.9, 0.55, 0.2, 1)
+
+[node name="Visual" type="AnimatedSprite2D" parent="."]
+script = ExtResource("7_visual")
 
 [node name="Health" type="Node" parent="."]
 script = ExtResource("2_health")
