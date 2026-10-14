@@ -43,6 +43,7 @@ func _ready() -> void:
 	player.died.connect(_on_player_died)
 
 	_camera.position_smoothing_enabled = true
+	_camera.position_smoothing_speed = 12.0  # tight follow: a lagging camera makes the run feel slow
 	_apply_camera_limits()
 	_camera.global_position = player.global_position
 

@@ -7,7 +7,7 @@ signal died
 const State := PlayerStateMachine.PlayerState
 
 # All distances are tiles, speeds tiles/s, accelerations tiles/s^2, times seconds.
-const RUN_SPEED: float = 9.0
+const RUN_SPEED: float = 13.0
 const JUMP_HEIGHT: float = 3.2
 const ROLL_SPEED: float = 14.0
 const ROLL_DURATION: float = PlayerStateMachine.ROLL_DURATION

@@ -23,7 +23,7 @@ const OUTLINE_COLOR := Color(0.05, 0.035, 0.047)
 ## stretched to fit the gameplay action (attacks, roll) or plays at a fixed speed.
 const CLIPS := {
 	&"Sword_Idle": {"start": 0.0, "end": -1.0, "fit": false, "speed": 1.0},
-	&"Sprint": {"start": 0.0, "end": -1.0, "fit": false, "speed": 1.1},
+	&"Sprint": {"start": 0.0, "end": -1.0, "fit": false, "speed": 1.6},
 	&"Jump_Start": {"start": 0.35, "end": -1.0, "fit": false, "speed": 1.6},
 	&"Jump": {"start": 0.0, "end": -1.0, "fit": false, "speed": 1.0},
 	&"Roll": {"start": 0.0, "end": 1.0, "fit": true, "speed": 1.0},

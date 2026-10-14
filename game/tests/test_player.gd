@@ -252,3 +252,11 @@ func test_the_combo_finisher_lasts_longer_than_a_normal_swing() -> void:
 	var duration: float = _player.get_node("Weapon").data.attack_duration
 	await _frames(int(duration * 60.0) + 4)
 	assert_int(_player.state()).is_equal(State.ATTACK)    # a normal swing would be over by now
+
+func test_running_covers_ground_fast_like_a_dead_cells_sprint() -> void:
+	await _land()
+	var start_x := _player.global_position.x
+	InputRouter.set_virtual_axis(1.0)
+	await _frames(60)
+	InputRouter.set_virtual_axis(0.0)
+	assert_float(_player.global_position.x - start_x).is_greater(GameConfig.tiles(12.0))
