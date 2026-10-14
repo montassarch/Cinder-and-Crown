@@ -3,8 +3,8 @@ extends Node2D
 ## The hero's sword lightning, drawn along the real blade (HeroBlade has its position in every
 ## animation frame) in hard-edged pixel style: a bold dark-outlined bolt from the sky onto the
 ## sword, then violet-and-cyan lightning spiralling around the blade and a thick cream crescent
-## that trails each swing while charged. Crimson Rend swings leave a crescent in black, red and
-## violet. Charge fades over the final STORM_FADE_SECONDS.
+## that trails each swing while charged. Charge fades over the final STORM_FADE_SECONDS.
+## (Crimson Rend's own lightning lives in RendWave.)
 
 const BOLT_SECONDS: float = 0.22
 const BOLT_TOP_TILES: float = 9.0
@@ -32,9 +32,6 @@ const WRAP_SPARK := Color8(255, 255, 255)
 const WRAP_AMPLITUDE: float = 2.8
 const WRAP_TURNS: float = 5.0
 const WRAP_FORKS: int = 3
-# Rend: red-orange rim, violet glow, black core (outer to inner), like the claw wave.
-const REND_LAYERS: Array[Color] = [Color(1.0, 0.33, 0.2), Color(0.62, 0.14, 0.55), Color(0.04, 0.0, 0.02)]
-const REND_SHRINK: Array[float] = [0.0, 0.08, 0.2]
 ## Each crescent layer's inner edge, as a fraction of the way from its root to the tip.
 const LAYER_SHRINK: Array[float] = [-0.12, 0.05, 0.6]
 
@@ -115,9 +112,7 @@ func _draw() -> void:
 		return
 	var seg := blade()
 	var alpha := charge_alpha()
-	if _player.state() == State.REND:
-		_draw_crescent(REND_LAYERS, 1.0, REND_SHRINK)
-	elif alpha > 0.0:
+	if alpha > 0.0 and _player.state() != State.REND:
 		_draw_crescent(STORM_LAYERS, alpha, LAYER_SHRINK)
 	if alpha > 0.0:
 		_draw_storm_wrap(seg[0], seg[1], alpha)

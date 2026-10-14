@@ -17,12 +17,11 @@ const ENEMY_HURTBOX_MASK: int = 16
 
 const CORE := Color(0.04, 0.0, 0.02)
 const EDGE := Color(1.0, 0.33, 0.2)
-const VIOLET := Color(0.62, 0.14, 0.55)
+const HOT := Color(1.0, 0.78, 0.6)
 const GLOW := Color(0.78, 0.2, 0.62, 0.4)
 const FORKS: int = 5
 const SPIKE_GAP_TILES: float = 1.8
-const SPIKE_POINTS: int = 6
-const SPIKE_BASE_WIDTH: float = 3.6
+const SPIKE_POINTS: int = 7
 
 var direction: float = 1.0
 
@@ -92,32 +91,25 @@ func _is_one_way(body: Node) -> bool:
 	return false
 
 
-## Crimson Rend's look: a jagged forked bolt of black-cored red lightning races along the
-## ground, and black spikes with a red-orange rim and violet glow erupt upward as it passes,
-## tallest at the head. Re-rolled every few ticks so it crackles.
+## Crimson Rend's look: a jagged forked bolt of red lightning races along the ground, and tall
+## jagged bolts erupt upward along its path as it passes, tallest at the head. Every bolt is a
+## violet glow, a red-orange edge, a black band and a hot cream core, re-rolled every few ticks.
 func _draw() -> void:
 	var d := signf(direction)
 	var ground := -GameConfig.tiles(LIFT_TILES)
 	var fade := clampf((1.0 - _travelled / GameConfig.tiles(RANGE_TILES)) / 0.35, 0.3, 1.0)
 	# Ground bolt from where the wave started to its head (the node's origin).
 	var back := minf(_travelled, GameConfig.tiles(RANGE_TILES))
-	var start := Vector2(-d * back, ground)
-	var ground_bolt := _jagged(start, Vector2(0.0, ground), maxi(int(back / 9.0), 2), 3.0, 0)
-	draw_polyline(ground_bolt, Color(GLOW, GLOW.a * fade), 7.0)
-	draw_polyline(ground_bolt, Color(EDGE, fade), 4.0)
-	draw_polyline(ground_bolt, Color(VIOLET, fade), 2.0)
-	draw_polyline(ground_bolt, Color(CORE, fade), 1.0)
-	# Forks branching up off the bolt.
+	var ground_bolt := _jagged(Vector2(-d * back, ground), Vector2(0.0, ground), maxi(int(back / 8.0), 2), 3.0, 0)
+	_bolt(ground_bolt, 1.0, fade)
+	# Forks branching off the ground bolt (up and forward, a couple dipping low).
 	for k in FORKS:
 		var index := 1 + int(_flicker(k) * float(ground_bolt.size() - 2))
 		var root := ground_bolt[clampi(index, 0, ground_bolt.size() - 1)]
-		var reach := 12.0 + 10.0 * _flicker(k + 70)
-		var tip := root + Vector2(d * (4.0 + 8.0 * _flicker(k + 90)), -reach)
-		var fork := _jagged(root, tip, 5, 3.0, 100 + k)
-		draw_polyline(fork, Color(GLOW, GLOW.a * fade), 5.0)
-		draw_polyline(fork, Color(EDGE, fade), 3.0)
-		draw_polyline(fork, Color(CORE, fade), 1.0)
-	# Spikes erupting at fixed spots along the path, rising then sinking as time passes.
+		var rise := 10.0 + 14.0 * _flicker(k + 70)
+		var tip := root + Vector2(d * (4.0 + 8.0 * _flicker(k + 90)), -rise if k % 3 != 2 else 4.0)
+		_bolt(_jagged(root, tip, 5, 3.0, 100 + k), 0.55, fade)
+	# Tall bolts erupting at fixed spots along the path, rising then sinking as time passes.
 	var gap := GameConfig.tiles(SPIKE_GAP_TILES)
 	var speed := GameConfig.tiles(SPEED_TILES)
 	var k := 1
@@ -126,29 +118,23 @@ func _draw() -> void:
 		var rise := clampf(age / 0.05, 0.0, 1.0)
 		var sink := clampf(1.0 - (age - 0.15) / 0.6, 0.0, 1.0)
 		if rise * sink > 0.05:
-			var local_x := -d * (_travelled - float(k) * gap)
-			var size := 0.55 + 0.3 * minf(float(k) / 4.0, 1.0)
-			_spike(Vector2(local_x, ground), GameConfig.tiles(HEIGHT_TILES) * size * rise * sink, d, 100 + k, fade)
+			var base := Vector2(-d * (_travelled - float(k) * gap), ground)
+			var size := 0.5 + 0.3 * minf(float(k) / 4.0, 1.0)
+			var top := base + Vector2(d * 2.0, -GameConfig.tiles(HEIGHT_TILES) * size * rise * sink)
+			_bolt(_jagged(base, top, SPIKE_POINTS, 3.0, 200 + k), 0.7, fade)
 		k += 1
-	_spike(Vector2(0.0, ground), GameConfig.tiles(HEIGHT_TILES) * (0.85 + 0.15 * _flicker(5)) * fade, d, 7, fade)
+	var head_top := Vector2(d * 2.0, ground - GameConfig.tiles(HEIGHT_TILES) * (0.9 + 0.1 * _flicker(5)))
+	_bolt(_jagged(Vector2(0.0, ground), head_top, SPIKE_POINTS, 3.5, 7), 1.0, fade)
 
 
-## A tapering black spike (rim, violet glow, core) leaning with the wave's direction.
-func _spike(base: Vector2, height: float, d: float, seed_value: int, fade: float) -> void:
-	var spine := _jagged(base, base + Vector2(d * height * 0.18, -height), SPIKE_POINTS, 2.2, seed_value)
-	var half := PackedFloat32Array()
-	var normals := PackedVector2Array()
-	for i in spine.size():
-		var t := float(i) / float(spine.size() - 1)
-		half.append(maxf(SPIKE_BASE_WIDTH * pow(1.0 - t, 0.85) * (0.7 + 0.3 * fade), 0.4))
-		var tangent := (spine[mini(i + 1, spine.size() - 1)] - spine[maxi(i - 1, 0)]).normalized()
-		normals.append(Vector2(-tangent.y, tangent.x) * d)
-	var none := PackedFloat32Array()
-	none.resize(spine.size())
-	_claw_layer(spine, normals, half, none, none, 1.9, 1.9, Color(GLOW, GLOW.a * fade))
-	_claw_layer(spine, normals, half, none, none, 1.4, 1.25, Color(EDGE, fade))
-	_claw_layer(spine, normals, half, none, none, 1.15, 1.05, Color(VIOLET, fade))
-	_claw_layer(spine, normals, half, none, none, 0.8, 0.85, Color(CORE, fade))
+## One lightning bolt: violet glow, red-orange edge, black band and a hot cream core.
+## `weight` scales its thickness (thin forks are about half).
+func _bolt(points: PackedVector2Array, weight: float, fade: float) -> void:
+	draw_polyline(points, Color(GLOW, GLOW.a * 0.6 * fade), 4.0 + 4.0 * weight)
+	draw_polyline(points, Color(EDGE, fade), maxf(3.0, 5.0 * weight))
+	draw_polyline(points, Color(CORE, fade), maxf(1.0, 3.0 * weight))
+	if weight >= 0.7:
+		draw_polyline(points, Color(HOT, fade), 1.0)
 
 
 ## A jagged line from a to b: `segments` pieces, each point pushed sideways at random.
@@ -162,18 +148,6 @@ func _jagged(a: Vector2, b: Vector2, segments: int, amplitude: float, seed_value
 		points.append(a + along * u + normal * offset)
 	points.append(b)
 	return points
-
-
-## One filled strip along `spine`, `front_scale` / `back_scale` times as wide as `half`.
-func _claw_layer(spine: PackedVector2Array, normals: PackedVector2Array, half: PackedFloat32Array, front_extra: PackedFloat32Array, back_extra: PackedFloat32Array, front_scale: float, back_scale: float, colour: Color) -> void:
-	var colours := PackedColorArray([colour, colour, colour])
-	for i in spine.size() - 1:
-		var a_front := spine[i] + normals[i] * (half[i] + front_extra[i]) * front_scale
-		var a_back := spine[i] - normals[i] * (half[i] + back_extra[i]) * back_scale
-		var b_front := spine[i + 1] + normals[i + 1] * (half[i + 1] + front_extra[i + 1]) * front_scale
-		var b_back := spine[i + 1] - normals[i + 1] * (half[i + 1] + back_extra[i + 1]) * back_scale
-		draw_primitive(PackedVector2Array([a_front, a_back, b_back]), colours, PackedVector2Array())
-		draw_primitive(PackedVector2Array([a_front, b_back, b_front]), colours, PackedVector2Array())
 
 
 ## 0..1, re-rolled every few ticks so the bolts crackle.
