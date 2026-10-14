@@ -52,7 +52,7 @@ var _attack_scale: float = 1.0
 @onready var _weapon: Weapon = $Weapon
 @onready var _health: Health = $Health
 @onready var _body: ColorRect = $Body
-@onready var _visual: PlayerVisual3D = $Visual
+@onready var _visual: PlayerVisual = $Visual
 @onready var _shape: CollisionShape2D = $CollisionShape2D
 @onready var _hurtbox_shape: CollisionShape2D = $Hurtbox/CollisionShape2D
 
@@ -63,7 +63,7 @@ func _ready() -> void:
 	(_hurtbox_shape.shape as RectangleShape2D).size = size
 	_body.size = size
 	_body.position = -size / 2.0
-	_body.visible = false  # SPIKE: the animated hero replaces the placeholder box
+	_body.visible = false  # the animated hero replaces the placeholder box
 	_health.died.connect(func() -> void: died.emit())
 	for slot in mini(WEAPON_SLOTS, starting_weapons.size()):
 		_weapons[slot] = starting_weapons[slot]
@@ -99,8 +99,7 @@ func _update_visual() -> void:
 	var action := ROLL_DURATION
 	if _state == State.ATTACK and _weapon.data != null:
 		action = _weapon.data.attack_duration * _attack_scale
-	var shown := State.HURT if not _health.is_alive() else _state
-	_visual.show_state(shown, _facing, GameConfig.tiles(BODY_SIZE_TILES.y) / 2.0, action, _combo_step)
+	_visual.show_state(_state, _facing, GameConfig.tiles(BODY_SIZE_TILES.y) / 2.0, action, _combo_step, not _health.is_alive())
 
 
 func state() -> State:
