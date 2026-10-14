@@ -112,3 +112,15 @@ func test_weapon_is_recovering_only_after_its_hit_window_closes() -> void:
 	assert_bool(weapon.is_recovering()).is_true()
 	weapon.cancel_attack()
 	assert_bool(weapon.is_recovering()).is_false()
+
+func test_a_slower_swing_stretches_its_hit_window_in_time() -> void:
+	var weapon := _weapon()
+	weapon.equip(_data(0.5, Vector2(0.2, 0.3)))
+	weapon.start_attack(2.0)
+	weapon.advance(0.25)                 # 0.125 s of swing time: before the window
+	assert_bool(weapon.is_hitbox_active()).is_false()
+	weapon.advance(0.25)                 # 0.25 s of swing time: inside it
+	assert_bool(weapon.is_hitbox_active()).is_true()
+	weapon.advance(0.6)                  # 0.55 s of swing time: past attack_duration, swing over
+	assert_bool(weapon.is_hitbox_active()).is_false()
+	assert_bool(weapon.is_recovering()).is_false()

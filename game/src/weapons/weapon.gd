@@ -11,6 +11,8 @@ const ENEMY_HURTBOX_MASK: int = 16
 var data: WeaponData
 
 var _elapsed: float = 0.0
+## Real seconds per second of swing time; > 1 plays the whole swing (and its hit window) slower.
+var _duration_scale: float = 1.0
 var _attacking: bool = false
 var _facing: float = 1.0
 var _hit_targets: Array[Node] = []
@@ -48,10 +50,11 @@ func set_facing(facing: float) -> void:
 	_apply_geometry()
 
 
-func start_attack() -> void:
+func start_attack(duration_scale: float = 1.0) -> void:
 	if data == null:
 		return
 	_hit_targets.clear()
+	_duration_scale = maxf(duration_scale, 0.01)
 	_elapsed = 0.0
 	_attacking = true
 	_sync_hitbox()
@@ -67,7 +70,7 @@ func cancel_attack() -> void:
 func advance(delta: float) -> void:
 	if not _attacking:
 		return
-	_elapsed += delta
+	_elapsed += delta / _duration_scale
 	if _elapsed >= data.attack_duration:
 		cancel_attack()
 		return

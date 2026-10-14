@@ -28,6 +28,8 @@ const WEAPON_SLOTS: int = 2
 ## Attacks started within this many seconds of the last one ending continue the combo.
 const COMBO_WINDOW: float = 0.4
 const COMBO_STEPS: int = 3
+## The last hit of the combo is a heavier, slower swing.
+const FINISHER_DURATION_SCALE: float = 1.8
 
 ## Slot 0 and 1 loadout. Set in the scene; the sandbox menu can reassign at runtime.
 @export var starting_weapons: Array[WeaponData] = []
@@ -45,11 +47,12 @@ var _clock: float = 0.0
 var _last_attack_end: float = -1000.0
 ## A tap during a swing, kept until the swing ends (input buffering alone would expire it).
 var _attack_queued: bool = false
+var _attack_scale: float = 1.0
 
 @onready var _weapon: Weapon = $Weapon
 @onready var _health: Health = $Health
 @onready var _body: ColorRect = $Body
-@onready var _visual: PlayerVisual = $Visual
+@onready var _visual: PlayerVisual3D = $Visual
 @onready var _shape: CollisionShape2D = $CollisionShape2D
 @onready var _hurtbox_shape: CollisionShape2D = $Hurtbox/CollisionShape2D
 
@@ -95,7 +98,7 @@ func _physics_process(delta: float) -> void:
 func _update_visual() -> void:
 	var action := ROLL_DURATION
 	if _state == State.ATTACK and _weapon.data != null:
-		action = _weapon.data.attack_duration
+		action = _weapon.data.attack_duration * _attack_scale
 	var shown := State.HURT if not _health.is_alive() else _state
 	_visual.show_state(shown, _facing, GameConfig.tiles(BODY_SIZE_TILES.y) / 2.0, action, _combo_step)
 
@@ -178,7 +181,7 @@ func _build_context(hurt_now: bool) -> Dictionary:
 		"coyote_time": _coyote,
 		"hurt": hurt_now,
 		"vel_y": velocity.y / GameConfig.TILE_SIZE,
-		"attack_duration": _weapon.data.attack_duration if _weapon.data != null else DEFAULT_ATTACK_DURATION,
+		"attack_duration": _weapon.data.attack_duration * _attack_scale if _weapon.data != null else DEFAULT_ATTACK_DURATION,
 	}
 
 
@@ -203,7 +206,8 @@ func _enter_state(next: State) -> void:
 			var chained := _clock - _last_attack_end <= COMBO_WINDOW
 			_combo_step = (_combo_step + 1) % COMBO_STEPS if chained else 0
 			_weapon.set_facing(_facing)
-			_weapon.start_attack()
+			_attack_scale = FINISHER_DURATION_SCALE if _combo_step == COMBO_STEPS - 1 else 1.0
+			_weapon.start_attack(_attack_scale)
 		State.HURT:
 			velocity.x = _hit_direction * GameConfig.tiles(HURT_KNOCKBACK_SPEED)
 

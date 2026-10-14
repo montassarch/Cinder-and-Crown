@@ -163,40 +163,47 @@ func test_jump_height_grows_with_how_long_jump_is_held() -> void:
 	assert_float(medium).is_greater(tap + 0.3)
 	assert_float(long_hold).is_greater(medium + 0.3)
 
-func test_hero_sprite_plays_the_animation_for_each_state() -> void:
-	# SPIKE: the animated hero follows the state machine; attacks follow the combo step.
-	assert_str(PlayerVisual.animation_for(State.IDLE, 0)).is_equal("idle")
-	assert_str(PlayerVisual.animation_for(State.RUN, 0)).is_equal("run")
-	assert_str(PlayerVisual.animation_for(State.JUMP, 0)).is_equal("jump")
-	assert_str(PlayerVisual.animation_for(State.FALL, 0)).is_equal("fall")
-	assert_str(PlayerVisual.animation_for(State.ROLL, 0)).is_equal("roll")
-	assert_str(PlayerVisual.animation_for(State.HURT, 0)).is_equal("hurt")
-	assert_str(PlayerVisual.animation_for(State.ATTACK, 0)).is_equal("slash")
-	assert_str(PlayerVisual.animation_for(State.ATTACK, 1)).is_equal("uppercut")
-	assert_str(PlayerVisual.animation_for(State.ATTACK, 2)).is_equal("slam")
+func test_hero_model_plays_the_clip_for_each_state() -> void:
+	# SPIKE: the 3D hero follows the state machine; attacks follow the combo step.
+	assert_str(PlayerVisual3D.clip_for(State.IDLE, 0)).is_equal("Sword_Idle")
+	assert_str(PlayerVisual3D.clip_for(State.RUN, 0)).is_equal("Sprint")
+	assert_str(PlayerVisual3D.clip_for(State.JUMP, 0)).is_equal("Jump_Start")
+	assert_str(PlayerVisual3D.clip_for(State.FALL, 0)).is_equal("Jump")
+	assert_str(PlayerVisual3D.clip_for(State.ROLL, 0)).is_equal("Roll")
+	assert_str(PlayerVisual3D.clip_for(State.HURT, 0)).is_equal("Hit_Chest")
+	assert_str(PlayerVisual3D.clip_for(State.ATTACK, 0)).is_equal("Sword_Regular_A")
+	assert_str(PlayerVisual3D.clip_for(State.ATTACK, 1)).is_equal("Sword_Regular_B")
+	assert_str(PlayerVisual3D.clip_for(State.ATTACK, 2)).is_equal("Sword_Regular_C")
+
+func test_every_clip_the_hero_uses_exists_in_the_model() -> void:
+	var visual: PlayerVisual3D = _player.get_node("Visual")
+	for state in [State.IDLE, State.RUN, State.JUMP, State.FALL, State.ROLL, State.HURT]:
+		assert_bool(visual.has_clip(PlayerVisual3D.clip_for(state, 0))).is_true()
+	for step in 3:
+		assert_bool(visual.has_clip(PlayerVisual3D.clip_for(State.ATTACK, step))).is_true()
 
 func test_hero_sprite_runs_when_the_player_runs_and_faces_the_way_it_moves() -> void:
 	await _land()
-	var visual: PlayerVisual = _player.get_node("Visual")
-	assert_str(visual.animation).is_equal("idle")
+	var visual: PlayerVisual3D = _player.get_node("Visual")
+	assert_str(visual.current_clip()).is_equal("Sword_Idle")
 	InputRouter.set_virtual_axis(-1.0)
 	await _frames(6)
 	InputRouter.set_virtual_axis(0.0)
-	assert_str(visual.animation).is_equal("run")
-	assert_bool(visual.flip_h).is_true()
+	assert_str(visual.current_clip()).is_equal("Sprint")
+	assert_float(visual.facing()).is_less(0.0)
 
 func test_hero_sprite_swings_when_attacking_and_rolls_when_rolling() -> void:
 	await _land()
-	var visual: PlayerVisual = _player.get_node("Visual")
+	var visual: PlayerVisual3D = _player.get_node("Visual")
 	InputRouter.set_virtual_button(&"attack", true)
 	await _frames(3)
 	InputRouter.set_virtual_button(&"attack", false)
-	assert_str(visual.animation).is_equal("slash")
+	assert_str(visual.current_clip()).is_equal("Sword_Regular_A")
 	await _frames(40)
 	InputRouter.set_virtual_button(&"roll", true)
 	await _frames(3)
 	InputRouter.set_virtual_button(&"roll", false)
-	assert_str(visual.animation).is_equal("roll")
+	assert_str(visual.current_clip()).is_equal("Roll")
 
 func _tap_attack() -> void:
 	InputRouter.set_virtual_button(&"attack", true)
@@ -232,3 +239,16 @@ func test_a_tap_early_in_a_swing_is_remembered_for_the_next_one() -> void:
 	await _tap_attack()                     # well before this swing ends: plain input buffering would drop it
 	await _frames(30)
 	assert_int(_player.combo_step()).is_equal(1)
+
+func test_the_combo_finisher_lasts_longer_than_a_normal_swing() -> void:
+	await _land()
+	await _tap_attack()
+	await _frames(22)
+	await _tap_attack()
+	await _frames(22)
+	await _tap_attack()
+	await _frames(3)
+	assert_int(_player.combo_step()).is_equal(2)
+	var duration: float = _player.get_node("Weapon").data.attack_duration
+	await _frames(int(duration * 60.0) + 4)
+	assert_int(_player.state()).is_equal(State.ATTACK)    # a normal swing would be over by now
