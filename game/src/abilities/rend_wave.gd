@@ -15,9 +15,14 @@ const LIFT_TILES: float = 0.1
 const WORLD_MASK: int = 1
 const ENEMY_HURTBOX_MASK: int = 16
 
-const CORE := Color(0.05, 0.0, 0.02)
+const CORE := Color(0.04, 0.0, 0.02)
 const EDGE := Color(1.0, 0.33, 0.2)
-const GLOW := Color(0.78, 0.2, 0.62, 0.45)
+const VIOLET := Color(0.62, 0.14, 0.55)
+const GLOW := Color(0.78, 0.2, 0.62, 0.4)
+const FORKS: int = 5
+const SPIKE_GAP_TILES: float = 1.8
+const SPIKE_POINTS: int = 6
+const SPIKE_BASE_WIDTH: float = 3.6
 
 var direction: float = 1.0
 
@@ -87,36 +92,91 @@ func _is_one_way(body: Node) -> bool:
 	return false
 
 
+## Crimson Rend's look: a jagged forked bolt of black-cored red lightning races along the
+## ground, and black spikes with a red-orange rim and violet glow erupt upward as it passes,
+## tallest at the head. Re-rolled every few ticks so it crackles.
 func _draw() -> void:
-	var h := GameConfig.tiles(HEIGHT_TILES)
-	var w := GameConfig.tiles(WIDTH_TILES)
-	var lift := GameConfig.tiles(LIFT_TILES)
 	var d := signf(direction)
-	var fade := clampf(1.0 - _travelled / GameConfig.tiles(RANGE_TILES), 0.25, 1.0)
-	# Crescent bulging forward: back edge straight-ish, front edge a curve.
-	var points := PackedVector2Array()
-	var steps := 10
-	for i in steps + 1:
-		var t := float(i) / steps
-		var y := -lift - h * t
-		var bulge := sin(t * PI) * w * 1.4
-		var jitter := (1.0 if (i + _tick) % 3 == 0 else 0.0)
-		points.append(Vector2(d * (bulge + jitter), y))
-	for i in range(steps, -1, -1):
-		var t := float(i) / steps
-		var y := -lift - h * t
-		points.append(Vector2(d * (sin(t * PI) * w * 0.5 - w * 0.3), y))
-	var glow := PackedVector2Array()
-	for p in points:
-		glow.append(Vector2(p.x * 1.5 - d * 2.0, p.y))
-	draw_colored_polygon(glow, Color(GLOW.r, GLOW.g, GLOW.b, GLOW.a * fade))
-	draw_colored_polygon(points, Color(EDGE.r, EDGE.g, EDGE.b, fade))
-	var core := PackedVector2Array()
-	for p in points:
-		core.append(Vector2(p.x * 0.55, p.y))
-	draw_colored_polygon(core, CORE)
-	# Crackle: a few short red sparks trailing behind.
-	for k in 3:
-		var sy := -lift - h * (0.2 + 0.3 * k) - float((_tick * 7 + k * 13) % 9)
-		var sx := -d * (4.0 + float((_tick * 5 + k * 11) % 10))
-		draw_line(Vector2(sx, sy), Vector2(sx - d * 5.0, sy + 3.0), Color(EDGE.r, EDGE.g, EDGE.b, 0.8 * fade), 1.0)
+	var ground := -GameConfig.tiles(LIFT_TILES)
+	var fade := clampf((1.0 - _travelled / GameConfig.tiles(RANGE_TILES)) / 0.35, 0.3, 1.0)
+	# Ground bolt from where the wave started to its head (the node's origin).
+	var back := minf(_travelled, GameConfig.tiles(RANGE_TILES))
+	var start := Vector2(-d * back, ground)
+	var ground_bolt := _jagged(start, Vector2(0.0, ground), maxi(int(back / 9.0), 2), 3.0, 0)
+	draw_polyline(ground_bolt, Color(GLOW, GLOW.a * fade), 7.0)
+	draw_polyline(ground_bolt, Color(EDGE, fade), 4.0)
+	draw_polyline(ground_bolt, Color(VIOLET, fade), 2.0)
+	draw_polyline(ground_bolt, Color(CORE, fade), 1.0)
+	# Forks branching up off the bolt.
+	for k in FORKS:
+		var index := 1 + int(_flicker(k) * float(ground_bolt.size() - 2))
+		var root := ground_bolt[clampi(index, 0, ground_bolt.size() - 1)]
+		var reach := 12.0 + 10.0 * _flicker(k + 70)
+		var tip := root + Vector2(d * (4.0 + 8.0 * _flicker(k + 90)), -reach)
+		var fork := _jagged(root, tip, 5, 3.0, 100 + k)
+		draw_polyline(fork, Color(GLOW, GLOW.a * fade), 5.0)
+		draw_polyline(fork, Color(EDGE, fade), 3.0)
+		draw_polyline(fork, Color(CORE, fade), 1.0)
+	# Spikes erupting at fixed spots along the path, rising then sinking as time passes.
+	var gap := GameConfig.tiles(SPIKE_GAP_TILES)
+	var speed := GameConfig.tiles(SPEED_TILES)
+	var k := 1
+	while float(k) * gap <= _travelled:
+		var age := (_travelled - float(k) * gap) / speed
+		var rise := clampf(age / 0.05, 0.0, 1.0)
+		var sink := clampf(1.0 - (age - 0.15) / 0.6, 0.0, 1.0)
+		if rise * sink > 0.05:
+			var local_x := -d * (_travelled - float(k) * gap)
+			var size := 0.55 + 0.3 * minf(float(k) / 4.0, 1.0)
+			_spike(Vector2(local_x, ground), GameConfig.tiles(HEIGHT_TILES) * size * rise * sink, d, 100 + k, fade)
+		k += 1
+	_spike(Vector2(0.0, ground), GameConfig.tiles(HEIGHT_TILES) * (0.85 + 0.15 * _flicker(5)) * fade, d, 7, fade)
+
+
+## A tapering black spike (rim, violet glow, core) leaning with the wave's direction.
+func _spike(base: Vector2, height: float, d: float, seed_value: int, fade: float) -> void:
+	var spine := _jagged(base, base + Vector2(d * height * 0.18, -height), SPIKE_POINTS, 2.2, seed_value)
+	var half := PackedFloat32Array()
+	var normals := PackedVector2Array()
+	for i in spine.size():
+		var t := float(i) / float(spine.size() - 1)
+		half.append(maxf(SPIKE_BASE_WIDTH * pow(1.0 - t, 0.85) * (0.7 + 0.3 * fade), 0.4))
+		var tangent := (spine[mini(i + 1, spine.size() - 1)] - spine[maxi(i - 1, 0)]).normalized()
+		normals.append(Vector2(-tangent.y, tangent.x) * d)
+	var none := PackedFloat32Array()
+	none.resize(spine.size())
+	_claw_layer(spine, normals, half, none, none, 1.9, 1.9, Color(GLOW, GLOW.a * fade))
+	_claw_layer(spine, normals, half, none, none, 1.4, 1.25, Color(EDGE, fade))
+	_claw_layer(spine, normals, half, none, none, 1.15, 1.05, Color(VIOLET, fade))
+	_claw_layer(spine, normals, half, none, none, 0.8, 0.85, Color(CORE, fade))
+
+
+## A jagged line from a to b: `segments` pieces, each point pushed sideways at random.
+func _jagged(a: Vector2, b: Vector2, segments: int, amplitude: float, seed_value: int) -> PackedVector2Array:
+	var points := PackedVector2Array([a])
+	var along := b - a
+	var normal := Vector2(-along.y, along.x).normalized()
+	for i in range(1, segments):
+		var u := float(i) / float(segments)
+		var offset := (_flicker(seed_value + i * 3) * 2.0 - 1.0) * amplitude
+		points.append(a + along * u + normal * offset)
+	points.append(b)
+	return points
+
+
+## One filled strip along `spine`, `front_scale` / `back_scale` times as wide as `half`.
+func _claw_layer(spine: PackedVector2Array, normals: PackedVector2Array, half: PackedFloat32Array, front_extra: PackedFloat32Array, back_extra: PackedFloat32Array, front_scale: float, back_scale: float, colour: Color) -> void:
+	var colours := PackedColorArray([colour, colour, colour])
+	for i in spine.size() - 1:
+		var a_front := spine[i] + normals[i] * (half[i] + front_extra[i]) * front_scale
+		var a_back := spine[i] - normals[i] * (half[i] + back_extra[i]) * back_scale
+		var b_front := spine[i + 1] + normals[i + 1] * (half[i + 1] + front_extra[i + 1]) * front_scale
+		var b_back := spine[i + 1] - normals[i + 1] * (half[i + 1] + back_extra[i + 1]) * back_scale
+		draw_primitive(PackedVector2Array([a_front, a_back, b_back]), colours, PackedVector2Array())
+		draw_primitive(PackedVector2Array([a_front, b_back, b_front]), colours, PackedVector2Array())
+
+
+## 0..1, re-rolled every few ticks so the bolts crackle.
+func _flicker(seed_value: int) -> float:
+	var h := (_tick / 3) * 17 + seed_value * 31
+	return fposmod(sin(float(h) * 12.9898) * 43758.5453, 1.0)

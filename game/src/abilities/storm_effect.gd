@@ -32,8 +32,9 @@ const WRAP_SPARK := Color8(255, 255, 255)
 const WRAP_AMPLITUDE: float = 2.8
 const WRAP_TURNS: float = 5.0
 const WRAP_FORKS: int = 3
-# Rend: black core, red-orange edge, magenta-violet glow (outer to inner).
-const REND_LAYERS: Array[Color] = [Color(0.78, 0.2, 0.62), Color(1.0, 0.33, 0.2), Color(0.05, 0.0, 0.02)]
+# Rend: red-orange rim, violet glow, black core (outer to inner), like the claw wave.
+const REND_LAYERS: Array[Color] = [Color(1.0, 0.33, 0.2), Color(0.62, 0.14, 0.55), Color(0.04, 0.0, 0.02)]
+const REND_SHRINK: Array[float] = [0.0, 0.08, 0.2]
 ## Each crescent layer's inner edge, as a fraction of the way from its root to the tip.
 const LAYER_SHRINK: Array[float] = [-0.12, 0.05, 0.6]
 
@@ -115,9 +116,9 @@ func _draw() -> void:
 	var seg := blade()
 	var alpha := charge_alpha()
 	if _player.state() == State.REND:
-		_draw_crescent(REND_LAYERS, 1.0)
+		_draw_crescent(REND_LAYERS, 1.0, REND_SHRINK)
 	elif alpha > 0.0:
-		_draw_crescent(STORM_LAYERS, alpha)
+		_draw_crescent(STORM_LAYERS, alpha, LAYER_SHRINK)
 	if alpha > 0.0:
 		_draw_storm_wrap(seg[0], seg[1], alpha)
 	if _bolt_left > 0.0:
@@ -158,7 +159,7 @@ func _draw_storm_wrap(guard: Vector2, tip: Vector2, alpha: float) -> void:
 
 ## A crescent filling the path the blade just swept: thin at the old end, thick at the new,
 ## with lighter bands hugging the leading edge. Layers run outer to inner.
-func _draw_crescent(layers: Array[Color], strength: float) -> void:
+func _draw_crescent(layers: Array[Color], strength: float, shrinks: Array[float]) -> void:
 	var count := _tips.size()
 	for i in range(1, count):
 		if _tips[i].distance_to(_tips[i - 1]) < 0.5:
@@ -168,7 +169,7 @@ func _draw_crescent(layers: Array[Color], strength: float) -> void:
 		var root_a := _tips[i - 1].lerp(_guards[i - 1], width_a)
 		var root_b := _tips[i].lerp(_guards[i], width_b)
 		for layer in layers.size():
-			var shrink: float = LAYER_SHRINK[layer]
+			var shrink: float = shrinks[layer]
 			_draw_quad(root_a.lerp(_tips[i - 1], shrink), _tips[i - 1], _tips[i], root_b.lerp(_tips[i], shrink), Color(layers[layer], strength))
 
 
