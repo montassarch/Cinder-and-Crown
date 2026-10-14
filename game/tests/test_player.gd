@@ -132,3 +132,33 @@ func test_a_dead_player_ignores_input() -> void:
 	await _frames(20)
 	InputRouter.set_virtual_axis(0.0)
 	assert_float(_player.global_position.x).is_equal_approx(x_before, 1.0)
+
+func _peak_rise_tiles(hold_frames: int) -> float:
+	await _land()
+	var ground_y := _player.position.y
+	var peak := ground_y
+	InputRouter.set_virtual_button(&"jump", true)
+	for i in 50:
+		await get_tree().physics_frame
+		if i == hold_frames:
+			InputRouter.set_virtual_button(&"jump", false)
+		peak = minf(peak, _player.position.y)
+	return (ground_y - peak) / GameConfig.TILE_SIZE
+
+func test_holding_jump_reaches_the_full_jump_height() -> void:
+	var rise: float = await _peak_rise_tiles(49)
+	assert_float(rise).is_between(Player.JUMP_HEIGHT * 0.9, Player.JUMP_HEIGHT * 1.05)
+
+func test_tapping_jump_gives_a_short_hop_not_nothing() -> void:
+	# Releasing jump while rising damps the rise every frame, so a tap hops (~0.8 tile measured).
+	var rise: float = await _peak_rise_tiles(1)
+	assert_float(rise).is_between(0.6, 1.6)
+
+func test_jump_height_grows_with_how_long_jump_is_held() -> void:
+	var tap: float = await _peak_rise_tiles(1)
+	_player.reset(GameConfig.tiles_v(0.0, 3.0))
+	var medium: float = await _peak_rise_tiles(4)
+	_player.reset(GameConfig.tiles_v(0.0, 3.0))
+	var long_hold: float = await _peak_rise_tiles(8)
+	assert_float(medium).is_greater(tap + 0.3)
+	assert_float(long_hold).is_greater(medium + 0.3)

@@ -9,7 +9,7 @@ Build a small, simple, playable prototype that works as a **sandbox for testing*
 - Hosting publishes outside the machine, so ask before doing it (GitHub Pages or Netlify, unlisted link).
 
 ## Engine
-Godot 4.3 or later (needed for single-threaded web export that works on iOS Safari). Not yet installed.
+Godot 4.7.2, standard build (4.3 or later is what single-threaded web export for iOS Safari needs).
 
 ## Architecture principle: data-driven
 Anything the user will add later is a data file (Godot Resource), not hard-coded:

@@ -10,8 +10,10 @@ A Dead Cells-style 2D action roguelite. Start as a simple sandbox prototype, the
 - Story/Dialogue, Story/Quests: Phase 3
 
 ## Status
-Planning done, awaiting approval. Godot 4.7.2 installed; repo live at
-`montassarch/Cinder-and-Crown` (private). No game code yet.
+Phase 1 implemented on branch `phase-1-prototype` (not yet merged): sandbox, player,
+weapons, enemies, generated levels, Windows and web exports (local). See
+[[README]] for how to run it. Still open: a hands-on feel pass, hosting the
+web build, and testing on an iPhone. Repo: `montassarch/Cinder-and-Crown` (private).
 
 ## Decisions
 - **Engine:** Godot 4.7.2, standard build (no C#)

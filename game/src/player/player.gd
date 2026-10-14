@@ -18,6 +18,8 @@ const HURT_DURATION: float = PlayerStateMachine.HURT_DURATION
 const HURT_KNOCKBACK_SPEED: float = 5.0
 const HURT_KNOCKBACK_DECAY: float = 20.0
 const ATTACK_MOVE_FACTOR: float = 0.25
+## Applied every frame while jump is released and the player is still rising,
+## so letting go ends the rise quickly: height scales with how long jump is held.
 const JUMP_RELEASE_FACTOR: float = 0.5
 const BODY_SIZE_TILES := Vector2(1.0, 2.0)
 ## Used only while no weapon is equipped.
