@@ -6,6 +6,7 @@ A Dead Cells-style 2D action roguelite. Start as a simple sandbox prototype, the
 - [[Design/Overview]]: goals, platforms, architecture
 - [[Design/Plans/2026-10-13-phase-1-prototype]]: the Phase 1 implementation plan
 - [[Tasks/Roadmap]]: ordered task list
+- [[Design/Plans/2026-10-14-phase-1-rulings]]: every decision, finding and gap from building Phase 1
 - Content/Bosses, Content/Equipment, Content/Classes: ideas to add after the prototype
 - Story/Dialogue, Story/Quests: Phase 3
 
