@@ -128,3 +128,16 @@ func test_menu_panel_is_opaque_so_the_hud_does_not_bleed_through() -> void:
 	var panel: PanelContainer = menu.find_child("Panel", true, false)
 	var style: StyleBoxFlat = panel.get_theme_stylebox("panel")
 	assert_float(style.bg_color.a).is_equal(1.0)
+
+func test_the_menu_offers_a_way_to_the_generated_level() -> void:
+	var menu: SandboxMenu = _sandbox.get_node("Menu")
+	assert_str(menu.scene_switch_target()).is_equal("res://levels/generated_level.tscn")
+
+func test_pressing_the_scene_switch_asks_for_that_scene() -> void:
+	var menu: SandboxMenu = auto_free(load(MENU_SCENE).instantiate())
+	add_child(menu)
+	menu.set_scene_switch("Go", "res://levels/somewhere.tscn")
+	var asked := []
+	menu.scene_requested.connect(func(path: String) -> void: asked.append(path))
+	menu.press_scene_switch()
+	assert_array(asked).is_equal(["res://levels/somewhere.tscn"])

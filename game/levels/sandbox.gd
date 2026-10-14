@@ -17,6 +17,8 @@ const SPAWN_DISTANCE_TILES: float = 8.0
 const GROUND_SPAWN_HEIGHT_TILES: float = 2.0
 const AIR_SPAWN_HEIGHT_TILES: float = 5.0
 const RESPAWN_DELAY: float = 2.0
+const SANDBOX_PATH := "res://levels/sandbox.tscn"
+const GENERATED_PATH := "res://levels/generated_level.tscn"
 
 const GROUND_COLOR := Color(0.22, 0.2, 0.26)
 const PLATFORM_COLOR := Color(0.35, 0.3, 0.4)
@@ -40,11 +42,8 @@ func _ready() -> void:
 	player.global_position = spawn_point()
 	player.died.connect(_on_player_died)
 
-	_camera.limit_left = 0
-	_camera.limit_top = 0
-	_camera.limit_right = int(GameConfig.tiles(ARENA_WIDTH_TILES))
-	_camera.limit_bottom = GameConfig.BASE_HEIGHT
 	_camera.position_smoothing_enabled = true
+	_apply_camera_limits()
 	_camera.global_position = player.global_position
 
 	_hud.bind(player, enemy_count)
@@ -54,6 +53,9 @@ func _ready() -> void:
 	_menu.reset_requested.connect(reset_player)
 	_menu.debug_toggled.connect(func(on: bool) -> void: _overlay.enabled = on)
 	_menu.opened.connect(_on_menu_opened)
+	_menu.scene_requested.connect(_switch_scene)
+	var switch := _scene_switch()
+	_menu.set_scene_switch(switch[0], switch[1])
 	_menu.sync_weapons(player)
 
 
@@ -61,8 +63,22 @@ func _process(_delta: float) -> void:
 	_camera.global_position = player.global_position
 
 
+## Hooks: a level that builds its own geometry overrides these.
 func spawn_point() -> Vector2:
 	return GameConfig.tiles_v(4.0, GROUND_TOP_TILES - 1.5)
+
+
+func arena_width_tiles() -> float:
+	return ARENA_WIDTH_TILES
+
+
+func arena_height_tiles() -> float:
+	return float(GameConfig.BASE_HEIGHT) / GameConfig.TILE_SIZE
+
+
+## [button label, scene path] for the menu's "go somewhere else" button.
+func _scene_switch() -> Array:
+	return ["Generated level", GENERATED_PATH]
 
 
 func platform_rects_tiles() -> Array[Rect2]:
@@ -79,9 +95,9 @@ func spawn_enemy(data: EnemyData) -> Enemy:
 	add_child(enemy)
 	enemy.configure(data)
 	enemy.target = player
-	var toward_center := 1.0 if player.global_position.x < GameConfig.tiles(ARENA_WIDTH_TILES / 2.0) else -1.0
+	var toward_center := 1.0 if player.global_position.x < GameConfig.tiles(arena_width_tiles() / 2.0) else -1.0
 	var x := player.global_position.x + toward_center * GameConfig.tiles(SPAWN_DISTANCE_TILES)
-	x = clampf(x, GameConfig.tiles(2.0), GameConfig.tiles(ARENA_WIDTH_TILES - 2.0))
+	x = clampf(x, GameConfig.tiles(2.0), GameConfig.tiles(arena_width_tiles() - 2.0))
 	var height := AIR_SPAWN_HEIGHT_TILES if data.behaviour == EnemyData.Behaviour.FLYER else GROUND_SPAWN_HEIGHT_TILES
 	enemy.global_position = Vector2(x, GameConfig.tiles(GROUND_TOP_TILES - height))
 	return enemy
@@ -113,6 +129,18 @@ func _on_player_died() -> void:
 	get_tree().create_timer(RESPAWN_DELAY).timeout.connect(reset_player)
 
 
+func _apply_camera_limits() -> void:
+	_camera.limit_left = 0
+	_camera.limit_top = 0
+	_camera.limit_right = int(GameConfig.tiles(arena_width_tiles()))
+	_camera.limit_bottom = int(GameConfig.tiles(arena_height_tiles()))
+
+
+func _switch_scene(path: String) -> void:
+	get_tree().paused = false
+	get_tree().change_scene_to_file(path)
+
+
 func _on_menu_opened(is_open: bool) -> void:
 	if is_open:
 		_touch.release_all()
@@ -129,7 +157,7 @@ func _build_arena() -> void:
 		_add_block(rect, PLATFORM_COLOR, true)
 
 
-func _add_block(rect_tiles: Rect2, color: Color, one_way: bool) -> void:
+func _add_block(rect_tiles: Rect2, color: Color, one_way: bool, parent: Node = self) -> void:
 	var size := GameConfig.tiles_v(rect_tiles.size.x, rect_tiles.size.y)
 	var body := StaticBody2D.new()
 	body.position = GameConfig.tiles_v(rect_tiles.position.x, rect_tiles.position.y) + size / 2.0
@@ -145,4 +173,4 @@ func _add_block(rect_tiles: Rect2, color: Color, one_way: bool) -> void:
 	visual.color = color
 	visual.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	body.add_child(visual)
-	add_child(body)
+	parent.add_child(body)

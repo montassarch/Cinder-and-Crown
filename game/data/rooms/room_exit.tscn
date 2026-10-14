@@ -1,0 +1,40 @@
+[gd_scene load_steps=3 format=3]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
+size = Vector2(384, 32)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_exit"]
+size = Vector2(64, 96)
+
+[node name="RoomExit" type="Node2D"]
+
+[node name="Floor" type="StaticBody2D" parent="."]
+position = Vector2(192, 208)
+
+[node name="Shape" type="CollisionShape2D" parent="Floor"]
+shape = SubResource("RectangleShape2D_1")
+
+[node name="Visual" type="ColorRect" parent="Floor"]
+offset_left = -192
+offset_top = -16
+offset_right = 192
+offset_bottom = 16
+mouse_filter = 2
+color = Color(0.22, 0.2, 0.26, 1)
+
+
+[node name="ExitZone" type="Area2D" parent="."]
+position = Vector2(336, 144)
+collision_layer = 0
+collision_mask = 2
+
+[node name="Shape" type="CollisionShape2D" parent="ExitZone"]
+shape = SubResource("RectangleShape2D_exit")
+
+[node name="Visual" type="ColorRect" parent="ExitZone"]
+offset_left = -32
+offset_top = -48
+offset_right = 32
+offset_bottom = 48
+mouse_filter = 2
+color = Color(0.95, 0.75, 0.2, 0.45)

@@ -10,6 +10,7 @@ signal weapon_assigned(slot: int, data: WeaponData)
 signal reset_requested
 signal debug_toggled(enabled: bool)
 signal opened(is_open: bool)
+signal scene_requested(path: String)
 
 const ENEMY_DIR := "res://data/enemies"
 const WEAPON_DIR := "res://data/weapons"
@@ -23,6 +24,8 @@ var _panel: PanelContainer
 var _toggle: Button
 var _spawn_buttons: Array[Button] = []
 var _clear_button: Button
+var _switch_button: Button
+var _switch_path: String = ""
 var _pickers: Array[OptionButton] = []
 
 
@@ -71,6 +74,21 @@ func press_spawn(index: int) -> void:
 
 func press_clear() -> void:
 	_clear_button.pressed.emit()
+
+
+## Adds a button that asks the host level to load another scene.
+func set_scene_switch(label: String, path: String) -> void:
+	_switch_path = path
+	_switch_button.text = label
+	_switch_button.visible = path != ""
+
+
+func scene_switch_target() -> String:
+	return _switch_path
+
+
+func press_scene_switch() -> void:
+	_switch_button.pressed.emit()
 
 
 ## Point each slot picker at what the player is actually holding.
@@ -138,6 +156,10 @@ func _build_ui() -> void:
 	var reset := _make_button("Reset player")
 	reset.pressed.connect(func() -> void: reset_requested.emit())
 	actions.add_child(reset)
+	_switch_button = _make_button("")
+	_switch_button.visible = false
+	_switch_button.pressed.connect(func() -> void: scene_requested.emit(_switch_path))
+	actions.add_child(_switch_button)
 	var debug := CheckButton.new()
 	debug.text = "Debug boxes"
 	debug.focus_mode = Control.FOCUS_NONE
