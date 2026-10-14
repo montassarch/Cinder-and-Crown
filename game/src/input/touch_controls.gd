@@ -1,5 +1,9 @@
+class_name TouchControls
 extends CanvasLayer
-## On-screen stick (left) plus Attack / Jump / Roll buttons (right).
+## On-screen stick (left) plus Attack / Jump / Roll / Swap buttons (right).
+## Positions are authored on the 384x216 base screen; on a wider or taller screen
+## the stick keeps its distance to the left and bottom edges, the buttons to the
+## right and bottom edges.
 ## Talks to the game only through InputRouter.set_virtual_*; it never marks
 ## events handled, so keyboard and gamepad keep working while it is shown.
 
@@ -31,7 +35,18 @@ var _stick_value: float = 0.0
 func _ready() -> void:
 	visible = force_visible or DisplayServer.is_touchscreen_available()
 	_overlay.draw.connect(_draw_overlay)
+	get_viewport().size_changed.connect(_overlay.queue_redraw)
 	_overlay.queue_redraw()
+
+
+func button_center(action: StringName, view: Vector2) -> Vector2:
+	var base := GameConfig.tiles_v(BUTTON_CENTERS_TILES[action].x, BUTTON_CENTERS_TILES[action].y)
+	return Vector2(view.x - (GameConfig.BASE_WIDTH - base.x), view.y - (GameConfig.BASE_HEIGHT - base.y))
+
+
+func stick_center(view: Vector2) -> Vector2:
+	var base := GameConfig.tiles_v(STICK_CENTER_TILES.x, STICK_CENTER_TILES.y)
+	return Vector2(base.x, view.y - (GameConfig.BASE_HEIGHT - base.y))
 
 
 func _input(event: InputEvent) -> void:
@@ -58,14 +73,15 @@ func release_all() -> void:
 
 
 func _touch_down(finger: int, pos: Vector2) -> void:
+	var view := _view_size()
 	for action in BUTTON_CENTERS_TILES:
-		var center: Vector2 = GameConfig.tiles_v(BUTTON_CENTERS_TILES[action].x, BUTTON_CENTERS_TILES[action].y)
+		var center := button_center(action, view)
 		if pos.distance_to(center) <= GameConfig.tiles(BUTTON_RADIUS_TILES):
 			_button_fingers[finger] = action
 			InputRouter.set_virtual_button(action, true)
 			_overlay.queue_redraw()
 			return
-	if _stick_finger == -1 and pos.x <= GameConfig.tiles(STICK_ZONE_RIGHT_EDGE_TILES) and pos.y >= GameConfig.tiles(STICK_ZONE_TOP_TILES):
+	if _stick_finger == -1 and pos.x <= GameConfig.tiles(STICK_ZONE_RIGHT_EDGE_TILES) and pos.y >= view.y - (GameConfig.BASE_HEIGHT - GameConfig.tiles(STICK_ZONE_TOP_TILES)):
 		_stick_finger = finger
 		_update_stick(pos)
 
@@ -82,7 +98,7 @@ func _touch_up(finger: int) -> void:
 
 
 func _update_stick(pos: Vector2) -> void:
-	var center := GameConfig.tiles_v(STICK_CENTER_TILES.x, STICK_CENTER_TILES.y)
+	var center := stick_center(_view_size())
 	var raw := (pos.x - center.x) / GameConfig.tiles(STICK_RADIUS_TILES)
 	_stick_value = clampf(raw, -1.0, 1.0)
 	InputRouter.set_virtual_axis(0.0 if absf(_stick_value) < STICK_DEADZONE else _stick_value)
@@ -92,14 +108,19 @@ func _update_stick(pos: Vector2) -> void:
 func _draw_overlay() -> void:
 	var idle := Color(1, 1, 1, 0.18)
 	var active := Color(1, 1, 1, 0.4)
-	var stick_center := GameConfig.tiles_v(STICK_CENTER_TILES.x, STICK_CENTER_TILES.y)
-	_overlay.draw_circle(stick_center, GameConfig.tiles(STICK_RADIUS_TILES), idle)
-	var knob := stick_center + Vector2(_stick_value * GameConfig.tiles(STICK_RADIUS_TILES), 0.0)
+	var view := _view_size()
+	var stick := stick_center(view)
+	_overlay.draw_circle(stick, GameConfig.tiles(STICK_RADIUS_TILES), idle)
+	var knob := stick + Vector2(_stick_value * GameConfig.tiles(STICK_RADIUS_TILES), 0.0)
 	_overlay.draw_circle(knob, GameConfig.tiles(1.0), active)
 	for action in BUTTON_CENTERS_TILES:
-		var center := GameConfig.tiles_v(BUTTON_CENTERS_TILES[action].x, BUTTON_CENTERS_TILES[action].y)
+		var center := button_center(action, view)
 		var pressed := _button_fingers.values().has(action)
 		_overlay.draw_circle(center, GameConfig.tiles(BUTTON_RADIUS_TILES), active if pressed else idle)
 		var width := GameConfig.tiles(BUTTON_RADIUS_TILES * 2.0)
 		var label_pos := center + Vector2(-width / 2.0, GameConfig.UI_FONT_SIZE / 3.0)
 		_overlay.draw_string(ThemeDB.fallback_font, label_pos, BUTTON_LABELS[action], HORIZONTAL_ALIGNMENT_CENTER, width, GameConfig.UI_FONT_SIZE, Color(1, 1, 1, 0.8))
+
+
+func _view_size() -> Vector2:
+	return get_viewport().get_visible_rect().size
