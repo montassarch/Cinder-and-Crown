@@ -9,20 +9,18 @@ Branch: `spike/abilities` (work in progress, not merged). Test link still shows 
 - Casts are committed (only a hit interrupts). Not enough mana: button does nothing and the mana bar flashes.
 - Look for Rend: black core, red-orange edge, magenta-violet glow (user's reference image). Storm: clean blue.
 
-## Done (code + tests, in this branch)
-Mana, input actions skill1/skill2 (U/I keys, LB/RB pad), STORM/REND player states, weapon bonus damage + stun chance, enemy stun, RendWave, player wiring. 195 of 196 tests pass.
+## Done (code + tests, in this branch; 200 of 200 tests pass)
+Mana, input actions skill1/skill2 (U/I keys, LB/RB pad), STORM/REND player states, weapon bonus damage + stun chance, enemy stun, RendWave (walls stop it via a physics-space shape query), player wiring.
+Added in the second session:
+- Touch buttons STORM / REND left of ROLL / SWAP (`TouchControls`), covered by tests.
+- Blue mana bar under the health bar, flashing on `Player.mana_denied` (`Hud.mana_fraction()`, `mana_flashing()`).
+- `StormEffect` (child of Player): blue bolt from the sky on `storm_struck`, crackling arcs on the blade while charged, fading over the last 2 s.
+- `PlayerVisual`: `storm` (Attack1 frames 0,1 then hold frame 1) and `rend` (Attack3 frames 1-6) animations, fitted to the cast times. Placeholder reuse of existing frames; commission real art later if wanted.
 
-## Known failing test
-`test_rend_wave.gd::test_a_wall_stops_the_wave`: Area2D `body_entered` is not fired for static walls the wave moves into. Fix (written, not yet applied): in `RendWave._physics_process`, query `get_world_2d().direct_space_state.intersect_shape` with the wave's shape against mask 1 and free the wave on a non-one-way static hit; drop `_on_body_entered`.
-
-## Still to do (Parts 2 and 3 of the design were never reviewed)
-1. Fix the wall test above, run the full suite.
-2. Touch buttons STORM / REND next to ATK and ROLL (TouchControls: add to BUTTON_CENTERS_TILES and BUTTON_LABELS; keep the no-overlap test green).
-3. Blue mana bar under the health bar in the HUD, flashing on `Player.mana_denied`.
-4. Visuals: blue bolt from the sky + crackling arcs on the blade while charged (fade in the last 2 s, `Player.storm_struck` signal); Rend wave art already drawn in code.
-5. Animations: knight has no "sword raised" or "vertical slash" frames; reuse Attack1 frame 1 (sword up) for the Storm cast and Attack3 frames 1-3 for Rend, or commission art.
-6. Player states STORM/REND need entries in `PlayerVisual.animation_for` (currently fall through to idle).
-7. Playtest on the phone, then tune the numbers above.
+## Still to do
+1. Playtest on the phone (not possible from a cloud session): check button placement, the blade/bolt position on the sprite (`StormEffect.BLADE_TILES`), and Rend timing against the slash frames.
+2. Tune the numbers above after playtesting.
+3. Parts 2 and 3 of the design were never reviewed by the user; confirm before merging.
 
 ## Other branches
 - `spike/hero-knight`: knight art, faster run, combo (test link). Merge this into `main` when the user approves ("make the knight the real game").

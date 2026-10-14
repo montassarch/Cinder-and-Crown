@@ -1,6 +1,6 @@
 class_name TouchControls
 extends CanvasLayer
-## On-screen stick (left) plus Attack / Jump / Roll / Swap buttons (right).
+## On-screen stick (left) plus Attack / Jump / Roll / Swap / Storm / Rend buttons (right).
 ## Positions are authored on the 384x216 base screen; on a wider or taller screen
 ## the stick keeps its distance to the left and bottom edges, the buttons to the
 ## right and bottom edges.
@@ -19,8 +19,10 @@ const BUTTON_CENTERS_TILES := {
 	&"jump": Vector2(21.5, 6.8),
 	&"roll": Vector2(18.5, 10.8),
 	&"swap_weapon": Vector2(18.5, 7.4),
+	&"skill1": Vector2(15.5, 10.8),
+	&"skill2": Vector2(15.5, 7.4),
 }
-const BUTTON_LABELS := {&"attack": "ATK", &"jump": "JMP", &"roll": "ROLL", &"swap_weapon": "SWAP"}
+const BUTTON_LABELS := {&"attack": "ATK", &"jump": "JMP", &"roll": "ROLL", &"swap_weapon": "SWAP", &"skill1": "STORM", &"skill2": "REND"}
 
 ## Show even without a touchscreen (desktop testing).
 @export var force_visible: bool = false

@@ -19,9 +19,13 @@ const ANIMS := {
 	&"attack1": {"dir": "Attack1", "count": 6, "fps": 20.0, "loop": false},
 	&"attack2": {"dir": "Attack2", "count": 6, "fps": 20.0, "loop": false},
 	&"attack3": {"dir": "Attack3", "count": 8, "fps": 20.0, "loop": false},
+	# Ability casts reuse attack frames (no dedicated art yet): Storm holds the sword raised,
+	# Rend is the heavy downward slash (wave leaves around its third frame).
+	&"storm": {"dir": "Attack1", "frames": [0, 1, 1, 1, 1, 1], "fps": 10.0, "loop": false},
+	&"rend": {"dir": "Attack3", "frames": [1, 2, 3, 4, 5, 6], "fps": 14.0, "loop": false},
 }
 ## These play over exactly the action's duration instead of their own frame rate.
-const FITTED: Array[StringName] = [&"roll", &"attack1", &"attack2", &"attack3"]
+const FITTED: Array[StringName] = [&"roll", &"attack1", &"attack2", &"attack3", &"storm", &"rend"]
 const COMBO_ANIMS: Array[StringName] = [&"attack1", &"attack2", &"attack3"]
 
 const State := PlayerStateMachine.PlayerState
@@ -39,7 +43,7 @@ func show_state(state: State, facing: float, feet_y: float, action_seconds: floa
 	var anim := &"death" if dead else animation_for(state, combo_step)
 	if anim != animation:
 		if anim in FITTED and action_seconds > 0.0:
-			sprite_frames.set_animation_speed(anim, ANIMS[anim]["count"] / action_seconds)
+			sprite_frames.set_animation_speed(anim, _frame_indices(ANIMS[anim]).size() / action_seconds)
 		play(anim)
 	flip_h = facing < 0.0
 	position = Vector2(-(FRAME.x - FEET.x) if flip_h else -FEET.x, feet_y - FEET.y)
@@ -53,6 +57,8 @@ static func animation_for(state: State, combo_step: int) -> StringName:
 		State.ROLL: return &"roll"
 		State.ATTACK: return COMBO_ANIMS[combo_step % COMBO_ANIMS.size()]
 		State.HURT: return &"hurt"
+		State.STORM: return &"storm"
+		State.REND: return &"rend"
 		_: return &"idle"
 
 
@@ -64,6 +70,10 @@ func _build_frames() -> SpriteFrames:
 		frames.add_animation(anim)
 		frames.set_animation_speed(anim, spec["fps"])
 		frames.set_animation_loop(anim, spec["loop"])
-		for i in spec["count"]:
+		for i in _frame_indices(spec):
 			frames.add_frame(anim, load("%s/%s/HeroKnight_%s_%d.png" % [ART_DIR, spec["dir"], spec["dir"], i]))
 	return frames
+
+
+static func _frame_indices(spec: Dictionary) -> Array:
+	return spec["frames"] if spec.has("frames") else range(spec["count"])

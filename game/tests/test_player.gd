@@ -174,6 +174,8 @@ func test_hero_plays_the_animation_for_each_state() -> void:
 	assert_str(PlayerVisual.animation_for(State.ATTACK, 0)).is_equal("attack1")
 	assert_str(PlayerVisual.animation_for(State.ATTACK, 1)).is_equal("attack2")
 	assert_str(PlayerVisual.animation_for(State.ATTACK, 2)).is_equal("attack3")
+	assert_str(PlayerVisual.animation_for(State.STORM, 0)).is_equal("storm")
+	assert_str(PlayerVisual.animation_for(State.REND, 0)).is_equal("rend")
 
 func test_every_hero_animation_loads_all_its_frames() -> void:
 	var visual: PlayerVisual = _player.get_node("Visual")

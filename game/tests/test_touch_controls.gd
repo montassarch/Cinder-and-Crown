@@ -12,9 +12,12 @@ func before_test() -> void:
 func after_test() -> void:
 	_controls.queue_free()
 	InputRouter.set_virtual_axis(0.0)
-	for action in [&"attack", &"jump", &"roll"]:
+	for action in [&"attack", &"jump", &"roll", &"skill1", &"skill2"]:
 		InputRouter.set_virtual_button(action, false)
-		InputRouter.call(&"consume_" + str(action))
+		if action in [&"skill1", &"skill2"]:
+			InputRouter.consume_skill(int(str(action).trim_prefix("skill")))
+		else:
+			InputRouter.call(&"consume_" + str(action))
 
 ## Where the screen actually is (headless runs have an odd-shaped window).
 func _view() -> Vector2:
@@ -68,6 +71,13 @@ func test_tapping_the_swap_button_requests_a_weapon_swap() -> void:
 	var center := _controls.button_center(&"swap_weapon", _view())
 	_touch(0, center, true)
 	assert_bool(InputRouter.swap_weapon_pressed()).is_true()
+
+func test_tapping_the_ability_buttons_buffers_the_matching_skill() -> void:
+	_touch(0, _controls.button_center(&"skill1", _view()), true)
+	assert_bool(InputRouter.skill_buffered(1)).is_true()
+	assert_bool(InputRouter.skill_buffered(2)).is_false()
+	_touch(1, _controls.button_center(&"skill2", _view()), true)
+	assert_bool(InputRouter.skill_buffered(2)).is_true()
 
 func test_no_two_touch_buttons_overlap() -> void:
 	var names: Array = _controls.BUTTON_CENTERS_TILES.keys()

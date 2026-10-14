@@ -1,16 +1,25 @@
 class_name Hud
 extends CanvasLayer
-## Health bar, both weapon slots, live enemy count. Reads state; owns none.
+## Health bar, mana bar, both weapon slots, live enemy count. Reads state; owns none.
 
 const BAR_SIZE_TILES := Vector2(6.0, 0.5)
+const MANA_BAR_SIZE_TILES := Vector2(6.0, 0.3)
 const MARGIN_TILES: float = 0.5
+const MANA_GAP_TILES: float = 0.1
+const MANA_COLOR := Color(0.25, 0.55, 1.0)
+const MANA_DENIED_COLOR := Color(1.0, 0.95, 0.95)
+const MANA_FLASH_SECONDS: float = 0.35
 
 var _player: Player
 var _enemy_counter: Callable
 var _fraction: float = 1.0
+var _mana_fraction: float = 1.0
+var _mana_flash: float = 0.0
 
 @onready var _back: ColorRect = $HealthBack
 @onready var _fill: ColorRect = $HealthFill
+@onready var _mana_back: ColorRect = $ManaBack
+@onready var _mana_fill: ColorRect = $ManaFill
 @onready var _weapons: Label = $WeaponLabel
 @onready var _enemies: Label = $EnemyLabel
 
@@ -24,10 +33,16 @@ func _ready() -> void:
 		rect.position = Vector2(margin, margin)
 		rect.size = bar
 		rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var mana_bar := GameConfig.tiles_v(MANA_BAR_SIZE_TILES.x, MANA_BAR_SIZE_TILES.y)
+	var mana_top := margin + bar.y + GameConfig.tiles(MANA_GAP_TILES)
+	for rect: ColorRect in [_mana_back, _mana_fill]:
+		rect.position = Vector2(margin, mana_top)
+		rect.size = mana_bar
+		rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	for label: Label in [_weapons, _enemies]:
 		label.theme = theme
 		label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_weapons.position = Vector2(margin, margin + bar.y + GameConfig.tiles(0.15))
+	_weapons.position = Vector2(margin, mana_top + mana_bar.y + GameConfig.tiles(0.15))
 	_enemies.position = _weapons.position + Vector2(0.0, GameConfig.tiles(0.8))
 	_refresh()
 
@@ -38,11 +53,24 @@ func bind(player: Player, enemy_counter: Callable) -> void:
 	var health: Health = player.get_node("Health")
 	health.health_changed.connect(_on_health_changed)
 	_on_health_changed(health.current, health.max_health)
+	var mana := player.mana()
+	mana.mana_changed.connect(_on_mana_changed)
+	_on_mana_changed(mana.current, mana.max_mana)
+	player.mana_denied.connect(_on_mana_denied)
 	_refresh()
 
 
 func health_fraction() -> float:
 	return _fraction
+
+
+func mana_fraction() -> float:
+	return _mana_fraction
+
+
+## True while the mana bar is flashing after a cast was refused.
+func mana_flashing() -> bool:
+	return _mana_flash > 0.0
 
 
 func weapon_text() -> String:
@@ -60,7 +88,11 @@ func enemy_text() -> String:
 	return "Enemies: %d" % (_enemy_counter.call() if _enemy_counter.is_valid() else 0)
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
+	if _mana_flash > 0.0:
+		_mana_flash = maxf(0.0, _mana_flash - delta)
+		_mana_fill.color = MANA_COLOR.lerp(MANA_DENIED_COLOR, _mana_flash / MANA_FLASH_SECONDS)
+		_mana_back.color = Color(0.04, 0.07, 0.15, 0.85).lerp(MANA_DENIED_COLOR, 0.5 * _mana_flash / MANA_FLASH_SECONDS)
 	_refresh()
 
 
@@ -72,3 +104,12 @@ func _refresh() -> void:
 func _on_health_changed(current: int, max_health: int) -> void:
 	_fraction = float(current) / float(maxi(max_health, 1))
 	_fill.size.x = GameConfig.tiles(BAR_SIZE_TILES.x) * _fraction
+
+
+func _on_mana_changed(current: float, max_mana: float) -> void:
+	_mana_fraction = current / maxf(max_mana, 0.001)
+	_mana_fill.size.x = GameConfig.tiles(MANA_BAR_SIZE_TILES.x) * _mana_fraction
+
+
+func _on_mana_denied() -> void:
+	_mana_flash = MANA_FLASH_SECONDS

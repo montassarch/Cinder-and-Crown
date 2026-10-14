@@ -100,6 +100,11 @@ func _ready() -> void:
 	add_child(_mana)
 	_mana.refill()
 	_weapon.hit_landed.connect(func(_target: Node, _damage: int) -> void: _mana.gain(MANA_PER_HIT))
+	var storm_effect := StormEffect.new()
+	storm_effect.name = "StormEffect"
+	storm_effect.z_index = 2
+	add_child(storm_effect)
+	storm_effect.bind(self)
 
 
 func _physics_process(delta: float) -> void:
@@ -148,6 +153,10 @@ func state() -> State:
 
 func mana() -> Mana:
 	return _mana
+
+
+func facing() -> float:
+	return _facing
 
 
 func storm_seconds_left() -> float:
