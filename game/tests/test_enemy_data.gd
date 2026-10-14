@@ -166,3 +166,40 @@ func test_charger_winds_up_when_target_is_in_trigger_range() -> void:
 	enemy.target = target
 	await _frames(10)
 	assert_bool(enemy.is_telegraphing()).is_true()
+
+func test_flyer_holds_still_while_telegraphing() -> void:
+	# A wind-up that drifts toward the player is not a readable telegraph.
+	var data := _fast_data(EnemyData.Behaviour.FLYER)
+	data.telegraph_seconds = 1.0
+	data.recovery_seconds = 5.0
+	var enemy := _spawn(data)
+	enemy.global_position = GameConfig.tiles_v(0.0, 0.0)
+	var target: Node2D = auto_free(DUMMY.new())
+	add_child(target)
+	target.global_position = GameConfig.tiles_v(0.0, 8.0)
+	enemy.target = target
+	await _frames(10)
+	assert_float(enemy.velocity.y).is_greater(0.0)  # it really was flying toward the target
+	enemy.begin_telegraph()
+	await _frames(3)
+	var held_at := enemy.global_position
+	await _frames(10)
+	assert_vector(enemy.velocity).is_equal(Vector2.ZERO)
+	assert_vector(enemy.global_position).is_equal_approx(held_at, Vector2(0.01, 0.01))
+
+func test_flyer_holds_still_while_recovering() -> void:
+	var data := _fast_data(EnemyData.Behaviour.FLYER)
+	data.recovery_seconds = 5.0
+	var enemy := _spawn(data)
+	enemy.global_position = GameConfig.tiles_v(0.0, 0.0)
+	var target: Node2D = auto_free(DUMMY.new())
+	add_child(target)
+	target.global_position = GameConfig.tiles_v(0.0, 8.0)
+	enemy.target = target
+	await _frames(10)
+	enemy.begin_telegraph()
+	await await_millis(250)  # telegraph (0.05s) has released; now recovering
+	var held_at := enemy.global_position
+	await _frames(10)
+	assert_vector(enemy.velocity).is_equal(Vector2.ZERO)
+	assert_vector(enemy.global_position).is_equal_approx(held_at, Vector2(0.01, 0.01))

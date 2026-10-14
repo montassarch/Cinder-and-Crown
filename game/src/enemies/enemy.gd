@@ -17,6 +17,8 @@ const CHARGE_CONTACT_TILES: float = 1.2
 const FLYER_HOVER_ABOVE_TILES: float = 1.5
 const FLYER_BOB_AMPLITUDE_TILES: float = 0.8
 const FLYER_BOB_HZ: float = 1.5
+## Within this distance of its hover point a flyer stops steering.
+const FLYER_ARRIVE_TILES: float = 0.15
 const DEATH_LINGER: float = 0.5
 const TELEGRAPH_FLASH := Color(1.0, 1.0, 1.0)
 
@@ -107,6 +109,8 @@ func _physics_process(delta: float) -> void:
 	velocity.x = move_x + _knockback_x
 	if data.behaviour != EnemyData.Behaviour.FLYER:
 		velocity.y += GameConfig.tiles(GRAVITY) * delta
+	elif _state != State.MOVE:
+		velocity.y = 0.0  # a wind-up or recovery must not drift; only MOVE steers a flyer
 	move_and_slide()
 
 
@@ -122,12 +126,13 @@ func _think_move(foe: Node2D, _delta: float) -> float:
 		EnemyData.Behaviour.FLYER:
 			var hover := foe.global_position + Vector2(0.0, -GameConfig.tiles(FLYER_HOVER_ABOVE_TILES))
 			hover.y += sin(_age * TAU * FLYER_BOB_HZ) * GameConfig.tiles(FLYER_BOB_AMPLITUDE_TILES)
-			var heading := (hover - global_position)
-			velocity.y = heading.normalized().y * speed if heading.length() > 2.0 else 0.0
+			var heading := hover - global_position
+			var arrived := heading.length() <= GameConfig.tiles(FLYER_ARRIVE_TILES)
+			velocity.y = 0.0 if arrived else heading.normalized().y * speed
 			if offset.length() <= reach:
 				begin_telegraph()
 				return 0.0
-			return heading.normalized().x * speed if heading.length() > 2.0 else 0.0
+			return 0.0 if arrived else heading.normalized().x * speed
 		EnemyData.Behaviour.CHARGER:
 			if absf(offset.x) <= reach and absf(offset.y) <= GameConfig.tiles(2.0):
 				begin_telegraph()
