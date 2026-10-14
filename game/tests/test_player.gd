@@ -72,3 +72,42 @@ func test_hit_during_iframes_is_ignored() -> void:
 	_player.take_hit(10, _player.global_position.x - 20.0)
 	assert_int(_player.get_node("Health").current).is_equal(100)
 	assert_int(_player.state()).is_equal(State.ROLL)
+
+func test_player_starts_with_blade_in_slot_zero_and_spear_in_slot_one() -> void:
+	assert_str(_player.weapon_in_slot(0).display_name).is_equal("Rusty Blade")
+	assert_str(_player.weapon_in_slot(1).display_name).is_equal("Ember Spear")
+	assert_int(_player.active_slot()).is_equal(0)
+
+func test_swap_is_always_allowed_and_toggles_slots() -> void:
+	_player.swap_weapons()
+	assert_int(_player.active_slot()).is_equal(1)
+	_player.swap_weapons()
+	assert_int(_player.active_slot()).is_equal(0)
+
+func test_swap_input_toggles_slots() -> void:
+	await _land()
+	Input.action_press("swap_weapon")
+	await _frames(2)
+	Input.action_release("swap_weapon")
+	assert_int(_player.active_slot()).is_equal(1)
+
+func test_attack_input_opens_the_equipped_weapons_hitbox_during_its_window() -> void:
+	await _land()
+	var weapon: Weapon = _player.get_node("Weapon")
+	InputRouter.set_virtual_button(&"attack", true)
+	await _frames(2)
+	assert_int(_player.state()).is_equal(State.ATTACK)
+	assert_bool(weapon.is_hitbox_active()).is_false()
+	await _frames(8)
+	assert_bool(weapon.is_hitbox_active()).is_true()
+	InputRouter.set_virtual_button(&"attack", false)
+
+func test_swapping_mid_swing_leaves_no_live_hitbox() -> void:
+	await _land()
+	var weapon: Weapon = _player.get_node("Weapon")
+	InputRouter.set_virtual_button(&"attack", true)
+	await _frames(10)
+	InputRouter.set_virtual_button(&"attack", false)
+	assert_bool(weapon.is_hitbox_active()).is_true()
+	_player.swap_weapons()
+	assert_bool(weapon.is_hitbox_active()).is_false()

@@ -20,8 +20,12 @@ const HURT_KNOCKBACK_DECAY: float = 20.0
 const ATTACK_MOVE_FACTOR: float = 0.25
 const JUMP_RELEASE_FACTOR: float = 0.5
 const BODY_SIZE_TILES := Vector2(1.0, 2.0)
-# Placeholder until Task 5 supplies the equipped weapon's attack_duration.
+## Used only while no weapon is equipped.
 const DEFAULT_ATTACK_DURATION: float = 0.3
+const WEAPON_SLOTS: int = 2
+
+## Slot 0 and 1 loadout. Set in the scene; the sandbox menu can reassign at runtime.
+@export var starting_weapons: Array[WeaponData] = []
 
 var _state: State = State.IDLE
 var _state_time: float = 0.0
@@ -29,7 +33,10 @@ var _coyote: float = 0.0
 var _hurt_pending: bool = false
 var _hit_direction: float = 0.0
 var _facing: float = 1.0
+var _weapons: Array[WeaponData] = [null, null]
+var _active_slot: int = 0
 
+@onready var _weapon: Weapon = $Weapon
 @onready var _health: Health = $Health
 @onready var _body: ColorRect = $Body
 @onready var _shape: CollisionShape2D = $CollisionShape2D
@@ -43,10 +50,15 @@ func _ready() -> void:
 	_body.size = size
 	_body.position = -size / 2.0
 	_health.died.connect(func() -> void: died.emit())
+	for slot in mini(WEAPON_SLOTS, starting_weapons.size()):
+		_weapons[slot] = starting_weapons[slot]
+	_weapon.equip(_weapons[_active_slot])
 
 
 func _physics_process(delta: float) -> void:
 	_state_time += delta
+	if InputRouter.swap_weapon_pressed():
+		swap_weapons()
 	_coyote = COYOTE_TIME if is_on_floor() else maxf(0.0, _coyote - delta)
 
 	var hurt_now := _hurt_pending
@@ -61,6 +73,29 @@ func _physics_process(delta: float) -> void:
 
 func state() -> State:
 	return _state
+
+
+func set_weapon(slot: int, data: WeaponData) -> void:
+	_weapons[slot] = data
+	if slot == _active_slot:
+		_weapon.equip(data)
+
+
+func weapon_in_slot(slot: int) -> WeaponData:
+	return _weapons[slot]
+
+
+func active_slot() -> int:
+	return _active_slot
+
+
+## Always allowed: no stamina, no lockout. Equipping withdraws any live hitbox.
+func swap_weapons() -> void:
+	var other := 1 - _active_slot
+	if _weapons[other] == null:
+		return
+	_active_slot = other
+	_weapon.equip(_weapons[_active_slot])
 
 
 func is_invincible() -> bool:
@@ -90,11 +125,13 @@ func _build_context(hurt_now: bool) -> Dictionary:
 		"coyote_time": _coyote,
 		"hurt": hurt_now,
 		"vel_y": velocity.y / GameConfig.TILE_SIZE,
-		"attack_duration": DEFAULT_ATTACK_DURATION,
+		"attack_duration": _weapon.data.attack_duration if _weapon.data != null else DEFAULT_ATTACK_DURATION,
 	}
 
 
 func _enter_state(next: State) -> void:
+	if _state == State.ATTACK and next != State.ATTACK:
+		_weapon.cancel_attack()
 	_state = next
 	_state_time = 0.0
 	match next:
@@ -106,6 +143,8 @@ func _enter_state(next: State) -> void:
 			InputRouter.consume_roll()
 		State.ATTACK:
 			InputRouter.consume_attack()
+			_weapon.set_facing(_facing)
+			_weapon.start_attack()
 		State.HURT:
 			velocity.x = _hit_direction * GameConfig.tiles(HURT_KNOCKBACK_SPEED)
 

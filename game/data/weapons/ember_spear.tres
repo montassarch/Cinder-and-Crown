@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/weapons/weapon_data.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+display_name = "Ember Spear"
+damage = 16
+attack_duration = 0.55
+hit_window = Vector2(0.2, 0.38)
+knockback_tiles = 2.0
+hitbox_size_tiles = Vector2(2.8, 0.6)
+hitbox_offset_tiles = Vector2(2, 0)
+hit_stop_seconds = 0.09
