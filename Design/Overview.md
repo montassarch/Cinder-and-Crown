@@ -4,9 +4,9 @@
 Build a small, simple, playable prototype that works as a **sandbox for testing**. After it is confirmed working, expand it: many bosses with different styles, equipment, classes, then story, dialogue and quests. The user wants to be able to add whatever they want later.
 
 ## Platforms
-- **PC:** Windows build, plus running in the Godot editor.
-- **iPhone:** Godot web export, hosted, opened in Safari, then "Add to Home Screen". Native iOS needs a Mac plus a paid Apple developer account, so it is out of scope.
-- Hosting publishes outside the machine, so ask before doing it (GitHub Pages or Netlify, unlisted link).
+- **iPhone (primary).** Godot web export hosted on GitHub Pages, opened in Safari, then "Add to Home Screen" so it runs fullscreen. The view widens to fill the phone screen; touch controls are the main input and every new feature must be playable by touch. Native iOS needs a Mac plus a paid Apple developer account, so it is out of scope.
+- **PC (secondary).** Windows build and the Godot editor, used for development; keyboard and gamepad keep working.
+- The game site is public by link (approved 2026-10-14); the repo stays private.
 
 ## Engine
 Godot 4.7.2, standard build (4.3 or later is what single-threaded web export for iOS Safari needs).

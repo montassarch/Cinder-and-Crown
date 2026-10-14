@@ -2,7 +2,9 @@
 
 A Dead Cells-style 2D action roguelite, built in Godot 4.7.2. Phase 1 is a playable **sandbox prototype**: a player who runs, jumps, rolls and attacks; two weapons; three enemies; a test room with a spawn/swap menu; and randomly assembled rooms with an exit. Everything is placeholder art on purpose. Bosses, classes, equipment, story, dialogue and quests come later ([roadmap](#roadmap)).
 
-**Status:** Phase 1 implemented and tested. Awaiting a hands-on feel pass, then web hosting and iPhone testing (see [What is not verified](#what-is-not-verified)).
+**Status:** Phase 1 done and played on an iPhone 14 Pro Max. The iPhone is the main platform.
+
+**Play it:** https://montassarch.github.io/Cinder-and-Crown/ in Safari. For fullscreen, tap Share > Add to Home Screen and launch it from the icon, in landscape.
 
 ## Run it
 
@@ -84,13 +86,13 @@ The web preset has **threading off**, which iOS Safari needs (no special server 
 cd build/web && python3 -m http.server 8000     # then open http://localhost:8000
 ```
 
-Nothing is hosted anywhere. Publishing the web build (e.g. GitHub Pages or Netlify) sends it off this machine and is a separate decision.
+The live site is the `gh-pages` branch (GitHub Pages, Deploy from branch `gh-pages` / root). To update it, export the web build and replace the files at the root of that branch. The site is public to anyone with the link.
 
 ## What is not verified
 
 - **Game feel.** Jump arc, roll distance and i-frame generosity, attack reach, hit-stop weight, enemy telegraph readability, hurt stun-lock. These are constants, easy to retune.
 - **The Windows build running.** It exports cleanly (`.exe` + `.pck`), but was built on Linux and never launched.
-- **iPhone.** The web build boots in desktop Chromium with real keyboard input, but has not been hosted or opened on a device.
+- **Other phones.** Played on an iPhone 14 Pro Max only; other iPhones and Android are untested.
 - **Real gamepad and touch hardware.** Logic is tested with synthetic events.
 
 ## Roadmap
