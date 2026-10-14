@@ -52,3 +52,13 @@ func test_negative_damage_never_heals() -> void:
 	var absorbed := health.take_damage(-30)
 	assert_int(absorbed).is_equal(0)
 	assert_int(health.current).is_equal(60)
+
+func test_setup_sets_max_and_fills_current() -> void:
+	var health := _make_health(100)
+	health.take_damage(60)
+	var seen := []
+	health.health_changed.connect(func(cur: int, mx: int) -> void: seen.append([cur, mx]))
+	health.setup(30)
+	assert_int(health.max_health).is_equal(30)
+	assert_int(health.current).is_equal(30)
+	assert_array(seen).is_equal([[30, 30]])

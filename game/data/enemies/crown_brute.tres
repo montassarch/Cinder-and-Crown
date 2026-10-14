@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/enemies/enemy_data.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+display_name = "Crown Brute"
+max_health = 80
+move_speed_tiles = 1.8
+attack_damage = 20
+attack_range_tiles = 5.0
+telegraph_seconds = 0.9
+recovery_seconds = 1.2
+behaviour = 2
+body_size_tiles = Vector2(1.6, 2.4)
+tint = Color(0.7, 0.6, 0.15, 1)

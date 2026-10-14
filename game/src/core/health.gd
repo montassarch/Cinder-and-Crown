@@ -13,6 +13,13 @@ func _ready() -> void:
 	current = max_health
 
 
+## Re-seat max and current at runtime (data-driven owners configure after _ready).
+func setup(new_max: int) -> void:
+	max_health = new_max
+	current = new_max
+	health_changed.emit(current, max_health)
+
+
 func take_damage(amount: int) -> int:
 	var absorbed := clampi(amount, 0, current)
 	if absorbed == 0:

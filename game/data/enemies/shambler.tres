@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/enemies/enemy_data.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+display_name = "Shambler"
+max_health = 30
+move_speed_tiles = 2.5
+attack_damage = 8
+attack_range_tiles = 1.4
+telegraph_seconds = 0.45
+recovery_seconds = 0.7
+behaviour = 0
+body_size_tiles = Vector2(1.0, 1.8)
+tint = Color(0.45, 0.6, 0.35, 1)

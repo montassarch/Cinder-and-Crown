@@ -64,3 +64,18 @@ func test_longer_freeze_is_not_cut_short_by_a_shorter_one() -> void:
 	OS.delay_msec(120)  # real time passes; the short freeze has expired, the long one has not
 	HitStop._process(0.0)
 	assert_float(Engine.time_scale).is_less(1.0)
+
+func test_weapon_damages_a_real_enemy_through_its_hurtbox() -> void:
+	_dummy.queue_free()
+	var data := EnemyData.new()
+	data.max_health = 30
+	data.behaviour = EnemyData.Behaviour.FLYER  # no gravity, no target: stays put
+	data.body_size_tiles = Vector2(1.0, 1.0)
+	data.telegraph_seconds = 0.5
+	var enemy: Enemy = auto_free(load("res://src/enemies/enemy.tscn").instantiate())
+	enemy.position = GameConfig.tiles_v(1.3, 0.0)
+	add_child(enemy)
+	enemy.configure(data)
+	_weapon.start_attack()
+	await _frames(40)
+	assert_int(enemy.health().current).is_equal(30 - load("res://data/weapons/rusty_blade.tres").damage)
