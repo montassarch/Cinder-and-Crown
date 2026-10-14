@@ -10,11 +10,11 @@ const MODEL := preload("res://art/hero3d/hero_model.scn")
 const VIEW := Vector2i(224, 184)
 const FEET := Vector2(112.0, 172.0)
 ## How many game pixels one metre of the model covers (sets the hero's on-screen size).
-const PX_PER_M: float = 48.0
+const PX_PER_M: float = 41.0
 const BLEND_SECONDS: float = 0.08
 const TURN_SPEED: float = 22.0
 const HURT_TINT := Color(1.0, 0.55, 0.55)
-const BODY_COLOR := Color(0.19, 0.18, 0.23)
+const BODY_COLOR := Color(0.27, 0.26, 0.32)
 const TRIM_COLOR := Color(0.42, 0.28, 0.2)
 const BLADE_COLOR := Color(0.62, 0.6, 0.68)
 const OUTLINE_COLOR := Color(0.05, 0.035, 0.047)
@@ -129,6 +129,12 @@ func _build_stage() -> void:
 	sun.rotation_degrees = Vector3(-40.0, -35.0, 0.0)
 	sun.light_energy = 1.3
 	_viewport.add_child(sun)
+	# Back light so the dark silhouette's edges catch light against dark scenery.
+	var rim := DirectionalLight3D.new()
+	rim.rotation_degrees = Vector3(-20.0, 150.0, 0.0)
+	rim.light_energy = 0.7
+	rim.light_color = Color(1.0, 0.72, 0.55)
+	_viewport.add_child(rim)
 
 	_model = MODEL.instantiate()
 	_model.rotation.y = PI / 2.0
