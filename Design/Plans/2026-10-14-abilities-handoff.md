@@ -1,13 +1,13 @@
 # Abilities: where things stand (handoff)
 
-Branch: `spike/abilities` (work in progress, not merged). Test link still shows the knight without abilities.
+Branch: `spike/abilities` (not merged). Test link: https://montassarch.github.io/Cinder-and-Crown/abilities-v3/ (each build goes in a new `abilities-vN/` folder on `gh-pages` so phones never show a cached copy).
 
 ## Approved design (Part 1: rules)
 - **Mana:** max 100, +2/s regen, +6 per sword hit that lands.
 - **Storm Blade (blue lightning):** 40 mana. 0.6 s raise-sword cast (bolt hits blade at 0.4 s), then 8 s of charged sword: +3 damage per hit, 30% chance to stun for 1.2 s. Fades over the last 2 s. Recast resets the timer.
 - **Crimson Rend (red lightning wave):** 30 mana. 0.45 s vertical slash; wave leaves at 0.16 s, travels 14 tiles/s up to 10 tiles, hits every enemy once for 14 + knockback, stopped by walls. Castable in the air.
 - Casts are committed (only a hit interrupts). Not enough mana: button does nothing and the mana bar flashes.
-- Look for Rend: black core, red-orange edge, magenta-violet glow (user's reference image). Storm: clean blue.
+- Look (approved on the phone 2026-10-14): Storm = violet/cyan lightning spiralling round the blade (`StormEffect`), bold dark-outlined bolt from the sky, thick cream swing crescent. Rend = thin jagged lightning (violet glow, red-orange edge, black band, cream core): forked bolt along the ground with tall bolts erupting along it (`RendWave`). Sword position per frame comes from `HeroBlade` (scanned from the art).
 
 ## Done (code + tests, in this branch; 200 of 200 tests pass)
 Mana, input actions skill1/skill2 (U/I keys, LB/RB pad), STORM/REND player states, weapon bonus damage + stun chance, enemy stun, RendWave (walls stop it via a physics-space shape query), player wiring.
@@ -18,9 +18,9 @@ Added in the second session:
 - `PlayerVisual`: `storm` (Attack1 frames 0,1 then hold frame 1) and `rend` (Attack3 frames 1-6) animations, fitted to the cast times. Placeholder reuse of existing frames; commission real art later if wanted.
 
 ## Still to do
-1. Playtest on the phone (not possible from a cloud session): check button placement, the blade/bolt position on the sprite (`StormEffect.BLADE_TILES`), and Rend timing against the slash frames.
-2. Tune the numbers above after playtesting.
-3. Parts 2 and 3 of the design were never reviewed by the user; confirm before merging.
+1. Playtest feel and tune the numbers (mana costs, damage, stun chance, Rend range and speed).
+2. Parts 2 and 3 of the design were never reviewed; confirm before merging.
+3. When approved: merge `spike/hero-knight` and then `spike/abilities` into `main` (abilities builds on the knight).
 
 ## Other branches
 - `spike/hero-knight`: knight art, faster run, combo (test link). Merge this into `main` when the user approves ("make the knight the real game").
