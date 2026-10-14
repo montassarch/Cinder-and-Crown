@@ -7,6 +7,8 @@ var _release_at_msec: int = 0
 
 
 func _ready() -> void:
+	# Keep ticking while the sandbox menu pauses the tree, or time_scale could stay frozen.
+	process_mode = Node.PROCESS_MODE_ALWAYS
 	set_process(false)
 
 

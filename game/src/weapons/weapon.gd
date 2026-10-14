@@ -86,6 +86,12 @@ func hitbox_center() -> Vector2:
 	return _hitbox.position
 
 
+## The live hitbox in world space (for the debug overlay).
+func hitbox_global_rect() -> Rect2:
+	var size := hitbox_size()
+	return Rect2(global_position + hitbox_center() - size / 2.0, size)
+
+
 func _apply_geometry() -> void:
 	if data == null:
 		return

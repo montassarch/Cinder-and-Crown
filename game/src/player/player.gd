@@ -56,6 +56,9 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if not _health.is_alive():
+		_idle_while_dead(delta)
+		return
 	_state_time += delta
 	if InputRouter.swap_weapon_pressed():
 		swap_weapons()
@@ -73,6 +76,18 @@ func _physics_process(delta: float) -> void:
 
 func state() -> State:
 	return _state
+
+
+## Back to a fresh life at `at`: full health, standing, nothing held over.
+func reset(at: Vector2) -> void:
+	global_position = at
+	velocity = Vector2.ZERO
+	_weapon.cancel_attack()
+	_state = State.IDLE
+	_state_time = 0.0
+	_coyote = 0.0
+	_hurt_pending = false
+	_health.setup(_health.max_health)
 
 
 func set_weapon(slot: int, data: WeaponData) -> void:
@@ -112,6 +127,13 @@ func take_hit(damage: int, source_x: float) -> void:
 	if _state != State.ROLL:
 		_hurt_pending = true
 		_hit_direction = signf(global_position.x - source_x)
+
+
+func _idle_while_dead(delta: float) -> void:
+	_weapon.cancel_attack()
+	velocity.x = move_toward(velocity.x, 0.0, GameConfig.tiles(HURT_KNOCKBACK_DECAY) * delta)
+	velocity.y += GameConfig.tiles(GRAVITY) * delta
+	move_and_slide()
 
 
 func _build_context(hurt_now: bool) -> Dictionary:

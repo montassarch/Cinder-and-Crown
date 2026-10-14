@@ -6,13 +6,17 @@ extends CanvasLayer
 const STICK_CENTER_TILES := Vector2(3.5, 10.0)
 const STICK_RADIUS_TILES: float = 2.5
 const STICK_ZONE_RIGHT_EDGE_TILES: float = 8.0
+## Touches above this line belong to menus and the HUD, not the stick.
+const STICK_ZONE_TOP_TILES: float = 7.0
 const STICK_DEADZONE: float = 0.25
 const BUTTON_RADIUS_TILES: float = 1.4
 const BUTTON_CENTERS_TILES := {
 	&"attack": Vector2(21.5, 10.0),
 	&"jump": Vector2(21.5, 6.8),
 	&"roll": Vector2(18.5, 10.8),
+	&"swap_weapon": Vector2(18.5, 7.4),
 }
+const BUTTON_LABELS := {&"attack": "ATK", &"jump": "JMP", &"roll": "ROLL", &"swap_weapon": "SWAP"}
 
 ## Show even without a touchscreen (desktop testing).
 @export var force_visible: bool = false
@@ -42,6 +46,17 @@ func _input(event: InputEvent) -> void:
 		_update_stick(event.position)
 
 
+## Lets go of every finger; used when a menu takes over and touch-ups would be missed.
+func release_all() -> void:
+	for finger in _button_fingers.keys():
+		InputRouter.set_virtual_button(_button_fingers[finger], false)
+	_button_fingers.clear()
+	_stick_finger = -1
+	_stick_value = 0.0
+	InputRouter.set_virtual_axis(0.0)
+	_overlay.queue_redraw()
+
+
 func _touch_down(finger: int, pos: Vector2) -> void:
 	for action in BUTTON_CENTERS_TILES:
 		var center: Vector2 = GameConfig.tiles_v(BUTTON_CENTERS_TILES[action].x, BUTTON_CENTERS_TILES[action].y)
@@ -50,7 +65,7 @@ func _touch_down(finger: int, pos: Vector2) -> void:
 			InputRouter.set_virtual_button(action, true)
 			_overlay.queue_redraw()
 			return
-	if _stick_finger == -1 and pos.x <= GameConfig.tiles(STICK_ZONE_RIGHT_EDGE_TILES):
+	if _stick_finger == -1 and pos.x <= GameConfig.tiles(STICK_ZONE_RIGHT_EDGE_TILES) and pos.y >= GameConfig.tiles(STICK_ZONE_TOP_TILES):
 		_stick_finger = finger
 		_update_stick(pos)
 
@@ -85,3 +100,6 @@ func _draw_overlay() -> void:
 		var center := GameConfig.tiles_v(BUTTON_CENTERS_TILES[action].x, BUTTON_CENTERS_TILES[action].y)
 		var pressed := _button_fingers.values().has(action)
 		_overlay.draw_circle(center, GameConfig.tiles(BUTTON_RADIUS_TILES), active if pressed else idle)
+		var width := GameConfig.tiles(BUTTON_RADIUS_TILES * 2.0)
+		var label_pos := center + Vector2(-width / 2.0, GameConfig.UI_FONT_SIZE / 3.0)
+		_overlay.draw_string(ThemeDB.fallback_font, label_pos, BUTTON_LABELS[action], HORIZONTAL_ALIGNMENT_CENTER, width, GameConfig.UI_FONT_SIZE, Color(1, 1, 1, 0.8))

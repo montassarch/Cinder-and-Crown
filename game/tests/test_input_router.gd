@@ -54,3 +54,19 @@ func test_virtual_jump_held_follows_press_and_release() -> void:
 	assert_bool(router.jump_held()).is_true()
 	router.set_virtual_button(&"jump", false)
 	assert_bool(router.jump_held()).is_false()
+
+func test_virtual_swap_reads_true_exactly_once() -> void:
+	# The player polls once per physics frame; a tap must not swap twice.
+	var router := _make_router()
+	router.set_virtual_button(&"swap_weapon", true)
+	assert_bool(router.swap_weapon_pressed()).is_true()
+	assert_bool(router.swap_weapon_pressed()).is_false()
+
+func test_holding_the_virtual_swap_button_does_not_repeat() -> void:
+	var router := _make_router()
+	router.set_virtual_button(&"swap_weapon", true)
+	router.swap_weapon_pressed()
+	router.set_virtual_button(&"swap_weapon", true)
+	assert_bool(router.swap_weapon_pressed()).is_true()
+	router.set_virtual_button(&"swap_weapon", false)
+	assert_bool(router.swap_weapon_pressed()).is_false()

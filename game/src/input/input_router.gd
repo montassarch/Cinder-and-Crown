@@ -7,6 +7,7 @@ const BUFFERED_ACTIONS: Array[StringName] = [&"jump", &"attack", &"roll"]
 
 var _virtual_axis: float = 0.0
 var _virtual_held: Dictionary = {}
+var _virtual_swap: bool = false
 var _stamps: Dictionary = {}
 
 
@@ -50,8 +51,12 @@ func consume_roll() -> void:
 	_stamps.erase(&"roll")
 
 
+## True once per press. The physical half is an edge; the touch half is a flag that
+## is consumed by this read, so a tap swaps once however often it is polled.
 func swap_weapon_pressed() -> bool:
-	return Input.is_action_just_pressed(&"swap_weapon")
+	var virtual_tap := _virtual_swap
+	_virtual_swap = false
+	return Input.is_action_just_pressed(&"swap_weapon") or virtual_tap
 
 
 func set_virtual_axis(value: float) -> void:
@@ -60,6 +65,8 @@ func set_virtual_axis(value: float) -> void:
 
 func set_virtual_button(action: StringName, pressed: bool) -> void:
 	_virtual_held[action] = pressed
+	if action == &"swap_weapon" and pressed:
+		_virtual_swap = true
 	if pressed and action in BUFFERED_ACTIONS:
 		_stamp(action)
 

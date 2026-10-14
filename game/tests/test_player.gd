@@ -111,3 +111,24 @@ func test_swapping_mid_swing_leaves_no_live_hitbox() -> void:
 	assert_bool(weapon.is_hitbox_active()).is_true()
 	_player.swap_weapons()
 	assert_bool(weapon.is_hitbox_active()).is_false()
+
+func test_reset_restores_health_position_and_idle_state() -> void:
+	await _land()
+	_player.take_hit(30, _player.global_position.x - 10.0)
+	await _frames(2)
+	assert_int(_player.state()).is_equal(State.HURT)
+	var spot := GameConfig.tiles_v(2.0, 3.0)
+	_player.reset(spot)
+	assert_vector(_player.global_position).is_equal(spot)
+	assert_int(_player.get_node("Health").current).is_equal(100)
+	assert_int(_player.state()).is_equal(State.IDLE)
+	assert_vector(_player.velocity).is_equal(Vector2.ZERO)
+
+func test_a_dead_player_ignores_input() -> void:
+	await _land()
+	_player.take_hit(999, _player.global_position.x - 10.0)
+	var x_before := _player.global_position.x
+	InputRouter.set_virtual_axis(1.0)
+	await _frames(20)
+	InputRouter.set_virtual_axis(0.0)
+	assert_float(_player.global_position.x).is_equal_approx(x_before, 1.0)
