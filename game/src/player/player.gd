@@ -30,6 +30,8 @@ const COMBO_WINDOW: float = 0.4
 const COMBO_STEPS: int = 3
 ## The last hit of the combo is a heavier, slower swing.
 const FINISHER_DURATION_SCALE: float = 1.8
+## After taking a hit he pulls on the plague mask for this long.
+const MASK_SECONDS: float = 3.0
 
 ## Slot 0 and 1 loadout. Set in the scene; the sandbox menu can reassign at runtime.
 @export var starting_weapons: Array[WeaponData] = []
@@ -48,6 +50,7 @@ var _last_attack_end: float = -1000.0
 ## A tap during a swing, kept until the swing ends (input buffering alone would expire it).
 var _attack_queued: bool = false
 var _attack_scale: float = 1.0
+var _mask_left: float = 0.0
 
 @onready var _weapon: Weapon = $Weapon
 @onready var _health: Health = $Health
@@ -77,6 +80,7 @@ func _physics_process(delta: float) -> void:
 		return
 	_state_time += delta
 	_clock += delta
+	_mask_left = maxf(0.0, _mask_left - delta)
 	if _state == State.ATTACK and InputRouter.attack_buffered():
 		_attack_queued = true
 		InputRouter.consume_attack()
@@ -99,11 +103,15 @@ func _update_visual() -> void:
 	var action := ROLL_DURATION
 	if _state == State.ATTACK and _weapon.data != null:
 		action = _weapon.data.attack_duration * _attack_scale
-	_visual.show_state(_state, _facing, GameConfig.tiles(BODY_SIZE_TILES.y) / 2.0, action, _combo_step, not _health.is_alive())
+	_visual.show_state(_state, _facing, GameConfig.tiles(BODY_SIZE_TILES.y) / 2.0, action, _combo_step, not _health.is_alive(), _mask_left > 0.0)
 
 
 func state() -> State:
 	return _state
+
+
+func mask_seconds_left() -> float:
+	return _mask_left
 
 
 ## Back to a fresh life at `at`: full health, standing, nothing held over.
@@ -115,6 +123,7 @@ func reset(at: Vector2) -> void:
 	_state_time = 0.0
 	_coyote = 0.0
 	_hurt_pending = false
+	_mask_left = 0.0
 	_health.setup(_health.max_health)
 
 
@@ -156,6 +165,7 @@ func take_hit(damage: int, source_x: float) -> void:
 		return
 	if _health.take_damage(damage) == 0:
 		return
+	_mask_left = MASK_SECONDS
 	if _state != State.ROLL:
 		_hurt_pending = true
 		_hit_direction = signf(global_position.x - source_x)

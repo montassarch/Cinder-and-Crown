@@ -267,3 +267,59 @@ func test_running_covers_ground_fast_like_a_dead_cells_sprint() -> void:
 	await _frames(60)
 	InputRouter.set_virtual_axis(0.0)
 	assert_float(_player.global_position.x - start_x).is_greater(GameConfig.tiles(12.0))
+
+func test_getting_hit_puts_the_mask_on_for_a_few_seconds() -> void:
+	await _land()
+	var visual: PlayerVisual = _player.get_node("Visual")
+	assert_bool(visual.is_masked()).is_false()
+	_player.take_hit(10, _player.global_position.x - 20.0)
+	await _frames(3)
+	assert_float(_player.mask_seconds_left()).is_greater(Player.MASK_SECONDS - 0.5)
+	assert_bool(visual.is_masked()).is_true()
+	await _frames(int(Player.MASK_SECONDS * 60.0) + 15)
+	assert_float(_player.mask_seconds_left()).is_equal(0.0)
+	assert_bool(visual.is_masked()).is_false()
+
+func test_a_hit_dodged_by_roll_invincibility_does_not_summon_the_mask() -> void:
+	await _land()
+	InputRouter.set_virtual_button(&"roll", true)
+	await _frames(5)
+	_player.take_hit(10, _player.global_position.x - 20.0)
+	assert_float(_player.mask_seconds_left()).is_equal(0.0)
+
+func test_a_second_hit_restarts_the_mask_timer() -> void:
+	await _land()
+	_player.take_hit(5, _player.global_position.x - 20.0)
+	await _frames(int(Player.MASK_SECONDS * 60.0 * 0.6))
+	var mid := _player.mask_seconds_left()
+	await _frames(int(Player.HURT_DURATION * 60.0) + 10)
+	_player.take_hit(5, _player.global_position.x - 20.0)
+	assert_float(_player.mask_seconds_left()).is_greater(mid)
+
+func test_resetting_the_player_takes_the_mask_off() -> void:
+	await _land()
+	_player.take_hit(5, _player.global_position.x - 20.0)
+	_player.reset(GameConfig.tiles_v(0.0, 3.0))
+	assert_float(_player.mask_seconds_left()).is_equal(0.0)
+
+func test_masked_art_covers_the_face_in_every_animation() -> void:
+	var visual: PlayerVisual = _player.get_node("Visual")
+	# Frame 0 of "hurt" is the pack's pure-white hit flash (no face to cover), so it is skipped.
+	for anim in ["idle", "run", "attack1", "attack2", "attack3", "jump", "fall", "roll"]:
+		for index in [0, 1]:
+			var plain := visual.frame_image(anim, index, false)
+			var masked := visual.frame_image(anim, index, true)
+			assert_bool(plain.get_data() == masked.get_data()).is_false()
+	assert_bool(visual.frame_image("hurt", 1, false).get_data() == visual.frame_image("hurt", 1, true).get_data()).is_false()
+
+func test_switching_to_the_mask_keeps_the_animation_and_frame() -> void:
+	await _land()
+	var visual: PlayerVisual = _player.get_node("Visual")
+	InputRouter.set_virtual_axis(1.0)
+	await _frames(8)
+	var anim := visual.animation
+	var frame := visual.frame
+	visual.set_masked(true)
+	assert_str(visual.animation).is_equal(anim)
+	assert_int(visual.frame).is_equal(frame)
+	InputRouter.set_virtual_axis(0.0)
