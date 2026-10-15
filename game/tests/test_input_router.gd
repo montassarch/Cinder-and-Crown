@@ -70,3 +70,13 @@ func test_holding_the_virtual_swap_button_does_not_repeat() -> void:
 	assert_bool(router.swap_weapon_pressed()).is_true()
 	router.set_virtual_button(&"swap_weapon", false)
 	assert_bool(router.swap_weapon_pressed()).is_false()
+
+func test_virtual_skill_buttons_buffer_and_consume() -> void:
+	var router := _make_router()
+	router.set_virtual_button(&"skill1", true)
+	router.set_virtual_button(&"skill2", true)
+	assert_bool(router.skill_buffered(1)).is_true()
+	assert_bool(router.skill_buffered(2)).is_true()
+	router.consume_skill(1)
+	assert_bool(router.skill_buffered(1)).is_false()
+	assert_bool(router.skill_buffered(2)).is_true()

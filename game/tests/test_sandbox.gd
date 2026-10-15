@@ -86,6 +86,16 @@ func test_hud_health_bar_follows_the_players_health() -> void:
 	_sandbox.player.take_hit(25, _sandbox.player.global_position.x - 10.0)
 	assert_float(hud.health_fraction()).is_equal(0.75)
 
+func test_hud_mana_bar_follows_mana_and_flashes_when_denied() -> void:
+	var hud: Node = _sandbox.get_node("Hud")
+	var player: Player = _sandbox.player
+	assert_float(hud.mana_fraction()).is_equal(1.0)
+	player.mana().spend(25.0)
+	assert_float(hud.mana_fraction()).is_equal_approx(0.75, 0.001)
+	assert_bool(hud.mana_flashing()).is_false()
+	player.mana_denied.emit()
+	assert_bool(hud.mana_flashing()).is_true()
+
 func test_hud_reports_live_enemy_count_and_weapon_names() -> void:
 	var hud: Node = _sandbox.get_node("Hud")
 	_sandbox.spawn_enemy(load(BAT))

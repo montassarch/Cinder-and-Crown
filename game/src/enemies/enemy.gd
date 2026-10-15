@@ -6,7 +6,7 @@ extends CharacterBody2D
 signal attack_released(damage: int)
 signal died
 
-enum State { MOVE, TELEGRAPH, STRIKE, RECOVER, DEAD }
+enum State { MOVE, TELEGRAPH, STRIKE, RECOVER, DEAD, STUNNED }
 
 const GRAVITY: float = 56.0
 const KNOCKBACK_DECAY: float = 20.0
@@ -21,6 +21,7 @@ const FLYER_BOB_HZ: float = 1.5
 const FLYER_ARRIVE_TILES: float = 0.15
 const DEATH_LINGER: float = 0.5
 const TELEGRAPH_FLASH := Color(1.0, 1.0, 1.0)
+const STUN_TINT := Color(0.55, 0.8, 1.0)
 
 ## Who this enemy hunts. Falls back to the first node in group "player".
 var target: Node2D
@@ -40,12 +41,17 @@ var _age: float = 0.0
 @onready var _hurtbox_shape: CollisionShape2D = $Hurtbox/CollisionShape2D
 @onready var _telegraph_timer: Timer = $TelegraphTimer
 @onready var _recovery_timer: Timer = $RecoveryTimer
+var _stun_timer: Timer
 
 
 func _ready() -> void:
 	_health.died.connect(_on_health_died)
 	_telegraph_timer.timeout.connect(_on_telegraph_timeout)
 	_recovery_timer.timeout.connect(_on_recovery_timeout)
+	_stun_timer = Timer.new()
+	_stun_timer.one_shot = true
+	_stun_timer.timeout.connect(_on_stun_timeout)
+	add_child(_stun_timer)
 	if data != null:
 		_apply_data()
 
@@ -67,6 +73,22 @@ func is_telegraphing() -> bool:
 
 func is_dead() -> bool:
 	return _state == State.DEAD
+
+
+func is_stunned() -> bool:
+	return _state == State.STUNNED
+
+
+## Freezes the enemy and cancels whatever it was winding up or doing.
+func stun(seconds: float) -> void:
+	if _state == State.DEAD or seconds <= 0.0:
+		return
+	_telegraph_timer.stop()
+	_recovery_timer.stop()
+	_state = State.STUNNED
+	if data != null:
+		_body.color = STUN_TINT
+	_stun_timer.start(seconds)
 
 
 func begin_telegraph() -> void:
@@ -173,6 +195,13 @@ func _on_telegraph_timeout() -> void:
 	_start_recovery()
 
 
+func _on_stun_timeout() -> void:
+	if _state == State.STUNNED:
+		_state = State.MOVE
+		if data != null:
+			_body.color = data.tint
+
+
 func _on_recovery_timeout() -> void:
 	if _state == State.RECOVER:
 		_state = State.MOVE
@@ -193,6 +222,7 @@ func _on_health_died() -> void:
 	_state = State.DEAD
 	_telegraph_timer.stop()
 	_recovery_timer.stop()
+	_stun_timer.stop()
 	_body.visible = false
 	_hurtbox.set_deferred("monitorable", false)
 	_shape.set_deferred("disabled", true)

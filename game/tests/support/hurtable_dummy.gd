@@ -2,6 +2,7 @@ extends Node2D
 ## Minimal stand-in for an enemy: an enemy-hurtbox Area2D plus take_hit().
 
 var hits: Array = []
+var stuns: Array = []
 
 func _init() -> void:
 	var area := Area2D.new()
@@ -19,3 +20,6 @@ func hurtbox() -> Area2D:
 
 func take_hit(damage: int, source_x: float, knockback_tiles: float = 0.0) -> void:
 	hits.append([damage, source_x, knockback_tiles])
+
+func stun(seconds: float) -> void:
+	stuns.append(seconds)

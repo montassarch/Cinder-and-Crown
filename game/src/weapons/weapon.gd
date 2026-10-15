@@ -9,6 +9,11 @@ signal hit_landed(target: Node, damage: int)
 const ENEMY_HURTBOX_MASK: int = 16
 
 var data: WeaponData
+## Temporary modifiers from abilities (Storm Blade sets these while the blade is charged).
+var bonus_damage: int = 0
+var stun_chance: float = 0.0
+var stun_seconds: float = 0.0
+var rng := RandomNumberGenerator.new()
 
 var _elapsed: float = 0.0
 ## Real seconds per second of swing time; > 1 plays the whole swing (and its hit window) slower.
@@ -119,8 +124,10 @@ func _on_area_entered(area: Area2D) -> void:
 	if target == null or _hit_targets.has(target):
 		return
 	_hit_targets.append(target)
-	var damage := Damage.compute(data.damage, 1.0, 0)
+	var damage := Damage.compute(data.damage + bonus_damage, 1.0, 0)
 	if target.has_method("take_hit"):
 		target.take_hit(damage, global_position.x, data.knockback_tiles)
+	if stun_chance > 0.0 and rng.randf() < stun_chance and target.has_method("stun"):
+		target.stun(stun_seconds)
 	hit_landed.emit(target, damage)
 	HitStop.freeze(data.hit_stop_seconds)

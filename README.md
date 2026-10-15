@@ -20,6 +20,8 @@ A Dead Cells-style 2D action roguelite, built in Godot 4.7.2. Phase 1 is a playa
 | Attack | J | X | ATK |
 | Roll (i-frames) | K | B | ROLL |
 | Swap weapon | Q | Y | SWAP |
+| Storm Blade (40 mana) | U | LB | STORM |
+| Crimson Rend (30 mana) | I | RB | REND |
 | Sandbox menu | Tab | Start | Menu button |
 
 The **menu** (it pauses the game) spawns enemies, clears them, assigns either weapon to either slot, resets the player, toggles hitbox/hurtbox debug boxes, and switches between the **Sandbox** and a **Generated level**. Reaching the gold exit gate in a generated level builds the next one from the next seed.

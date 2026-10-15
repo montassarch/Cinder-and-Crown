@@ -174,6 +174,8 @@ func test_hero_plays_the_animation_for_each_state() -> void:
 	assert_str(PlayerVisual.animation_for(State.ATTACK, 0)).is_equal("attack1")
 	assert_str(PlayerVisual.animation_for(State.ATTACK, 1)).is_equal("attack2")
 	assert_str(PlayerVisual.animation_for(State.ATTACK, 2)).is_equal("attack3")
+	assert_str(PlayerVisual.animation_for(State.STORM, 0)).is_equal("storm")
+	assert_str(PlayerVisual.animation_for(State.REND, 0)).is_equal("rend")
 
 func test_every_hero_animation_loads_all_its_frames() -> void:
 	var visual: PlayerVisual = _player.get_node("Visual")
@@ -323,3 +325,66 @@ func test_switching_to_the_mask_keeps_the_animation_and_frame() -> void:
 	assert_str(visual.animation).is_equal(anim)
 	assert_int(visual.frame).is_equal(frame)
 	InputRouter.set_virtual_axis(0.0)
+
+func _tap(action: StringName) -> void:
+	InputRouter.set_virtual_button(action, true)
+	await _frames(1)
+	InputRouter.set_virtual_button(action, false)
+
+func test_storm_blade_spends_mana_then_charges_the_sword() -> void:
+	await _land()
+	await _tap(&"skill1")
+	await _frames(3)
+	assert_int(_player.state()).is_equal(State.STORM)
+	assert_float(_player.mana().current).is_less_equal(Player.MANA_MAX - Player.STORM_COST + 1.0)
+	await _frames(int(Player.STORM_CAST_SECONDS * 60.0) + 4)
+	assert_float(_player.storm_seconds_left()).is_greater(Player.STORM_SECONDS - 0.5)
+	var weapon: Weapon = _player.get_node("Weapon")
+	assert_int(weapon.bonus_damage).is_equal(Player.STORM_BONUS_DAMAGE)
+	assert_float(weapon.stun_chance).is_equal(Player.STORM_STUN_CHANCE)
+
+func test_the_storm_charge_wears_off() -> void:
+	await _land()
+	await _tap(&"skill1")
+	await _frames(int((Player.STORM_CAST_SECONDS + Player.STORM_SECONDS) * 60.0) + 10)
+	var weapon: Weapon = _player.get_node("Weapon")
+	assert_float(_player.storm_seconds_left()).is_equal(0.0)
+	assert_int(weapon.bonus_damage).is_equal(0)
+	assert_float(weapon.stun_chance).is_equal(0.0)
+
+func test_casting_without_enough_mana_does_nothing_but_flash() -> void:
+	await _land()
+	_player.mana().spend(_player.mana().current)
+	var denied := [0]
+	_player.mana_denied.connect(func() -> void: denied[0] += 1)
+	await _tap(&"skill2")
+	await _frames(3)
+	assert_int(_player.state()).is_equal(State.IDLE)
+	assert_int(denied[0]).is_equal(1)
+
+func test_crimson_rend_spends_mana_and_launches_a_wave() -> void:
+	await _land()
+	await _tap(&"skill2")
+	await _frames(int(Player.REND_RELEASE_SECONDS * 60.0) + 6)
+	assert_float(_player.mana().current).is_less_equal(Player.MANA_MAX - Player.REND_COST + 1.0)
+	var waves := get_children().filter(func(n: Node) -> bool: return n is RendWave)
+	assert_int(waves.size()).is_equal(1)
+
+func test_mana_regenerates_slowly() -> void:
+	await _land()
+	_player.mana().spend(50.0)
+	var before := _player.mana().current
+	await _frames(60)
+	assert_float(_player.mana().current - before).is_between(Player.MANA_REGEN * 0.8, Player.MANA_REGEN * 1.3)
+
+func test_landing_a_sword_hit_restores_mana() -> void:
+	await _land()
+	var dummy: Node2D = auto_free(load("res://tests/support/hurtable_dummy.gd").new())
+	add_child(dummy)
+	dummy.global_position = _player.global_position + GameConfig.tiles_v(1.3, 0.0)
+	_player.mana().spend(50.0)
+	_player.mana().regen_per_second = 0.0
+	await _tap(&"attack")
+	await _frames(25)
+	assert_int(dummy.hits.size()).is_equal(1)
+	assert_float(_player.mana().current).is_equal_approx(50.0 + Player.MANA_PER_HIT, 0.01)

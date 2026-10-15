@@ -86,3 +86,25 @@ func test_jump_cancels_an_attack_once_its_hit_has_landed() -> void:
 func test_jump_cannot_cancel_an_attack_before_its_hit_lands() -> void:
 	var ctx := _ctx({"state_time": 0.05, "attack_duration": 0.3, "jump_buffered": true, "attack_cancelable": false})
 	assert_int(PlayerStateMachine.next_state(State.ATTACK, ctx)).is_equal(State.ATTACK)
+
+func test_storm_casts_from_the_ground_when_affordable() -> void:
+	var ctx := _ctx({"skill1_buffered": true, "storm_ready": true})
+	assert_int(PlayerStateMachine.next_state(State.IDLE, ctx)).is_equal(State.STORM)
+
+func test_storm_needs_the_ground_and_the_mana() -> void:
+	assert_int(PlayerStateMachine.next_state(State.FALL, _ctx({"on_floor": false, "skill1_buffered": true, "storm_ready": true}))).is_equal(State.FALL)
+	assert_int(PlayerStateMachine.next_state(State.IDLE, _ctx({"skill1_buffered": true, "storm_ready": false}))).is_equal(State.IDLE)
+
+func test_rend_casts_on_the_ground_or_in_the_air() -> void:
+	assert_int(PlayerStateMachine.next_state(State.RUN, _ctx({"move_axis": 1.0, "skill2_buffered": true, "rend_ready": true}))).is_equal(State.REND)
+	assert_int(PlayerStateMachine.next_state(State.FALL, _ctx({"on_floor": false, "skill2_buffered": true, "rend_ready": true}))).is_equal(State.REND)
+
+func test_a_cast_is_committed_until_it_finishes() -> void:
+	var busy := _ctx({"state_time": 0.3, "cast_duration": 0.6, "roll_buffered": true, "jump_buffered": true, "attack_buffered": true})
+	assert_int(PlayerStateMachine.next_state(State.STORM, busy)).is_equal(State.STORM)
+	assert_int(PlayerStateMachine.next_state(State.STORM, _ctx({"state_time": 0.6, "cast_duration": 0.6}))).is_equal(State.IDLE)
+	assert_int(PlayerStateMachine.next_state(State.REND, _ctx({"state_time": 0.45, "cast_duration": 0.45}))).is_equal(State.IDLE)
+
+func test_a_hit_interrupts_a_cast() -> void:
+	var ctx := _ctx({"state_time": 0.2, "cast_duration": 0.6, "hurt": true})
+	assert_int(PlayerStateMachine.next_state(State.STORM, ctx)).is_equal(State.HURT)
