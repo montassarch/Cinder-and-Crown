@@ -35,3 +35,6 @@ desktop.ini
 
 # GdUnit4 test reports (generated)
 game/reports/
+
+# Claude Code local settings (per machine)
+.claude/settings.local.json
