@@ -23,6 +23,8 @@ const GENERATED_PATH := "res://levels/generated_level.tscn"
 const GROUND_COLOR := Color(0.22, 0.2, 0.26)
 const PLATFORM_COLOR := Color(0.35, 0.3, 0.4)
 const BACKGROUND_COLOR := Color(0.09, 0.08, 0.11)
+const GROUND_TEXTURE := preload("res://art/cathedral/ground_tile.png")
+const LEDGE_TEXTURE := preload("res://art/cathedral/ledge_tile.png")
 
 var player: Player
 
@@ -35,6 +37,10 @@ var player: Player
 
 func _ready() -> void:
 	RenderingServer.set_default_clear_color(BACKGROUND_COLOR)
+	var backdrop := Backdrop.new()
+	backdrop.name = "Backdrop"
+	add_child(backdrop)
+	move_child(backdrop, 0)
 	_build_arena()
 
 	player = PLAYER_SCENE.instantiate()
@@ -168,10 +174,11 @@ func _add_block(rect_tiles: Rect2, color: Color, one_way: bool, parent: Node = s
 	shape.shape = rect
 	shape.one_way_collision = one_way
 	body.add_child(shape)
-	var visual := ColorRect.new()
+	var visual := TextureRect.new()
+	visual.texture = LEDGE_TEXTURE if one_way else GROUND_TEXTURE
+	visual.stretch_mode = TextureRect.STRETCH_TILE
 	visual.size = size
 	visual.position = -size / 2.0
-	visual.color = color
 	visual.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	body.add_child(visual)
 	parent.add_child(body)
