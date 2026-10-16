@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://src/enemies/enemy_data.gd" id="1_data"]
+[ext_resource type="Script" path="res://src/enemies/enemy_move.gd" id="2_move"]
+[ext_resource type="Resource" path="res://data/moves/guard_quick.tres" id="3_a"]
+[ext_resource type="Resource" path="res://data/moves/guard_quick_2.tres" id="4_b"]
+[ext_resource type="Resource" path="res://data/moves/guard_heavy.tres" id="5_c"]
+
+[resource]
+script = ExtResource("1_data")
+display_name = "Crown Guard"
+max_health = 45
+move_speed_tiles = 2.2
+attack_damage = 6
+attack_range_tiles = 1.8
+telegraph_seconds = 0.35
+recovery_seconds = 0.15
+behaviour = 0
+moves = Array[ExtResource("2_move")]([ExtResource("3_a"), ExtResource("4_b"), ExtResource("5_c")])
+pattern = 0
+chain_gap_seconds = 0.1
+cooldown_seconds = 1.2
+poise = 2
+threat = 4
+unlock_depth = 1
+max_per_wave = 2
+cell_reward = 2
+body_size_tiles = Vector2(1, 2)
+tint = Color(0.45, 0.55, 0.75, 1)

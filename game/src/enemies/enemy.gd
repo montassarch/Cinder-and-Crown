@@ -39,6 +39,8 @@ const TELL_START_RADIUS: float = 14.0
 const TELL_END_RADIUS: float = 3.0
 const TELL_COLOR := Color(1.0, 0.25, 0.2)
 const TELL_COMMITTED_COLOR := Color(1.0, 0.85, 0.25)
+## A dodge-only attack (it cannot be parried): roll or jump.
+const TELL_DODGE_COLOR := Color(1.0, 0.55, 0.1)
 const POISE_PIP_SIZE: float = 3.0
 const POISE_PIP_GAP: float = 2.0
 ## How long a parried strike leaves the attacker staggered, and how far it is shoved back.
@@ -133,6 +135,16 @@ func telegraph_progress() -> float:
 	if _state != State.TELEGRAPH or data == null or _move == null:
 		return 0.0
 	return clampf(1.0 - _telegraph_timer.time_left / maxf(_move.telegraph_seconds, 0.001), 0.0, 1.0)
+
+
+## The colour of the ring over a winding-up enemy: red to parry, orange to dodge, yellow once
+## the strike is committed; transparent when it is not winding up.
+func tell_color() -> Color:
+	if _state != State.TELEGRAPH or _move == null:
+		return Color.TRANSPARENT
+	if is_committed():
+		return TELL_COMMITTED_COLOR
+	return TELL_COLOR if _move.parryable else TELL_DODGE_COLOR
 
 
 ## The strike is coming whatever lands on the enemy (only a guard break stops it).
@@ -400,7 +412,7 @@ func _draw() -> void:
 		return
 	var top := -GameConfig.tiles(data.body_size_tiles.y) / 2.0
 	if _state == State.TELEGRAPH:
-		var color := TELL_COMMITTED_COLOR if is_committed() else TELL_COLOR
+		var color := tell_color()
 		var center := Vector2(0.0, top - TELL_HEIGHT_PIXELS)
 		var radius := lerpf(TELL_START_RADIUS, TELL_END_RADIUS, telegraph_progress())
 		draw_arc(center, radius, 0.0, TAU, 20, color, 2.0)
