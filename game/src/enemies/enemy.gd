@@ -51,6 +51,8 @@ var target: Node2D
 var data: EnemyData
 
 var _state: State = State.MOVE
+var _move: EnemyMove
+var _move_index: int = 0
 var _facing: float = 1.0
 var _knockback_x: float = 0.0
 var _strike_time: float = 0.0
@@ -93,6 +95,15 @@ func health() -> Health:
 	return _health
 
 
+## The attack being played (winding up, striking or recovering); null between attacks.
+func current_move() -> EnemyMove:
+	return _move
+
+
+func move_index() -> int:
+	return _move_index
+
+
 func is_telegraphing() -> bool:
 	return _state == State.TELEGRAPH
 
@@ -115,9 +126,9 @@ func is_guard_broken() -> bool:
 
 ## 0 as the wind-up starts, 1 as the strike lands; 0 whenever it is not winding up.
 func telegraph_progress() -> float:
-	if _state != State.TELEGRAPH or data == null:
+	if _state != State.TELEGRAPH or data == null or _move == null:
 		return 0.0
-	return clampf(1.0 - _telegraph_timer.time_left / maxf(data.telegraph_seconds, 0.001), 0.0, 1.0)
+	return clampf(1.0 - _telegraph_timer.time_left / maxf(_move.telegraph_seconds, 0.001), 0.0, 1.0)
 
 
 ## The strike is coming whatever lands on the enemy (only a guard break stops it).
@@ -131,6 +142,8 @@ func stun(seconds: float) -> void:
 		return
 	_telegraph_timer.stop()
 	_recovery_timer.stop()
+	_move = null
+	_move_index = 0
 	_state = State.STUNNED
 	if data != null:
 		_body.color = STUN_TINT
@@ -152,9 +165,11 @@ func begin_telegraph() -> void:
 	var foe := _current_target()
 	if foe != null:
 		_facing = signf(foe.global_position.x - global_position.x) if foe.global_position.x != global_position.x else _facing
+	_move_index = 0
+	_move = data.effective_moves()[0]
 	_state = State.TELEGRAPH
 	_body.color = TELEGRAPH_FLASH
-	_telegraph_timer.start(maxf(data.telegraph_seconds, 0.001))
+	_telegraph_timer.start(maxf(_move.telegraph_seconds, 0.001))
 
 
 ## Contract used by Weapon: damage lands, health drops, the body is knocked back.
@@ -261,33 +276,36 @@ func _think_move(foe: Node2D, _delta: float) -> float:
 			return signf(offset.x) * speed
 
 
+## A rush (DASH): runs at the hero for the move's duration and hits on contact.
 func _think_strike(foe: Node2D, delta: float) -> float:
 	_strike_time += delta
 	if foe != null and not _struck:
-		if global_position.distance_to(foe.global_position) <= GameConfig.tiles(CHARGE_CONTACT_TILES):
+		if global_position.distance_to(foe.global_position) <= GameConfig.tiles(_move.reach_tiles):
 			_struck = true
-			_deal_damage(foe)
+			_hit_hero(foe, _move)
 	if _state == State.STUNNED:
 		return 0.0  # the strike was parried
-	if _strike_time >= CHARGE_DURATION:
+	if _strike_time >= _move.active_seconds:
 		_start_recovery()
 		return 0.0
-	return _facing * GameConfig.tiles(data.move_speed_tiles * CHARGE_SPEED_MULTIPLIER)
+	return _facing * GameConfig.tiles(_move.speed_tiles)
 
 
 func _on_telegraph_timeout() -> void:
 	if _state != State.TELEGRAPH:
 		return
 	_body.color = data.tint
-	attack_released.emit(data.attack_damage)
-	if data.behaviour == EnemyData.Behaviour.CHARGER:
-		_state = State.STRIKE
-		_strike_time = 0.0
-		_struck = false
-		return
-	var foe := _current_target()
-	if foe != null and global_position.distance_to(foe.global_position) <= GameConfig.tiles(data.attack_range_tiles * STRIKE_REACH_FACTOR):
-		_deal_damage(foe)
+	attack_released.emit(_move.damage)
+	match _move.kind:
+		EnemyMove.Kind.DASH:
+			_state = State.STRIKE
+			_strike_time = 0.0
+			_struck = false
+			return
+		EnemyMove.Kind.MELEE:
+			var foe := _current_target()
+			if foe != null and global_position.distance_to(foe.global_position) <= GameConfig.tiles(_move.reach_tiles * STRIKE_REACH_FACTOR):
+				_hit_hero(foe, _move)
 	if _state != State.STUNNED:  # a parried strike leaves the attacker staggered, not recovering
 		_start_recovery()
 
@@ -302,23 +320,27 @@ func _on_stun_timeout() -> void:
 func _on_recovery_timeout() -> void:
 	if _state == State.RECOVER:
 		_state = State.MOVE
+		_move = null
 
 
 func _start_recovery() -> void:
 	_state = State.RECOVER
-	_recovery_timer.start(maxf(data.recovery_seconds, 0.001))
+	_recovery_timer.start(maxf(_move.recovery_seconds, 0.001))
 
 
-func _deal_damage(foe: Node) -> void:
-	if foe.has_method("take_strike"):
-		foe.take_strike(data.attack_damage, global_position.x, self)
+## A parryable move goes through take_strike (the hero can deflect it); a dodge-only one is
+## a plain hit that only a roll's i-frames or a jump avoid.
+func _hit_hero(foe: Node, move: EnemyMove) -> void:
+	if move.parryable and foe.has_method("take_strike"):
+		foe.take_strike(move.damage, global_position.x, self)
 	elif foe.has_method("take_hit"):
-		foe.take_hit(data.attack_damage, global_position.x)
+		foe.take_hit(move.damage, global_position.x)
 
 
 ## Health.died is the single place a wind-up is cancelled: a dead enemy deals nothing.
 func _on_health_died() -> void:
 	_state = State.DEAD
+	_move = null
 	_telegraph_timer.stop()
 	_recovery_timer.stop()
 	_stun_timer.stop()
