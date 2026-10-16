@@ -98,3 +98,18 @@ func test_no_stun_chance_never_stuns() -> void:
 	_weapon.start_attack()
 	await _frames(40)
 	assert_array(_dummy.stuns).is_empty()
+
+func test_a_next_hit_multiplier_scales_the_damage_of_that_swing() -> void:
+	var base: int = load("res://data/weapons/rusty_blade.tres").damage
+	_weapon.next_hit_multiplier = 3.0
+	_weapon.start_attack()
+	await _frames(40)
+	assert_int(_dummy.hits[0][0]).is_equal(base * 3)
+
+func test_the_next_hit_multiplier_stacks_with_the_run_damage_multiplier() -> void:
+	var base: int = load("res://data/weapons/rusty_blade.tres").damage
+	_weapon.damage_multiplier = 1.5
+	_weapon.next_hit_multiplier = 2.0
+	_weapon.start_attack()
+	await _frames(40)
+	assert_int(_dummy.hits[0][0]).is_equal(floori(base * 3.0))

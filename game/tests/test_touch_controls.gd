@@ -100,3 +100,9 @@ func test_stick_stays_at_the_left_and_follows_the_bottom_of_a_tall_screen() -> v
 	var base_stick := GameConfig.tiles_v(TouchControls.STICK_CENTER_TILES.x, TouchControls.STICK_CENTER_TILES.y)
 	assert_float(stick.x).is_equal_approx(base_stick.x, 0.001)
 	assert_float(tall.y - stick.y).is_equal_approx(GameConfig.BASE_HEIGHT - base_stick.y, 0.001)
+
+func test_tapping_parry_buffers_a_parry() -> void:
+	_touch(0, _controls.button_center(&"parry", _view()), true)
+	assert_bool(InputRouter.parry_buffered()).is_true()
+	_touch(0, _controls.button_center(&"parry", _view()), false)
+	InputRouter.consume_parry()

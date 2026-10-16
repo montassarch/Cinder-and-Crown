@@ -108,3 +108,38 @@ func test_a_cast_is_committed_until_it_finishes() -> void:
 func test_a_hit_interrupts_a_cast() -> void:
 	var ctx := _ctx({"state_time": 0.2, "cast_duration": 0.6, "hurt": true})
 	assert_int(PlayerStateMachine.next_state(State.STORM, ctx)).is_equal(State.HURT)
+
+# --- Parry ---
+
+func test_parry_starts_from_the_ground_or_the_air() -> void:
+	assert_int(PlayerStateMachine.next_state(State.IDLE, _ctx({"parry_buffered": true, "parry_ready": true}))).is_equal(State.PARRY)
+	assert_int(PlayerStateMachine.next_state(State.RUN, _ctx({"move_axis": 1.0, "parry_buffered": true, "parry_ready": true}))).is_equal(State.PARRY)
+	assert_int(PlayerStateMachine.next_state(State.FALL, _ctx({"on_floor": false, "parry_buffered": true, "parry_ready": true}))).is_equal(State.PARRY)
+
+func test_parry_waits_for_its_cooldown() -> void:
+	assert_int(PlayerStateMachine.next_state(State.IDLE, _ctx({"parry_buffered": true, "parry_ready": false}))).is_equal(State.IDLE)
+
+func test_a_parry_is_committed_until_it_ends() -> void:
+	var busy := _ctx({"state_time": 0.1, "parry_duration": 0.5, "move_axis": 1.0, "jump_buffered": true, "attack_buffered": true})
+	assert_int(PlayerStateMachine.next_state(State.PARRY, busy)).is_equal(State.PARRY)
+	assert_int(PlayerStateMachine.next_state(State.PARRY, _ctx({"state_time": 0.5, "parry_duration": 0.5}))).is_equal(State.IDLE)
+
+func test_a_hit_that_lands_during_a_parry_still_hurts() -> void:
+	var ctx := _ctx({"state_time": 0.1, "parry_duration": 0.5, "hurt": true})
+	assert_int(PlayerStateMachine.next_state(State.PARRY, ctx)).is_equal(State.HURT)
+
+func test_a_successful_parry_can_be_cut_short_by_an_attack_or_a_roll() -> void:
+	var ctx := _ctx({"state_time": 0.15, "parry_duration": 0.5, "parry_succeeded": true, "attack_buffered": true})
+	assert_int(PlayerStateMachine.next_state(State.PARRY, ctx)).is_equal(State.ATTACK)
+	ctx = _ctx({"state_time": 0.15, "parry_duration": 0.5, "parry_succeeded": true, "roll_buffered": true})
+	assert_int(PlayerStateMachine.next_state(State.PARRY, ctx)).is_equal(State.ROLL)
+
+func test_a_whiffed_parry_cannot_be_cut_short() -> void:
+	var ctx := _ctx({"state_time": 0.15, "parry_duration": 0.5, "parry_succeeded": false, "attack_buffered": true})
+	assert_int(PlayerStateMachine.next_state(State.PARRY, ctx)).is_equal(State.PARRY)
+
+func test_attacks_and_casts_are_not_interrupted_by_a_parry_press() -> void:
+	var attacking := _ctx({"state_time": 0.1, "attack_duration": 0.3, "parry_buffered": true, "parry_ready": true})
+	assert_int(PlayerStateMachine.next_state(State.ATTACK, attacking)).is_equal(State.ATTACK)
+	var casting := _ctx({"state_time": 0.1, "cast_duration": 0.6, "parry_buffered": true, "parry_ready": true})
+	assert_int(PlayerStateMachine.next_state(State.STORM, casting)).is_equal(State.STORM)

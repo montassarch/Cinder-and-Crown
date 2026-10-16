@@ -80,3 +80,24 @@ func test_virtual_skill_buttons_buffer_and_consume() -> void:
 	router.consume_skill(1)
 	assert_bool(router.skill_buffered(1)).is_false()
 	assert_bool(router.skill_buffered(2)).is_true()
+
+func test_virtual_parry_buffers_and_consumes() -> void:
+	var router := _make_router()
+	router.set_virtual_button(&"parry", true)
+	assert_bool(router.parry_buffered()).is_true()
+	router.consume_parry()
+	assert_bool(router.parry_buffered()).is_false()
+
+func test_a_parry_press_expires_after_the_buffer_window() -> void:
+	var router := _make_router()
+	router.set_virtual_button(&"parry", true)
+	assert_bool(router.parry_buffered()).is_true()
+	await await_millis(int(router.BUFFER_SECONDS * 1000.0) + 80)
+	assert_bool(router.parry_buffered()).is_false()
+
+func test_the_parry_action_exists_with_a_key_and_a_pad_button() -> void:
+	assert_bool(InputMap.has_action(&"parry")).is_true()
+	var kinds := InputMap.action_get_events(&"parry").map(func(e: InputEvent) -> bool: return e is InputEventKey)
+	assert_bool(kinds.has(true)).is_true()
+	var pads := InputMap.action_get_events(&"parry").map(func(e: InputEvent) -> bool: return e is InputEventJoypadButton)
+	assert_bool(pads.has(true)).is_true()

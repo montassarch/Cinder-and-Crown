@@ -22,6 +22,10 @@ const FLYER_ARRIVE_TILES: float = 0.15
 const DEATH_LINGER: float = 0.5
 const TELEGRAPH_FLASH := Color(1.0, 1.0, 1.0)
 const STUN_TINT := Color(0.55, 0.8, 1.0)
+## How long a parried strike leaves the attacker staggered, and how far it is shoved back.
+const PARRY_STAGGER: float = 0.8
+const PERFECT_PARRY_STAGGER: float = 1.3
+const PARRY_KNOCKBACK_TILES: float = 1.5
 
 ## Who this enemy hunts. Falls back to the first node in group "player".
 var target: Node2D
@@ -89,6 +93,15 @@ func stun(seconds: float) -> void:
 	if data != null:
 		_body.color = STUN_TINT
 	_stun_timer.start(seconds)
+
+
+## The player deflected this enemy's strike: it reels, shoved away from the parry.
+func on_parried(perfect: bool, from_x: float) -> void:
+	if _state == State.DEAD:
+		return
+	stun(PERFECT_PARRY_STAGGER if perfect else PARRY_STAGGER)
+	var direction := signf(global_position.x - from_x)
+	_knockback_x = (direction if direction != 0.0 else -_facing) * GameConfig.tiles(sqrt(2.0 * KNOCKBACK_DECAY * PARRY_KNOCKBACK_TILES))
 
 
 func begin_telegraph() -> void:
@@ -173,6 +186,8 @@ func _think_strike(foe: Node2D, delta: float) -> float:
 		if global_position.distance_to(foe.global_position) <= GameConfig.tiles(CHARGE_CONTACT_TILES):
 			_struck = true
 			_deal_damage(foe)
+	if _state == State.STUNNED:
+		return 0.0  # the strike was parried
 	if _strike_time >= CHARGE_DURATION:
 		_start_recovery()
 		return 0.0
@@ -192,7 +207,8 @@ func _on_telegraph_timeout() -> void:
 	var foe := _current_target()
 	if foe != null and global_position.distance_to(foe.global_position) <= GameConfig.tiles(data.attack_range_tiles * STRIKE_REACH_FACTOR):
 		_deal_damage(foe)
-	_start_recovery()
+	if _state != State.STUNNED:  # a parried strike leaves the attacker staggered, not recovering
+		_start_recovery()
 
 
 func _on_stun_timeout() -> void:
@@ -213,7 +229,9 @@ func _start_recovery() -> void:
 
 
 func _deal_damage(foe: Node) -> void:
-	if foe.has_method("take_hit"):
+	if foe.has_method("take_strike"):
+		foe.take_strike(data.attack_damage, global_position.x, self)
+	elif foe.has_method("take_hit"):
 		foe.take_hit(data.attack_damage, global_position.x)
 
 

@@ -7,6 +7,8 @@ signal died
 signal mana_denied
 ## Storm Blade's bolt has struck the sword (for the lightning effect).
 signal storm_struck
+## A strike was deflected; `perfect` when it came in the first instant of the window.
+signal parried(perfect: bool)
 
 const State := PlayerStateMachine.PlayerState
 
@@ -36,6 +38,19 @@ const COMBO_STEPS: int = 3
 const FINISHER_DURATION_SCALE: float = 1.8
 ## After taking a hit he pulls on the plague mask for this long.
 const MASK_SECONDS: float = 3.0
+
+# Parry (all times in seconds). The window is generous because touch is slower than a keyboard.
+const PARRY_DURATION: float = 0.5
+const PARRY_WINDOW: float = 0.25
+const PERFECT_PARRY_WINDOW: float = 0.1
+## Pause after a parry ends before the next one may start (stops mashing the button).
+const PARRY_COOLDOWN: float = 0.3
+## After a deflect the next sword hit is a riposte for this long, at this damage multiple.
+const RIPOSTE_SECONDS: float = 1.2
+const RIPOSTE_MULTIPLIER: float = 2.0
+const PERFECT_RIPOSTE_MULTIPLIER: float = 3.0
+const PARRY_HIT_STOP: float = 0.08
+const PERFECT_PARRY_HIT_STOP: float = 0.14
 
 # Mana and abilities (all times in seconds).
 const MANA_MAX: float = 100.0
@@ -76,6 +91,9 @@ var _mask_left: float = 0.0
 var _mana: Mana
 var _storm_left: float = 0.0
 var _cast_fired: bool = false
+var _parry_succeeded: bool = false
+var _parry_cooldown: float = 0.0
+var _riposte_left: float = 0.0
 var _build := RunBuild.new()
 var _base_max_health: int = 0
 
@@ -111,6 +129,11 @@ func _ready() -> void:
 	storm_effect.z_index = 2
 	add_child(storm_effect)
 	storm_effect.bind(self)
+	var parry_effect := ParryEffect.new()
+	parry_effect.name = "ParryEffect"
+	parry_effect.z_index = 2
+	add_child(parry_effect)
+	parry_effect.bind(self)
 
 
 func _physics_process(delta: float) -> void:
@@ -121,6 +144,9 @@ func _physics_process(delta: float) -> void:
 	_state_time += delta
 	_clock += delta
 	_mask_left = maxf(0.0, _mask_left - delta)
+	_tick_riposte(delta)
+	if _state != State.PARRY:
+		_parry_cooldown = maxf(0.0, _parry_cooldown - delta)
 	if _state == State.ATTACK and InputRouter.attack_buffered():
 		_attack_queued = true
 		InputRouter.consume_attack()
@@ -151,6 +177,8 @@ func _update_visual() -> void:
 		action = STORM_CAST_SECONDS
 	elif _state == State.REND:
 		action = REND_CAST_SECONDS
+	elif _state == State.PARRY:
+		action = PARRY_DURATION
 	_visual.show_state(_state, _facing, GameConfig.tiles(BODY_SIZE_TILES.y) / 2.0, action, _combo_step, not _health.is_alive(), _mask_left > 0.0)
 
 
@@ -184,6 +212,8 @@ func reset(at: Vector2) -> void:
 	_coyote = 0.0
 	_hurt_pending = false
 	_mask_left = 0.0
+	_clear_riposte()
+	_parry_cooldown = 0.0
 	_health.setup(_base_max_health + _build.bonus_max_health())
 	_mana.refill()
 	_storm_left = 0.0
@@ -208,6 +238,7 @@ func apply_boon(boon: BoonData) -> void:
 ## A fresh run: every boon is dropped and health returns to its base cap.
 func start_new_run() -> void:
 	_build.clear()
+	_clear_riposte()
 	_weapon.damage_multiplier = 1.0
 	_health.setup(_base_max_health)
 
@@ -257,12 +288,53 @@ func take_hit(damage: int, source_x: float) -> void:
 
 
 func _on_hit_landed(_target: Node, _damage: int) -> void:
+	if _riposte_left > 0.0:
+		_clear_riposte()  # the counter has landed
 	_mana.gain(MANA_PER_HIT * _build.mana_gain_multiplier())
 	_health.heal(_build.lifesteal())
 
 
 func _run_speed() -> float:
 	return GameConfig.tiles(RUN_SPEED) * _build.speed_multiplier()
+
+
+## A strike from `attacker` (anything with on_parried). A parry in its window deflects it.
+func take_strike(damage: int, source_x: float, attacker: Node) -> void:
+	if is_invincible():
+		return
+	if _state == State.PARRY and _state_time <= PARRY_WINDOW:
+		_deflect(attacker)
+		return
+	take_hit(damage, source_x)
+
+
+func _deflect(attacker: Node) -> void:
+	var perfect := _state_time <= PERFECT_PARRY_WINDOW
+	_parry_succeeded = true
+	_riposte_left = RIPOSTE_SECONDS
+	_weapon.next_hit_multiplier = PERFECT_RIPOSTE_MULTIPLIER if perfect else RIPOSTE_MULTIPLIER
+	if is_instance_valid(attacker) and attacker.has_method("on_parried"):
+		attacker.on_parried(perfect, global_position.x)
+	HitStop.freeze(PERFECT_PARRY_HIT_STOP if perfect else PARRY_HIT_STOP)
+	parried.emit(perfect)
+
+
+func _tick_riposte(delta: float) -> void:
+	if _riposte_left <= 0.0:
+		return
+	_riposte_left = maxf(0.0, _riposte_left - delta)
+	if _riposte_left == 0.0:
+		_weapon.next_hit_multiplier = 1.0
+
+
+func _clear_riposte() -> void:
+	_riposte_left = 0.0
+	_parry_succeeded = false
+	_weapon.next_hit_multiplier = 1.0
+
+
+func riposte_seconds_left() -> float:
+	return _riposte_left
 
 
 func _idle_while_dead(delta: float) -> void:
@@ -281,6 +353,10 @@ func _build_context(hurt_now: bool) -> Dictionary:
 		"attack_cancelable": _weapon.is_recovering(),
 		"skill1_buffered": InputRouter.skill_buffered(1),
 		"skill2_buffered": InputRouter.skill_buffered(2),
+		"parry_buffered": InputRouter.parry_buffered(),
+		"parry_ready": _parry_cooldown <= 0.0,
+		"parry_duration": PARRY_DURATION,
+		"parry_succeeded": _parry_succeeded,
 		"storm_ready": _mana.can_afford(STORM_COST),
 		"rend_ready": _mana.can_afford(REND_COST),
 		"cast_duration": STORM_CAST_SECONDS if _state == State.STORM else REND_CAST_SECONDS,
@@ -294,6 +370,8 @@ func _build_context(hurt_now: bool) -> Dictionary:
 
 
 func _enter_state(next: State) -> void:
+	if _state == State.PARRY and next != State.PARRY:
+		_parry_cooldown = PARRY_COOLDOWN
 	if _state == State.ATTACK and next != State.ATTACK:
 		_weapon.cancel_attack()
 		_last_attack_end = _clock
@@ -324,6 +402,9 @@ func _enter_state(next: State) -> void:
 			InputRouter.consume_skill(2)
 			_mana.spend(REND_COST)
 			_cast_fired = false
+		State.PARRY:
+			InputRouter.consume_parry()
+			_parry_succeeded = false
 		State.HURT:
 			velocity.x = _hit_direction * GameConfig.tiles(HURT_KNOCKBACK_SPEED)
 
@@ -338,7 +419,7 @@ func _apply_velocity(delta: float) -> void:
 			velocity.x = _facing * GameConfig.tiles(ROLL_SPEED)
 		State.HURT:
 			velocity.x = move_toward(velocity.x, 0.0, GameConfig.tiles(HURT_KNOCKBACK_DECAY) * delta)
-		State.STORM, State.REND:
+		State.STORM, State.REND, State.PARRY:
 			velocity.x = 0.0
 		State.ATTACK:
 			velocity.x = axis * _run_speed() * ATTACK_MOVE_FACTOR

@@ -12,8 +12,11 @@ extends RefCounted
 ##   skill1_buffered / skill2_buffered  an ability button was pressed (1 Storm Blade, 2 Crimson Rend)
 ##   storm_ready / rend_ready  there is enough mana for that ability
 ##   cast_duration  seconds the current ability cast lasts
+##   parry_buffered / parry_ready  the parry button was pressed / its cooldown is over
+##   parry_duration  seconds a parry lasts, hit or whiff
+##   parry_succeeded  this parry deflected a strike (attack or roll may then cut it short)
 
-enum PlayerState { IDLE, RUN, JUMP, FALL, ROLL, ATTACK, HURT, STORM, REND }
+enum PlayerState { IDLE, RUN, JUMP, FALL, ROLL, ATTACK, HURT, STORM, REND, PARRY }
 
 const ROLL_DURATION: float = 0.32
 const HURT_DURATION: float = 0.25
@@ -51,6 +54,16 @@ static func next_state(current: PlayerState, ctx: Dictionary) -> PlayerState:
 			if state_time < ctx.get("cast_duration", 0.0):
 				return current
 			return _settled_state(ctx)
+		PlayerState.PARRY:
+			# Committed, unless the parry landed: then the counter may start at once.
+			if state_time < ctx.get("parry_duration", 0.0):
+				if ctx.get("parry_succeeded", false):
+					if ctx.get("attack_buffered", false):
+						return PlayerState.ATTACK
+					if ctx.get("roll_buffered", false) and ctx.get("on_floor", false):
+						return PlayerState.ROLL
+				return PlayerState.PARRY
+			return _settled_state(ctx)
 		PlayerState.JUMP:
 			if ctx.get("vel_y", 0.0) < 0.0:
 				return PlayerState.JUMP
@@ -66,6 +79,8 @@ static func _free_state(ctx: Dictionary) -> PlayerState:
 		return PlayerState.ROLL
 	if ctx.get("jump_buffered", false) and (on_floor or ctx.get("coyote_time", 0.0) > 0.0):
 		return PlayerState.JUMP
+	if ctx.get("parry_buffered", false) and ctx.get("parry_ready", false):
+		return PlayerState.PARRY
 	if on_floor and ctx.get("skill1_buffered", false) and ctx.get("storm_ready", false):
 		return PlayerState.STORM
 	if ctx.get("skill2_buffered", false) and ctx.get("rend_ready", false):

@@ -15,6 +15,8 @@ var stun_chance: float = 0.0
 var stun_seconds: float = 0.0
 ## Run-wide damage scaling (boons set this).
 var damage_multiplier: float = 1.0
+## Scales the next landed hit only (a riposte); whoever sets it clears it.
+var next_hit_multiplier: float = 1.0
 var rng := RandomNumberGenerator.new()
 
 var _elapsed: float = 0.0
@@ -126,7 +128,7 @@ func _on_area_entered(area: Area2D) -> void:
 	if target == null or _hit_targets.has(target):
 		return
 	_hit_targets.append(target)
-	var damage := Damage.compute(data.damage + bonus_damage, damage_multiplier, 0)
+	var damage := Damage.compute(data.damage + bonus_damage, damage_multiplier * next_hit_multiplier, 0)
 	if target.has_method("take_hit"):
 		target.take_hit(damage, global_position.x, data.knockback_tiles)
 	if stun_chance > 0.0 and rng.randf() < stun_chance and target.has_method("stun"):

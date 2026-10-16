@@ -388,3 +388,6 @@ func test_landing_a_sword_hit_restores_mana() -> void:
 	await _frames(25)
 	assert_int(dummy.hits.size()).is_equal(1)
 	assert_float(_player.mana().current).is_equal_approx(50.0 + Player.MANA_PER_HIT, 0.01)
+
+func test_hero_plays_the_parry_animation_while_parrying() -> void:
+	assert_str(PlayerVisual.animation_for(State.PARRY, 0)).is_equal("parry")

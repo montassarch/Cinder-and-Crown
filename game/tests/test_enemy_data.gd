@@ -233,3 +233,55 @@ func test_a_dead_enemy_cannot_be_stunned() -> void:
 	enemy.take_hit(999, enemy.global_position.x - 10.0)
 	enemy.stun(1.0)
 	assert_bool(enemy.is_stunned()).is_false()
+
+# --- Parry ---
+
+func test_a_parried_enemy_is_staggered_and_its_wind_up_cancelled() -> void:
+	var enemy := _spawn(_fast_data())
+	enemy.begin_telegraph()
+	assert_bool(enemy.is_telegraphing()).is_true()
+	enemy.on_parried(false, enemy.global_position.x - 20.0)
+	assert_bool(enemy.is_stunned()).is_true()
+	assert_bool(enemy.is_telegraphing()).is_false()
+
+func test_a_perfect_parry_staggers_longer() -> void:
+	var plain := _spawn(_fast_data())
+	var perfect := _spawn(_fast_data())
+	plain.on_parried(false, -10.0)
+	perfect.on_parried(true, -10.0)
+	assert_float(Enemy.PERFECT_PARRY_STAGGER).is_greater(Enemy.PARRY_STAGGER)
+	await get_tree().create_timer(Enemy.PARRY_STAGGER + 0.15).timeout
+	assert_bool(plain.is_stunned()).is_false()
+	assert_bool(perfect.is_stunned()).is_true()
+
+func test_a_parried_enemy_is_knocked_back_away_from_the_parry() -> void:
+	_add_floor()
+	var enemy := _spawn(_fast_data())
+	enemy.global_position = GameConfig.tiles_v(5.0, 5.0)
+	await _frames(5)
+	var before := enemy.global_position.x
+	enemy.on_parried(false, enemy.global_position.x - 20.0)
+	await _frames(10)
+	assert_float(enemy.global_position.x).is_greater(before + 1.0)
+
+func test_an_enemy_names_itself_as_the_attacker_when_it_strikes() -> void:
+	var enemy := _spawn(_fast_data())
+	var victim: Node2D = auto_free(load("res://tests/support/strike_recorder.gd").new())
+	add_child(victim)
+	victim.global_position = enemy.global_position + GameConfig.tiles_v(1.0, 0.0)
+	enemy.target = victim
+	enemy.begin_telegraph()
+	await _frames(15)
+	assert_int(victim.strikes.size()).is_greater_equal(1)
+	assert_object(victim.strikes[0][2]).is_same(enemy)
+
+func test_a_strike_that_gets_parried_does_not_fall_through_into_recovery() -> void:
+	var enemy := _spawn(_fast_data())
+	var victim: Node2D = auto_free(load("res://tests/support/strike_recorder.gd").new())
+	victim.parry_it = true
+	add_child(victim)
+	victim.global_position = enemy.global_position + GameConfig.tiles_v(1.0, 0.0)
+	enemy.target = victim
+	enemy.begin_telegraph()
+	await _frames(12)
+	assert_bool(enemy.is_stunned()).is_true()

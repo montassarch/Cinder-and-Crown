@@ -25,9 +25,11 @@ const ANIMS := {
 	# Rend is the heavy downward slash (wave leaves around its third frame).
 	&"storm": {"dir": "Attack1", "frames": [0, 1, 1, 1, 1, 1], "fps": 10.0, "loop": false},
 	&"rend": {"dir": "Attack3", "frames": [1, 2, 3, 4, 5, 6], "fps": 14.0, "loop": false},
+	# Parry: the blade is thrust forward and held low (Attack3's follow-through), then drawn back.
+	&"parry": {"dir": "Attack3", "frames": [5, 6, 6, 6, 6, 7], "fps": 12.0, "loop": false},
 }
 ## These play over exactly the action's duration instead of their own frame rate.
-const FITTED: Array[StringName] = [&"roll", &"attack1", &"attack2", &"attack3", &"storm", &"rend"]
+const FITTED: Array[StringName] = [&"roll", &"attack1", &"attack2", &"attack3", &"storm", &"rend", &"parry"]
 const COMBO_ANIMS: Array[StringName] = [&"attack1", &"attack2", &"attack3"]
 
 const State := PlayerStateMachine.PlayerState
@@ -92,6 +94,7 @@ static func animation_for(state: State, combo_step: int) -> StringName:
 		State.HURT: return &"hurt"
 		State.STORM: return &"storm"
 		State.REND: return &"rend"
+		State.PARRY: return &"parry"
 		_: return &"idle"
 
 
