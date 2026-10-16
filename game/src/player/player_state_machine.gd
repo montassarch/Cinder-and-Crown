@@ -15,8 +15,10 @@ extends RefCounted
 ##   parry_buffered / parry_ready  the parry button was pressed / its cooldown is over
 ##   parry_duration  seconds a parry lasts, hit or whiff
 ##   parry_succeeded  this parry deflected a strike (attack or roll may then cut it short)
+##   heal_buffered / heal_ready  the flask button was pressed / a drink would help (charge and missing health)
+##   heal_duration  seconds a drink lasts
 
-enum PlayerState { IDLE, RUN, JUMP, FALL, ROLL, ATTACK, HURT, STORM, REND, PARRY }
+enum PlayerState { IDLE, RUN, JUMP, FALL, ROLL, ATTACK, HURT, STORM, REND, PARRY, HEAL }
 
 const ROLL_DURATION: float = 0.32
 const HURT_DURATION: float = 0.25
@@ -54,6 +56,11 @@ static func next_state(current: PlayerState, ctx: Dictionary) -> PlayerState:
 			if state_time < ctx.get("cast_duration", 0.0):
 				return current
 			return _settled_state(ctx)
+		PlayerState.HEAL:
+			# A drink is committed; only a hit (handled above) spills it.
+			if state_time < ctx.get("heal_duration", 0.0):
+				return PlayerState.HEAL
+			return _settled_state(ctx)
 		PlayerState.PARRY:
 			# Committed, unless the parry landed: then the counter may start at once.
 			if state_time < ctx.get("parry_duration", 0.0):
@@ -81,6 +88,8 @@ static func _free_state(ctx: Dictionary) -> PlayerState:
 		return PlayerState.JUMP
 	if ctx.get("parry_buffered", false) and ctx.get("parry_ready", false):
 		return PlayerState.PARRY
+	if on_floor and ctx.get("heal_buffered", false) and ctx.get("heal_ready", false):
+		return PlayerState.HEAL
 	if on_floor and ctx.get("skill1_buffered", false) and ctx.get("storm_ready", false):
 		return PlayerState.STORM
 	if ctx.get("skill2_buffered", false) and ctx.get("rend_ready", false):

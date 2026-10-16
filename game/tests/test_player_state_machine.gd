@@ -143,3 +143,21 @@ func test_attacks_and_casts_are_not_interrupted_by_a_parry_press() -> void:
 	assert_int(PlayerStateMachine.next_state(State.ATTACK, attacking)).is_equal(State.ATTACK)
 	var casting := _ctx({"state_time": 0.1, "cast_duration": 0.6, "parry_buffered": true, "parry_ready": true})
 	assert_int(PlayerStateMachine.next_state(State.STORM, casting)).is_equal(State.STORM)
+
+# --- Flask ---
+
+func test_drinking_starts_on_the_ground_when_it_is_worth_it() -> void:
+	assert_int(PlayerStateMachine.next_state(State.IDLE, _ctx({"heal_buffered": true, "heal_ready": true}))).is_equal(State.HEAL)
+	assert_int(PlayerStateMachine.next_state(State.RUN, _ctx({"move_axis": 1.0, "heal_buffered": true, "heal_ready": true}))).is_equal(State.HEAL)
+
+func test_drinking_needs_the_ground_and_a_reason() -> void:
+	assert_int(PlayerStateMachine.next_state(State.FALL, _ctx({"on_floor": false, "heal_buffered": true, "heal_ready": true}))).is_equal(State.FALL)
+	assert_int(PlayerStateMachine.next_state(State.IDLE, _ctx({"heal_buffered": true, "heal_ready": false}))).is_equal(State.IDLE)
+
+func test_a_drink_is_committed_until_it_ends() -> void:
+	var busy := _ctx({"state_time": 0.2, "heal_duration": 0.55, "move_axis": 1.0, "jump_buffered": true, "attack_buffered": true, "roll_buffered": true})
+	assert_int(PlayerStateMachine.next_state(State.HEAL, busy)).is_equal(State.HEAL)
+	assert_int(PlayerStateMachine.next_state(State.HEAL, _ctx({"state_time": 0.55, "heal_duration": 0.55}))).is_equal(State.IDLE)
+
+func test_a_hit_interrupts_a_drink() -> void:
+	assert_int(PlayerStateMachine.next_state(State.HEAL, _ctx({"state_time": 0.2, "heal_duration": 0.55, "hurt": true}))).is_equal(State.HURT)

@@ -3,7 +3,7 @@ extends Node
 ## InputMap; touch arrives through the set_virtual_* calls. Gameplay never reads Input.*.
 
 const BUFFER_SECONDS: float = 0.12
-const BUFFERED_ACTIONS: Array[StringName] = [&"jump", &"attack", &"roll", &"skill1", &"skill2", &"parry"]
+const BUFFERED_ACTIONS: Array[StringName] = [&"jump", &"attack", &"roll", &"skill1", &"skill2", &"parry", &"flask"]
 
 var _virtual_axis: float = 0.0
 var _virtual_held: Dictionary = {}
@@ -57,6 +57,14 @@ func parry_buffered() -> bool:
 
 func consume_parry() -> void:
 	_stamps.erase(&"parry")
+
+
+func flask_buffered() -> bool:
+	return _is_buffered(&"flask")
+
+
+func consume_flask() -> void:
+	_stamps.erase(&"flask")
 
 
 ## True once per press. The physical half is an edge; the touch half is a flag that

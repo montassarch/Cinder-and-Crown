@@ -22,6 +22,7 @@ var _mana_flash: float = 0.0
 @onready var _mana_fill: ColorRect = $ManaFill
 @onready var _weapons: Label = $WeaponLabel
 @onready var _enemies: Label = $EnemyLabel
+var _flask_label: Label
 
 
 func _ready() -> void:
@@ -39,11 +40,15 @@ func _ready() -> void:
 		rect.position = Vector2(margin, mana_top)
 		rect.size = mana_bar
 		rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	for label: Label in [_weapons, _enemies]:
+	_flask_label = Label.new()
+	_flask_label.name = "FlaskLabel"
+	add_child(_flask_label)
+	for label: Label in [_weapons, _enemies, _flask_label]:
 		label.theme = theme
 		label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_weapons.position = Vector2(margin, mana_top + mana_bar.y + GameConfig.tiles(0.15))
 	_enemies.position = _weapons.position + Vector2(0.0, GameConfig.tiles(0.8))
+	_flask_label.position = _enemies.position + Vector2(0.0, GameConfig.tiles(0.8))
 	_refresh()
 
 
@@ -57,6 +62,7 @@ func bind(player: Player, enemy_counter: Callable) -> void:
 	mana.mana_changed.connect(_on_mana_changed)
 	_on_mana_changed(mana.current, mana.max_mana)
 	player.mana_denied.connect(_on_mana_denied)
+	player.flask_changed.connect(func(_charges: int, _maximum: int) -> void: _refresh())
 	_refresh()
 
 
@@ -84,6 +90,12 @@ func weapon_text() -> String:
 	return "  ".join(parts)
 
 
+func flask_text() -> String:
+	if _player == null:
+		return ""
+	return "Flask: %d/%d" % [_player.flask_charges(), _player.flask_max()]
+
+
 func enemy_text() -> String:
 	return "Enemies: %d" % (_enemy_counter.call() if _enemy_counter.is_valid() else 0)
 
@@ -99,6 +111,7 @@ func _process(delta: float) -> void:
 func _refresh() -> void:
 	_weapons.text = weapon_text()
 	_enemies.text = enemy_text()
+	_flask_label.text = flask_text()
 
 
 func _on_health_changed(current: int, max_health: int) -> void:

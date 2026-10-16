@@ -9,6 +9,8 @@ signal mana_denied
 signal storm_struck
 ## A strike was deflected; `perfect` when it came in the first instant of the window.
 signal parried(perfect: bool)
+## The flask's charges changed (drunk, refilled, or the maximum moved).
+signal flask_changed(charges: int, maximum: int)
 
 const State := PlayerStateMachine.PlayerState
 
@@ -52,6 +54,12 @@ const PERFECT_RIPOSTE_MULTIPLIER: float = 3.0
 const PARRY_HIT_STOP: float = 0.08
 const PERFECT_PARRY_HIT_STOP: float = 0.14
 
+# Healing flask. A drink is committed and only heals when it finishes.
+const FLASK_BASE_CHARGES: int = 3
+const FLASK_HEAL: int = 45
+const HEAL_SECONDS: float = 0.55
+const HEAL_TINT := Color(0.6, 1.0, 0.75)
+
 # Mana and abilities (all times in seconds).
 const MANA_MAX: float = 100.0
 const MANA_REGEN: float = 2.0
@@ -91,6 +99,7 @@ var _mask_left: float = 0.0
 var _mana: Mana
 var _storm_left: float = 0.0
 var _cast_fired: bool = false
+var _flask: int = FLASK_BASE_CHARGES
 var _parry_succeeded: bool = false
 var _parry_cooldown: float = 0.0
 var _riposte_left: float = 0.0
@@ -179,6 +188,7 @@ func _update_visual() -> void:
 		action = REND_CAST_SECONDS
 	elif _state == State.PARRY:
 		action = PARRY_DURATION
+	_visual.modulate = HEAL_TINT if _state == State.HEAL else Color.WHITE
 	_visual.show_state(_state, _facing, GameConfig.tiles(BODY_SIZE_TILES.y) / 2.0, action, _combo_step, not _health.is_alive(), _mask_left > 0.0)
 
 
@@ -202,8 +212,8 @@ func storm_seconds_left() -> float:
 	return _storm_left
 
 
-## Back to a fresh life at `at`: full health, standing, nothing held over.
-func reset(at: Vector2) -> void:
+## Standing at `at` for the next level: health, flask and boons carry over; mana is topped up.
+func enter_level(at: Vector2) -> void:
 	global_position = at
 	velocity = Vector2.ZERO
 	_weapon.cancel_attack()
@@ -214,14 +224,37 @@ func reset(at: Vector2) -> void:
 	_mask_left = 0.0
 	_clear_riposte()
 	_parry_cooldown = 0.0
-	_health.setup(_base_max_health + _build.bonus_max_health())
 	_mana.refill()
 	_storm_left = 0.0
 	_apply_storm_to_weapon()
 
 
+## Back to a fresh life at `at`: full health, standing, nothing held over.
+func reset(at: Vector2) -> void:
+	enter_level(at)
+	_health.setup(_base_max_health + _build.bonus_max_health())
+
+
 func build() -> RunBuild:
 	return _build
+
+
+func flask_charges() -> int:
+	return _flask
+
+
+func flask_max() -> int:
+	return FLASK_BASE_CHARGES + _build.bonus_flask_charges()
+
+
+func set_flask_charges(charges: int) -> void:
+	_flask = clampi(charges, 0, flask_max())
+	flask_changed.emit(_flask, flask_max())
+
+
+## Give back charges (a level cleared), never past the maximum.
+func refill_flask(amount: int = 1) -> void:
+	set_flask_charges(_flask + amount)
 
 
 ## Take a boon for the rest of the run.
@@ -232,6 +265,8 @@ func apply_boon(boon: BoonData) -> void:
 			_health.raise_max(roundi(boon.amount))
 		BoonData.Effect.HEAL:
 			_health.heal(roundi(boon.amount))
+		BoonData.Effect.FLASK_CHARGE:
+			set_flask_charges(_flask + roundi(boon.amount))
 	_weapon.damage_multiplier = _build.damage_multiplier()
 
 
@@ -241,6 +276,7 @@ func start_new_run() -> void:
 	_clear_riposte()
 	_weapon.damage_multiplier = 1.0
 	_health.setup(_base_max_health)
+	set_flask_charges(FLASK_BASE_CHARGES)
 
 
 func set_weapon(slot: int, data: WeaponData) -> void:
@@ -319,6 +355,12 @@ func _deflect(attacker: Node) -> void:
 	parried.emit(perfect)
 
 
+func _drink() -> void:
+	_flask = maxi(_flask - 1, 0)
+	_health.heal(FLASK_HEAL)
+	flask_changed.emit(_flask, flask_max())
+
+
 func _tick_riposte(delta: float) -> void:
 	if _riposte_left <= 0.0:
 		return
@@ -353,6 +395,9 @@ func _build_context(hurt_now: bool) -> Dictionary:
 		"attack_cancelable": _weapon.is_recovering(),
 		"skill1_buffered": InputRouter.skill_buffered(1),
 		"skill2_buffered": InputRouter.skill_buffered(2),
+		"heal_buffered": InputRouter.flask_buffered(),
+		"heal_ready": _flask > 0 and _health.current < _health.max_health,
+		"heal_duration": HEAL_SECONDS,
 		"parry_buffered": InputRouter.parry_buffered(),
 		"parry_ready": _parry_cooldown <= 0.0,
 		"parry_duration": PARRY_DURATION,
@@ -370,6 +415,8 @@ func _build_context(hurt_now: bool) -> Dictionary:
 
 
 func _enter_state(next: State) -> void:
+	if _state == State.HEAL and next != State.HEAL and next != State.HURT and _state_time >= HEAL_SECONDS:
+		_drink()
 	if _state == State.PARRY and next != State.PARRY:
 		_parry_cooldown = PARRY_COOLDOWN
 	if _state == State.ATTACK and next != State.ATTACK:
@@ -405,6 +452,8 @@ func _enter_state(next: State) -> void:
 		State.PARRY:
 			InputRouter.consume_parry()
 			_parry_succeeded = false
+		State.HEAL:
+			InputRouter.consume_flask()
 		State.HURT:
 			velocity.x = _hit_direction * GameConfig.tiles(HURT_KNOCKBACK_SPEED)
 
@@ -419,7 +468,7 @@ func _apply_velocity(delta: float) -> void:
 			velocity.x = _facing * GameConfig.tiles(ROLL_SPEED)
 		State.HURT:
 			velocity.x = move_toward(velocity.x, 0.0, GameConfig.tiles(HURT_KNOCKBACK_DECAY) * delta)
-		State.STORM, State.REND, State.PARRY:
+		State.STORM, State.REND, State.PARRY, State.HEAL:
 			velocity.x = 0.0
 		State.ATTACK:
 			velocity.x = axis * _run_speed() * ATTACK_MOVE_FACTOR

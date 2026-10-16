@@ -9,6 +9,8 @@ signal level_completed
 const ROOM_DIR := "res://data/rooms"
 const BOON_DIR := "res://data/boons"
 const ENEMY_DIR := "res://data/enemies"
+## Flask charges handed back for clearing a level.
+const FLASK_PER_LEVEL: int = 1
 ## The hero is this far into a room when its wave appears.
 const ENCOUNTER_TRIGGER_TILES: float = 3.0
 ## A wave stands between this far from the room's left edge and a margin from its right.
@@ -127,7 +129,7 @@ func arena_height_tiles() -> float:
 
 
 ## Builds the next level and puts the player back at its spawn.
-func regenerate(new_seed: int) -> void:
+func regenerate(new_seed: int, keep_health: bool = false) -> void:
 	level_seed = new_seed
 	for container in [_rooms, _walls]:
 		for child in container.get_children():
@@ -136,7 +138,10 @@ func regenerate(new_seed: int) -> void:
 	clear_enemies()
 	_build_arena()
 	_apply_camera_limits()
-	player.reset(spawn_point())
+	if keep_health:
+		player.enter_level(spawn_point())
+	else:
+		player.reset(spawn_point())
 
 
 func _scene_switch() -> Array:
@@ -214,8 +219,9 @@ func _on_exit_entered(body: Node) -> void:
 
 func _on_boon_chosen(boon: BoonData) -> void:
 	player.apply_boon(boon)
+	player.refill_flask(FLASK_PER_LEVEL)
 	_depth += 1
-	regenerate(level_seed + 1)
+	regenerate(level_seed + 1, true)
 
 
 ## A fresh run: back to depth 0 on a fresh copy of this level, boons dropped.

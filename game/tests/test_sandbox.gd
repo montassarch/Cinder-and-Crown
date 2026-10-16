@@ -104,6 +104,12 @@ func test_hud_reports_live_enemy_count_and_weapon_names() -> void:
 	assert_str(hud.weapon_text()).contains("Rusty Blade")
 	assert_str(hud.weapon_text()).contains("Ember Spear")
 
+func test_hud_shows_the_flask_charges() -> void:
+	var hud: Node = _sandbox.get_node("Hud")
+	assert_str(hud.flask_text()).contains("%d/%d" % [Player.FLASK_BASE_CHARGES, Player.FLASK_BASE_CHARGES])
+	_sandbox.player.set_flask_charges(1)
+	assert_str(hud.flask_text()).contains("1/%d" % Player.FLASK_BASE_CHARGES)
+
 func test_menu_lists_every_shipped_enemy_and_both_weapon_slots() -> void:
 	var menu: SandboxMenu = _sandbox.get_node("Menu")
 	assert_int(menu.spawn_button_count()).is_equal(DataScanner.list("res://data/enemies").size())

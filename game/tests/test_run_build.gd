@@ -133,3 +133,11 @@ func test_a_boon_offered_before_is_less_likely_next_time() -> void:
 		if build.roll_offers(pool, 1, rng)[0].id == "a":
 			picked_a += 1
 	assert_int(picked_a).is_less(160)  # 50% without the penalty, 1/(1+1.5) = 40% share with it
+
+func test_flask_boons_add_charges() -> void:
+	var build := RunBuild.new()
+	assert_int(build.bonus_flask_charges()).is_equal(0)
+	build.apply(_boon("f", BoonData.Effect.FLASK_CHARGE, 1.0))
+	assert_int(build.bonus_flask_charges()).is_equal(1)
+	build.clear()
+	assert_int(build.bonus_flask_charges()).is_equal(0)

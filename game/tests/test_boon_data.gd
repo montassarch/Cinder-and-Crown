@@ -11,7 +11,7 @@ func _all() -> Array[BoonData]:
 	return boons
 
 func test_a_dozen_boons_ship() -> void:
-	assert_int(_all().size()).is_greater_equal(12)
+	assert_int(_all().size()).is_greater_equal(13)
 
 func test_every_file_in_the_folder_is_a_boon() -> void:
 	assert_int(_all().size()).is_equal(DataScanner.list(BOON_DIR).size())

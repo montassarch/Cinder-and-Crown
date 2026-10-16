@@ -156,3 +156,19 @@ func test_the_next_level_has_fresh_encounters() -> void:
 	assert_int(_enemies().size()).is_equal(0)
 	await _enter_room(1)
 	assert_int(_enemies().size()).is_greater_equal(1)
+
+# --- Health and the flask carry between levels ---
+
+func test_the_next_level_keeps_the_heros_health_and_gives_back_a_flask_charge() -> void:
+	_level.player.get_node("Health").take_damage(45)
+	_level.player.set_flask_charges(1)
+	_level._on_boon_chosen(load("res://data/boons/whetstone.tres"))
+	assert_int(_level.player.get_node("Health").current).is_equal(55)
+	assert_int(_level.player.flask_charges()).is_equal(2)
+
+func test_dying_starts_a_new_run_with_full_health_and_flask() -> void:
+	_level.player.get_node("Health").take_damage(80)
+	_level.player.set_flask_charges(0)
+	_level.reset_player()
+	assert_int(_level.player.get_node("Health").current).is_equal(100)
+	assert_int(_level.player.flask_charges()).is_equal(Player.FLASK_BASE_CHARGES)

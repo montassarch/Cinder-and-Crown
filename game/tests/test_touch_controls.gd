@@ -106,3 +106,9 @@ func test_tapping_parry_buffers_a_parry() -> void:
 	assert_bool(InputRouter.parry_buffered()).is_true()
 	_touch(0, _controls.button_center(&"parry", _view()), false)
 	InputRouter.consume_parry()
+
+func test_tapping_flask_buffers_a_drink() -> void:
+	_touch(0, _controls.button_center(&"flask", _view()), true)
+	assert_bool(InputRouter.flask_buffered()).is_true()
+	_touch(0, _controls.button_center(&"flask", _view()), false)
+	InputRouter.consume_flask()

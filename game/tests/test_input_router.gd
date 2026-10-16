@@ -101,3 +101,15 @@ func test_the_parry_action_exists_with_a_key_and_a_pad_button() -> void:
 	assert_bool(kinds.has(true)).is_true()
 	var pads := InputMap.action_get_events(&"parry").map(func(e: InputEvent) -> bool: return e is InputEventJoypadButton)
 	assert_bool(pads.has(true)).is_true()
+
+func test_virtual_flask_buffers_and_consumes() -> void:
+	var router := _make_router()
+	router.set_virtual_button(&"flask", true)
+	assert_bool(router.flask_buffered()).is_true()
+	router.consume_flask()
+	assert_bool(router.flask_buffered()).is_false()
+
+func test_the_flask_action_exists_with_a_key_and_a_pad_button() -> void:
+	assert_bool(InputMap.has_action(&"flask")).is_true()
+	assert_bool(InputMap.action_get_events(&"flask").any(func(e: InputEvent) -> bool: return e is InputEventKey)).is_true()
+	assert_bool(InputMap.action_get_events(&"flask").any(func(e: InputEvent) -> bool: return e is InputEventJoypadButton)).is_true()

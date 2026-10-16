@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="BoonData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/boons/boon_data.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+id = "witch_flask"
+display_name = "Witch's Flask"
+description = "+1 flask charge, and one charge refilled now."
+effect = 6
+amount = 1.0
+rarity = 1
+unique = false

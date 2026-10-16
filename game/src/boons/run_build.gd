@@ -18,6 +18,7 @@ var _speed: float = 0.0
 var _mana_gain: float = 0.0
 var _lifesteal: float = 0.0
 var _max_health: float = 0.0
+var _flask: float = 0.0
 
 
 func apply(boon: BoonData) -> void:
@@ -33,6 +34,8 @@ func apply(boon: BoonData) -> void:
 			_lifesteal += boon.amount
 		BoonData.Effect.MAX_HEALTH:
 			_max_health += boon.amount
+		BoonData.Effect.FLASK_CHARGE:
+			_flask += boon.amount
 		BoonData.Effect.HEAL:
 			pass  # an instant effect, applied by whoever owns the health
 
@@ -45,6 +48,7 @@ func clear() -> void:
 	_mana_gain = 0.0
 	_lifesteal = 0.0
 	_max_health = 0.0
+	_flask = 0.0
 
 
 func times_taken(id: String) -> int:
@@ -70,6 +74,10 @@ func lifesteal() -> int:
 
 func bonus_max_health() -> int:
 	return roundi(_max_health)
+
+
+func bonus_flask_charges() -> int:
+	return roundi(_flask)
 
 
 ## Up to `count` distinct boons from `pool`. Rarer boons come up less often, a boon
