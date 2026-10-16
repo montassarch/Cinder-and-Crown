@@ -12,6 +12,12 @@
   - hosted on GitHub Pages; played and signed off on an iPhone 14 Pro Max (2026-10-14)
   - Windows build exports but has never been launched (iPhone is now the focus)
 
+## Phase 1.5: Dead Cells feel (ideas from Graveflame, MIT)
+- [x] Boons: pick one of three after each level, 12 data-driven boons (`Design/Plans/2026-10-16-boons.md`)
+- [ ] Parry and riposte
+- [ ] Enemy telegraph, poise, guard-break
+- [ ] Flask healing, cells shop, threat-budget waves
+
 ## Phase 2: Content (after the prototype is tested)
 - [ ] 9. Boss framework, then many bosses with different styles
 - [ ] 10. Equipment system and classes
