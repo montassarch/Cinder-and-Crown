@@ -17,6 +17,8 @@
 - [x] Parry and riposte (`Design/Plans/2026-10-16-parry.md`)
 - [x] Enemy telegraph, poise, guard-break (`Design/Plans/2026-10-16-poise.md`)
 - [x] Flask healing, cells shop, threat-budget waves (`Design/Plans/2026-10-16-runs.md`)
+- [x] Enemy attack patterns: seven enemies with data-driven attacks (`Design/Plans/2026-10-16-enemy-attacks-spec.md`)
+- [ ] Enemy art and animation (next: coloured boxes today)
 
 ## Phase 2: Content (after the prototype is tested)
 - [ ] 9. Boss framework, then many bosses with different styles

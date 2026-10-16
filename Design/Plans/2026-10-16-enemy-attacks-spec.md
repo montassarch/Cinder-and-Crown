@@ -1,6 +1,6 @@
 # Enemy attack patterns: design spec
 
-Branch: `feature/enemy-attacks` (from `feature/runs`). Status: **awaiting your review**. No code written yet.
+Branch: `feature/enemy-attacks` (from `feature/runs`). Status: **built** (all four slices; test builds `/enemies-1/` .. `/enemies-4/`). Plan: `2026-10-16-enemy-attacks-plan.md`.
 Chosen focus (you): attack patterns first, with the current coloured-box enemies. Real enemy art comes after.
 
 ## What we are building and why

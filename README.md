@@ -2,7 +2,7 @@
 
 A Dead Cells-style 2D action roguelite, built in Godot 4.7.2. Phase 1 is a playable **sandbox prototype**: a player who runs, jumps, rolls and attacks; two weapons; three enemies; a test room with a spawn/swap menu; and randomly assembled rooms with an exit. Everything is placeholder art on purpose. Bosses, classes, equipment, story, dialogue and quests come later ([roadmap](#roadmap)).
 
-**Status:** Phase 1 done and played on an iPhone 14 Pro Max. The iPhone is the main platform. Since then: a black swordsman hero with a plague mask after a hit, Storm Blade and Crimson Rend abilities with mana, a ruined-cathedral backdrop, 12 data-driven boons, parry with riposte, and enemy telegraphs, poise and guard break (see `Design/Plans/`).
+**Status:** Phase 1 done and played on an iPhone 14 Pro Max. The iPhone is the main platform. Since then: a black swordsman hero with a plague mask after a hit, Storm Blade and Crimson Rend abilities with mana, a ruined-cathedral backdrop, 12 data-driven boons, parry with riposte, enemy telegraphs, poise and guard break, and seven enemies with their own attack patterns (strings, shots you can parry back, shockwaves, dives, shields, explosions; see `Design/Plans/`).
 
 **Play it:** https://montassarch.github.io/Cinder-and-Crown/ in Safari. For fullscreen, tap Share > Add to Home Screen and launch it from the icon, in landscape.
 

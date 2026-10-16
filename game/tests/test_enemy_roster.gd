@@ -117,3 +117,13 @@ func test_the_pilgrim_data_is_valid() -> void:
 	assert_int(pilgrim.unlock_depth).is_equal(3)
 	assert_int(pilgrim.max_per_wave).is_equal(1)
 	assert_int(pilgrim.max_health).is_less(20)
+
+func test_every_shipped_enemy_has_at_least_one_valid_move() -> void:
+	for path in DataScanner.list(ENEMY_DIR):
+		var data := load(path) as EnemyData
+		var moves := data.effective_moves()
+		assert_int(moves.size()).is_greater(0)
+		for move in moves:
+			assert_bool(move.is_valid()).is_true()
+		assert_int(data.threat).is_greater(0)
+		assert_int(data.cell_reward).is_greater(0)

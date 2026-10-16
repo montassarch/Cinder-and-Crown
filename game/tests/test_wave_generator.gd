@@ -85,3 +85,42 @@ func test_shipped_enemies_unlock_in_order_light_to_heavy() -> void:
 	assert_int(brute.unlock_depth).is_greater(bat.unlock_depth - 1)
 	assert_int(brute.threat).is_greater(shambler.threat)
 	assert_int(brute.max_per_wave).is_equal(1)
+
+# --- The full shipped roster ---
+
+func _roster() -> Array[EnemyData]:
+	var pool: Array[EnemyData] = []
+	for path in DataScanner.list("res://data/enemies"):
+		pool.append(load(path) as EnemyData)
+	return pool
+
+func _unlock(file: String) -> int:
+	return (load("res://data/enemies/%s.tres" % file) as EnemyData).unlock_depth
+
+func test_every_shipped_enemy_unlocks_in_the_spec_order() -> void:
+	assert_int(_unlock("shambler")).is_equal(0)
+	assert_int(_unlock("crown_guard")).is_equal(1)
+	assert_int(_unlock("cinder_bat")).is_equal(1)
+	assert_int(_unlock("ember_wisp")).is_equal(2)
+	assert_int(_unlock("powder_pilgrim")).is_equal(3)
+	assert_int(_unlock("penitent")).is_equal(3)
+	assert_int(_unlock("crown_brute")).is_equal(4)
+
+func test_no_wave_at_any_depth_exceeds_its_budget_with_the_full_roster() -> void:
+	var pool := _roster()
+	assert_int(pool.size()).is_equal(7)
+	for depth in 9:
+		for seed_value in 40:
+			var wave := WaveGenerator.roll(pool, depth, _rng(seed_value))
+			assert_int(wave.size()).is_between(1, WaveGenerator.MAX_WAVE_SIZE)
+			assert_int(_threat(wave)).is_less_equal(WaveGenerator.budget_for(depth))
+			for enemy in pool:
+				assert_int(wave.count(enemy)).is_less_equal(enemy.max_per_wave)
+
+func test_the_heaviest_enemies_never_appear_before_their_depth() -> void:
+	var pool := _roster()
+	for seed_value in 60:
+		for enemy in WaveGenerator.roll(pool, 0, _rng(seed_value)):
+			assert_str(enemy.display_name).is_equal("Shambler")
+		for enemy in WaveGenerator.roll(pool, 3, _rng(seed_value)):
+			assert_str(enemy.display_name).is_not_equal("Crown Brute")
