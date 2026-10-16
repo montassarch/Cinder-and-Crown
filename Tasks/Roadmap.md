@@ -15,7 +15,7 @@
 ## Phase 1.5: Dead Cells feel (ideas from Graveflame, MIT)
 - [x] Boons: pick one of three after each level, 12 data-driven boons (`Design/Plans/2026-10-16-boons.md`)
 - [x] Parry and riposte (`Design/Plans/2026-10-16-parry.md`)
-- [ ] Enemy telegraph, poise, guard-break
+- [x] Enemy telegraph, poise, guard-break (`Design/Plans/2026-10-16-poise.md`)
 - [ ] Flask healing, cells shop, threat-budget waves
 
 ## Phase 2: Content (after the prototype is tested)

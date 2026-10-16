@@ -5,6 +5,8 @@ extends CharacterBody2D
 
 signal attack_released(damage: int)
 signal died
+## The poise ran out: the enemy is staggered and takes extra damage for a moment.
+signal guard_broken
 
 enum State { MOVE, TELEGRAPH, STRIKE, RECOVER, DEAD, STUNNED }
 
@@ -22,6 +24,23 @@ const FLYER_ARRIVE_TILES: float = 0.15
 const DEATH_LINGER: float = 0.5
 const TELEGRAPH_FLASH := Color(1.0, 1.0, 1.0)
 const STUN_TINT := Color(0.55, 0.8, 1.0)
+## Past this share of its wind-up an enemy is committed: hits no longer stop the strike.
+const COMMIT_FRACTION: float = 0.5
+const FLINCH_SECONDS: float = 0.2
+## A broken guard: how long the enemy reels, and how much harder it is hit meanwhile.
+const BREAK_STAGGER: float = 1.6
+const BREAK_DAMAGE_MULTIPLIER: float = 1.5
+const BREAK_TINT := Color(1.0, 0.6, 0.15)
+## Poise refills in full after this long without a hit.
+const POISE_REGEN_DELAY: float = 2.0
+## The on-screen tell above a winding-up enemy: a ring that closes exactly as the strike lands.
+const TELL_HEIGHT_PIXELS: float = 12.0
+const TELL_START_RADIUS: float = 14.0
+const TELL_END_RADIUS: float = 3.0
+const TELL_COLOR := Color(1.0, 0.25, 0.2)
+const TELL_COMMITTED_COLOR := Color(1.0, 0.85, 0.25)
+const POISE_PIP_SIZE: float = 3.0
+const POISE_PIP_GAP: float = 2.0
 ## How long a parried strike leaves the attacker staggered, and how far it is shoved back.
 const PARRY_STAGGER: float = 0.8
 const PERFECT_PARRY_STAGGER: float = 1.3
@@ -37,6 +56,9 @@ var _knockback_x: float = 0.0
 var _strike_time: float = 0.0
 var _struck: bool = false
 var _age: float = 0.0
+var _poise: int = 0
+var _poise_idle: float = 0.0
+var _vulnerable_left: float = 0.0
 
 @onready var _health: Health = $Health
 @onready var _body: ColorRect = $Body
@@ -83,6 +105,26 @@ func is_stunned() -> bool:
 	return _state == State.STUNNED
 
 
+func poise() -> int:
+	return _poise
+
+
+func is_guard_broken() -> bool:
+	return _vulnerable_left > 0.0
+
+
+## 0 as the wind-up starts, 1 as the strike lands; 0 whenever it is not winding up.
+func telegraph_progress() -> float:
+	if _state != State.TELEGRAPH or data == null:
+		return 0.0
+	return clampf(1.0 - _telegraph_timer.time_left / maxf(data.telegraph_seconds, 0.001), 0.0, 1.0)
+
+
+## The strike is coming whatever lands on the enemy (only a guard break stops it).
+func is_committed() -> bool:
+	return _state == State.STRIKE or (_state == State.TELEGRAPH and telegraph_progress() >= COMMIT_FRACTION)
+
+
 ## Freezes the enemy and cancels whatever it was winding up or doing.
 func stun(seconds: float) -> void:
 	if _state == State.DEAD or seconds <= 0.0:
@@ -119,16 +161,45 @@ func begin_telegraph() -> void:
 func take_hit(damage: int, source_x: float, knockback_tiles: float = 0.0) -> void:
 	if _state == State.DEAD:
 		return
+	if is_guard_broken():
+		damage = ceili(damage * BREAK_DAMAGE_MULTIPLIER)
 	_health.take_damage(damage)
-	if _state != State.DEAD and knockback_tiles > 0.0:
+	if _state == State.DEAD:
+		return
+	if knockback_tiles > 0.0:
 		var direction := signf(global_position.x - source_x)
 		_knockback_x = direction * GameConfig.tiles(sqrt(2.0 * KNOCKBACK_DECAY * knockback_tiles))
+	_react_to_hit()
+
+
+## Poised enemies wear their poise down and break; light ones flinch unless they are already
+## committed to a strike, recovering, or reeling.
+func _react_to_hit() -> void:
+	_poise_idle = 0.0
+	if data.poise > 0 and not is_guard_broken():
+		_poise -= 1
+		if _poise <= 0:
+			_break_guard()
+		return
+	if _state == State.STUNNED or _state == State.RECOVER or is_committed():
+		return
+	stun(FLINCH_SECONDS)
+
+
+func _break_guard() -> void:
+	_poise = data.poise
+	_vulnerable_left = BREAK_STAGGER
+	stun(BREAK_STAGGER)
+	_body.color = BREAK_TINT
+	guard_broken.emit()
 
 
 func _physics_process(delta: float) -> void:
 	if data == null or _state == State.DEAD:
 		return
 	_age += delta
+	_vulnerable_left = maxf(0.0, _vulnerable_left - delta)
+	_tick_poise(delta)
 	_knockback_x = move_toward(_knockback_x, 0.0, GameConfig.tiles(KNOCKBACK_DECAY) * delta)
 
 	var foe := _current_target()
@@ -147,6 +218,16 @@ func _physics_process(delta: float) -> void:
 	elif _state != State.MOVE:
 		velocity.y = 0.0  # a wind-up or recovery must not drift; only MOVE steers a flyer
 	move_and_slide()
+	if _state == State.TELEGRAPH or data.poise > 0:
+		queue_redraw()
+
+
+func _tick_poise(delta: float) -> void:
+	if data.poise <= 0 or _poise >= data.poise or is_guard_broken():
+		return
+	_poise_idle += delta
+	if _poise_idle >= POISE_REGEN_DELAY:
+		_poise = data.poise
 
 
 ## Returns horizontal velocity; FLYER also sets velocity.y directly.
@@ -262,4 +343,29 @@ func _apply_data() -> void:
 	_body.size = size
 	_body.position = -size / 2.0
 	_body.color = data.tint
+	_poise = data.poise
 	_health.setup(data.max_health)
+
+
+func _draw() -> void:
+	if data == null or _state == State.DEAD:
+		return
+	var top := -GameConfig.tiles(data.body_size_tiles.y) / 2.0
+	if _state == State.TELEGRAPH:
+		var color := TELL_COMMITTED_COLOR if is_committed() else TELL_COLOR
+		var center := Vector2(0.0, top - TELL_HEIGHT_PIXELS)
+		var radius := lerpf(TELL_START_RADIUS, TELL_END_RADIUS, telegraph_progress())
+		draw_arc(center, radius, 0.0, TAU, 20, color, 2.0)
+		draw_rect(Rect2(center.x - 1.0, center.y - 4.0, 2.0, 5.0), color)
+		draw_rect(Rect2(center.x - 1.0, center.y + 2.0, 2.0, 2.0), color)
+	if data.poise > 0:
+		var width := data.poise * POISE_PIP_SIZE + (data.poise - 1) * POISE_PIP_GAP
+		var left := -width / 2.0
+		for i in data.poise:
+			var filled := i < _poise
+			var tint := BREAK_TINT if is_guard_broken() else Color(0.85, 0.85, 0.9)
+			var rect := Rect2(left + i * (POISE_PIP_SIZE + POISE_PIP_GAP), top - 5.0, POISE_PIP_SIZE, POISE_PIP_SIZE)
+			if filled or is_guard_broken():
+				draw_rect(rect, tint)
+			else:
+				draw_rect(rect, Color(tint, 0.25))

@@ -13,5 +13,8 @@ enum Behaviour { CHASER, FLYER, CHARGER }
 @export var telegraph_seconds: float = 0.5
 @export var recovery_seconds: float = 0.8
 @export var behaviour: Behaviour = Behaviour.CHASER
+## Sword hits it shrugs off before its guard breaks. 0: every hit that lands while it is not
+## yet committed to a strike makes it flinch.
+@export var poise: int = 0
 @export var body_size_tiles: Vector2 = Vector2(1.0, 1.8)
 @export var tint: Color = Color(0.6, 0.6, 0.6)

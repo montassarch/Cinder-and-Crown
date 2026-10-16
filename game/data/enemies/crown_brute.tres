@@ -12,5 +12,6 @@ attack_range_tiles = 5.0
 telegraph_seconds = 0.9
 recovery_seconds = 1.2
 behaviour = 2
+poise = 4
 body_size_tiles = Vector2(1.6, 2.4)
 tint = Color(0.7, 0.6, 0.15, 1)
