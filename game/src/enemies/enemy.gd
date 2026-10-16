@@ -38,6 +38,10 @@ const SHOT_MUZZLE_TILES: float = 0.8
 const SLAM_TELL_RADIUS_TILES: float = 2.0
 ## A dive ends when it is this close to the spot it was aimed at.
 const DIVE_ARRIVE_TILES: float = 0.3
+## Shots, shockwaves and blast flashes join this group so a restarted level can sweep them up.
+const ATTACK_GROUP := &"enemy_attacks"
+const SHIELD_FLASH_COLOR := Color(0.85, 0.9, 1.0)
+const SHIELD_FLASH_SECONDS: float = 0.1
 const BLAST_COLOR := Color(1.0, 0.55, 0.1, 0.6)
 const BLAST_FLASH_SECONDS: float = 0.3
 ## A broken guard: how long the enemy reels, and how much harder it is hit meanwhile.
@@ -80,6 +84,9 @@ var _knockback_x: float = 0.0
 var _strike_time: float = 0.0
 var _struck: bool = false
 var _age: float = 0.0
+## How many times the enemy has been drawn (tests check the tell keeps being redrawn).
+var draw_count: int = 0
+var _shield_flash_left: float = 0.0
 var _poise: int = 0
 var _poise_idle: float = 0.0
 var _vulnerable_left: float = 0.0
@@ -115,6 +122,10 @@ func configure(new_data: EnemyData) -> void:
 
 func health() -> Health:
 	return _health
+
+
+func body_color() -> Color:
+	return _body.color
 
 
 ## +1 when the enemy faces right, -1 left.
@@ -249,8 +260,20 @@ func _is_front_hit(source_x: float) -> bool:
 ## A shield takes the whole blow, but a poised enemy's poise still wears down, so a guard can
 ## still be broken from the front.
 func _absorb_with_shield() -> void:
+	_shield_flash_left = SHIELD_FLASH_SECONDS
+	_body.color = SHIELD_FLASH_COLOR
 	if data.poise > 0:
 		_react_to_hit()
+
+
+## The colour the body should show for what the enemy is doing (after a shield flash ends).
+func _state_color() -> Color:
+	match _state:
+		State.TELEGRAPH:
+			return TELEGRAPH_FLASH
+		State.STUNNED:
+			return BREAK_TINT if is_guard_broken() else STUN_TINT
+	return BREAK_TINT if is_guard_broken() else data.tint
 
 
 ## Poised enemies wear their poise down and break; light ones flinch unless they are already
@@ -279,6 +302,10 @@ func _physics_process(delta: float) -> void:
 	if data == null or _state == State.DEAD:
 		return
 	_age += delta
+	if _shield_flash_left > 0.0:
+		_shield_flash_left -= delta
+		if _shield_flash_left <= 0.0:
+			_body.color = _state_color()
 	_rest_left = maxf(0.0, _rest_left - delta)
 	_vulnerable_left = maxf(0.0, _vulnerable_left - delta)
 	_tick_poise(delta)
@@ -287,7 +314,7 @@ func _physics_process(delta: float) -> void:
 	var foe := _current_target()
 	if _state == State.TELEGRAPH and _move != null and _move.kind == EnemyMove.Kind.DIVE and not is_committed() and foe != null:
 		_dive_target = foe.global_position
-	if data.shielded and foe != null and (_state == State.MOVE or _state == State.RECOVER):
+	if data.shielded and foe != null and _state == State.MOVE:  # not while recovering: its back stays open
 		var side := foe.global_position.x - global_position.x
 		if side != 0.0:
 			_facing = signf(side)
@@ -308,8 +335,7 @@ func _physics_process(delta: float) -> void:
 	if _state == State.STRIKE and _move != null and _move.kind == EnemyMove.Kind.DIVE:
 		velocity.y = _dive_velocity.y
 	move_and_slide()
-	if _state == State.TELEGRAPH or data.poise > 0:
-		queue_redraw()
+	queue_redraw()  # the tell and the poise pips change with the state, so redraw every frame
 
 
 func _tick_poise(delta: float) -> void:
@@ -410,34 +436,45 @@ func _think_dive(foe: Node2D, delta: float) -> float:
 func _on_telegraph_timeout() -> void:
 	if _state != State.TELEGRAPH:
 		return
+	var move := _move  # a parry inside _hit_hero clears _move, so keep our own reference
 	_body.color = data.tint
-	attack_released.emit(_move.damage)
-	match _move.kind:
+	attack_released.emit(move.damage)
+	match move.kind:
 		EnemyMove.Kind.DASH, EnemyMove.Kind.DIVE:
 			_state = State.STRIKE
 			_strike_time = 0.0
 			_struck = false
-			if _move.kind == EnemyMove.Kind.DIVE:
+			if move.kind == EnemyMove.Kind.DIVE:
 				var aim := _dive_target - global_position
 				var heading := aim.normalized() if aim.length() > 1.0 else Vector2(_facing, 0.0)
-				_dive_velocity = heading * GameConfig.tiles(_move.speed_tiles)
+				_dive_velocity = heading * GameConfig.tiles(move.speed_tiles)
 			return
 		EnemyMove.Kind.PROJECTILE:
-			_fire_projectile(_move)
+			_fire_projectile(move)
 		EnemyMove.Kind.SLAM:
-			_launch_waves(_move)
+			_launch_waves(move)
 		EnemyMove.Kind.EXPLODE:
 			var target_foe := _current_target()
-			if target_foe != null and global_position.distance_to(target_foe.global_position) <= GameConfig.tiles(_move.reach_tiles):
-				_hit_hero(target_foe, _move)
-			_explode(_move)
+			if target_foe != null and global_position.distance_to(target_foe.global_position) <= GameConfig.tiles(move.reach_tiles):
+				_hit_hero(target_foe, move)
+			if _state == State.STUNNED:
+				return  # a parry cancelled the blast
+			_explode(move)
 			return
 		EnemyMove.Kind.MELEE:
 			var foe := _current_target()
-			if foe != null and global_position.distance_to(foe.global_position) <= GameConfig.tiles(_move.reach_tiles * STRIKE_REACH_FACTOR):
-				_hit_hero(foe, _move)
+			if foe != null and _melee_reaches(foe, move):
+				_hit_hero(foe, move)
 	if _state != State.STUNNED:  # a parried strike leaves the attacker staggered, not recovering
 		_start_recovery()
+
+
+## A swing lands when the hero is within reach; a shielded enemy also has to face him, so
+## a hero who has stepped round behind it is not stabbed through its back.
+func _melee_reaches(foe: Node2D, move: EnemyMove) -> bool:
+	if global_position.distance_to(foe.global_position) > GameConfig.tiles(move.reach_tiles * STRIKE_REACH_FACTOR):
+		return false
+	return not data.shielded or _is_front_hit(foe.global_position.x)
 
 
 func _fire_projectile(move: EnemyMove) -> void:
@@ -549,6 +586,7 @@ func _explode(move: EnemyMove) -> void:
 		ring.append(Vector2.from_angle(TAU * float(i) / 24.0) * radius)
 	flash.polygon = ring
 	flash.color = BLAST_COLOR
+	flash.add_to_group(ATTACK_GROUP)
 	get_parent().add_child(flash)
 	flash.global_position = global_position
 	flash.create_tween().tween_property(flash, "modulate:a", 0.0, BLAST_FLASH_SECONDS)
@@ -575,6 +613,7 @@ func _apply_data() -> void:
 
 
 func _draw() -> void:
+	draw_count += 1
 	if data == null or _state == State.DEAD:
 		return
 	var top := -GameConfig.tiles(data.body_size_tiles.y) / 2.0

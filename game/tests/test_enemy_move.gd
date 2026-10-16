@@ -11,6 +11,7 @@ func _move(kind: EnemyMove.Kind) -> EnemyMove:
 	m.reach_tiles = 1.5
 	m.speed_tiles = 6.0
 	m.range_tiles = 10.0
+	m.parryable = kind == EnemyMove.Kind.MELEE or kind == EnemyMove.Kind.PROJECTILE
 	return m
 
 func test_a_melee_move_needs_a_reach_and_times() -> void:
@@ -88,3 +89,15 @@ func test_a_charger_without_moves_gets_a_dash_move() -> void:
 	assert_float(moves[0].speed_tiles).is_equal(2.0 * Enemy.CHARGE_SPEED_MULTIPLIER)
 	assert_float(moves[0].active_seconds).is_equal(Enemy.CHARGE_DURATION)
 	assert_int(moves[0].damage).is_equal(20)
+
+func test_only_melee_and_projectile_moves_may_be_parryable() -> void:
+	for kind in [EnemyMove.Kind.SLAM, EnemyMove.Kind.DASH, EnemyMove.Kind.DIVE, EnemyMove.Kind.EXPLODE]:
+		var m := _move(kind)
+		m.parryable = true
+		assert_bool(m.is_valid()).is_false()
+		m.parryable = false
+		assert_bool(m.is_valid()).is_true()
+	for kind in [EnemyMove.Kind.MELEE, EnemyMove.Kind.PROJECTILE]:
+		var m := _move(kind)
+		m.parryable = true
+		assert_bool(m.is_valid()).is_true()

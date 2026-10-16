@@ -116,7 +116,7 @@ func spawn_enemy(data: EnemyData) -> Enemy:
 
 func clear_enemies() -> void:
 	for child in get_children():
-		if child is Enemy:
+		if child is Enemy or child.is_in_group(Enemy.ATTACK_GROUP):  # their shots and waves go too
 			child.queue_free()
 
 

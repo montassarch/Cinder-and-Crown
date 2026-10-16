@@ -436,7 +436,9 @@ func test_the_blast_does_not_hurt_other_enemies() -> void:
 	var bystander: Node2D = auto_free(load("res://tests/support/hurtable_dummy.gd").new())
 	add_child(bystander)
 	bystander.global_position = bomber.global_position + GameConfig.tiles_v(1.0, 0.0)
-	var other := _spawn(_data())
+	var other_data := _data()
+	other_data.behaviour = EnemyData.Behaviour.FLYER  # no gravity: it stays inside the blast radius
+	var other := _spawn(other_data)
 	other.global_position = bomber.global_position + GameConfig.tiles_v(-1.0, 0.0)
 	bomber.begin_telegraph()
 	await _frames(35)
@@ -469,3 +471,21 @@ func test_the_exploding_bomber_is_gone_and_announces_it() -> void:
 	assert_int(blasts[0]).is_equal(1)
 	assert_int(deaths[0]).is_equal(0)  # a self-destruct is not a kill
 	assert_bool(bomber.is_dead()).is_true()
+
+func test_a_parried_explosion_is_cancelled_and_the_enemy_survives_staggered() -> void:
+	var move := _move(EnemyMove.Kind.EXPLODE, true)  # an invalid combination, but it must not crash
+	move.telegraph_seconds = 0.3
+	move.reach_tiles = 2.5
+	var data := _data([move] as Array[EnemyMove])
+	data.behaviour = EnemyData.Behaviour.FLYER
+	var bomber := _spawn(data)
+	var hero := _victim_beside(bomber)
+	hero.parry_it = true
+	hero.global_position = bomber.global_position + GameConfig.tiles_v(1.0, 0.0)
+	var blasts := [0]
+	bomber.exploded.connect(func() -> void: blasts[0] += 1)
+	bomber.begin_telegraph()
+	await _frames(30)
+	assert_int(blasts[0]).is_equal(0)
+	assert_bool(bomber.is_dead()).is_false()
+	assert_bool(bomber.is_stunned()).is_true()

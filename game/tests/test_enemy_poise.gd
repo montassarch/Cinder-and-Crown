@@ -235,3 +235,43 @@ func test_the_shield_follows_the_hero_even_after_the_enemy_is_knocked_past_him()
 	assert_int(enemy.health().current).is_equal(100)
 	enemy.take_hit(10, enemy.global_position.x + 50.0)  # from its right: its back
 	assert_int(enemy.health().current).is_equal(90)
+
+func _melee_shield_scene() -> Array:
+	var data := _data(0)
+	data.shielded = true
+	data.behaviour = EnemyData.Behaviour.FLYER
+	var enemy := _spawn(data)
+	var hero: Node2D = auto_free(load("res://tests/support/strike_recorder.gd").new())
+	add_child(hero)
+	hero.global_position = enemy.global_position + Vector2(24.0, 0.0)
+	enemy.target = hero
+	return [enemy, hero]
+
+func test_a_hero_behind_a_winding_up_shielded_enemy_is_not_struck() -> void:
+	var scene := _melee_shield_scene()
+	var enemy: Enemy = scene[0]
+	var hero: Node2D = scene[1]
+	enemy.begin_telegraph()  # the hero is on its right: it winds up facing right
+	await _frames(5)
+	hero.global_position = enemy.global_position + Vector2(-24.0, 0.0)  # he steps round behind it
+	await _frames(45)
+	assert_int(hero.strikes.size() + hero.hits.size()).is_equal(0)
+
+func test_a_shielded_enemy_does_not_turn_while_recovering_so_its_back_stays_open() -> void:
+	var scene := _melee_shield_scene()
+	var enemy: Enemy = scene[0]
+	var hero: Node2D = scene[1]
+	enemy.begin_telegraph()
+	await _frames(33)  # the strike is over: it is recovering
+	hero.global_position = enemy.global_position + Vector2(-24.0, 0.0)
+	await _frames(5)
+	assert_float(enemy.facing()).is_equal(1.0)  # still facing where it struck
+	enemy.take_hit(10, hero.global_position.x)  # from behind it
+	assert_int(enemy.health().current).is_equal(90)
+
+func test_a_blocked_hit_flashes_the_body_then_settles() -> void:
+	var enemy := _shielded()
+	enemy.take_hit(10, enemy.global_position.x + 10.0)
+	assert_object(enemy.body_color()).is_equal(Enemy.SHIELD_FLASH_COLOR)
+	await _frames(int(Enemy.SHIELD_FLASH_SECONDS * 60.0) + 6)
+	assert_object(enemy.body_color()).is_equal(enemy.data.tint)

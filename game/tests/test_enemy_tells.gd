@@ -50,3 +50,11 @@ func test_there_is_no_tell_when_not_winding_up() -> void:
 func test_the_two_tells_are_different_colours() -> void:
 	assert_object(Enemy.TELL_COLOR).is_not_equal(Enemy.TELL_DODGE_COLOR)
 	assert_object(Enemy.TELL_DODGE_COLOR).is_not_equal(Enemy.TELL_COMMITTED_COLOR)
+
+func test_the_tell_is_redrawn_after_the_wind_up_ends() -> void:
+	var enemy := _enemy(true)  # no poise: nothing else would ask for a redraw
+	enemy.begin_telegraph()
+	await _frames(40)  # the 0.5 s wind-up is over
+	var drawn := enemy.draw_count
+	await _frames(5)
+	assert_int(enemy.draw_count).is_greater(drawn)

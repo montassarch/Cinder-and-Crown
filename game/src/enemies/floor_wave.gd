@@ -19,6 +19,7 @@ var _spent: bool = false
 
 
 func _init() -> void:
+	add_to_group(Enemy.ATTACK_GROUP)
 	collision_layer = 0
 	collision_mask = HERO_HURTBOX_MASK
 	var shape := CollisionShape2D.new()

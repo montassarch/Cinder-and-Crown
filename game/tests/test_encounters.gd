@@ -261,3 +261,25 @@ func test_a_pilgrim_killed_by_the_hero_pays_its_cells() -> void:
 	var pilgrim := _level.spawn_wave_enemy(data, _level.player.global_position + Vector2(200.0, 0.0))
 	pilgrim.take_hit(9999, pilgrim.global_position.x - 10.0)
 	assert_int(MetaSave.cells() - cells_before).is_equal(data.cell_reward)
+
+# --- Enemy shots and waves do not outlive their level ---
+
+func test_regenerating_clears_enemy_shots_waves_and_flashes() -> void:
+	var shot: EnemyProjectile = EnemyProjectile.new()
+	_level.add_child(shot)
+	shot.launch(1.0, 100.0, 1000.0, 5, null)
+	var wave: FloorWave = FloorWave.new()
+	_level.add_child(wave)
+	wave.launch(1.0, 100.0, 1000.0, 5)
+	_level.regenerate(8)
+	await _frames(3)
+	assert_bool(not is_instance_valid(shot) or shot.is_queued_for_deletion()).is_true()
+	assert_bool(not is_instance_valid(wave) or wave.is_queued_for_deletion()).is_true()
+
+func test_the_menus_clear_enemies_also_clears_their_shots() -> void:
+	var shot: EnemyProjectile = EnemyProjectile.new()
+	_level.add_child(shot)
+	shot.launch(1.0, 100.0, 1000.0, 5, null)
+	_level.clear_enemies()
+	await _frames(3)
+	assert_bool(not is_instance_valid(shot) or shot.is_queued_for_deletion()).is_true()

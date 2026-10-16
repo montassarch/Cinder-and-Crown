@@ -29,6 +29,9 @@ enum Kind { MELEE, PROJECTILE, SLAM, DASH, DIVE, EXPLODE }
 func is_valid() -> bool:
 	if telegraph_seconds <= 0.0:
 		return false
+	# Only a melee swing or a thrown shot can be deflected; the rest are plain hits.
+	if parryable and kind != Kind.MELEE and kind != Kind.PROJECTILE:
+		return false
 	match kind:
 		Kind.MELEE:
 			return reach_tiles > 0.0 and active_seconds > 0.0
