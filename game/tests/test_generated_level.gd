@@ -15,6 +15,14 @@ func after_test() -> void:
 	_level.queue_free()
 	InputRouter.set_virtual_axis(0.0)
 
+func _exit_zone_center() -> Vector2:
+	var rooms := _level.get_node("Rooms").get_children()
+	var zone := rooms[rooms.size() - 1].get_node("ExitZone") as Area2D
+	return zone.global_position
+
+func _stand_on_exit() -> void:
+	_level.player.global_position = _exit_zone_center()
+
 func _frames(count: int) -> void:
 	for i in count:
 		await get_tree().physics_frame
@@ -62,6 +70,7 @@ func test_player_can_walk_out_of_the_spawn_room_along_the_floor() -> void:
 func test_reaching_the_exit_offers_boons_before_building_the_next_level() -> void:
 	var before := _level.level_seed
 	var picker: BoonPicker = _level.get_node("BoonPicker")
+	_stand_on_exit()
 	_level._on_exit_entered(_level.player)
 	assert_bool(picker.is_open()).is_true()
 	assert_int(picker.card_count()).is_equal(3)
@@ -70,7 +79,7 @@ func test_reaching_the_exit_offers_boons_before_building_the_next_level() -> voi
 func test_choosing_a_boon_applies_it_then_builds_the_next_level_and_resets_the_player() -> void:
 	var before := _level.level_seed
 	var picker: BoonPicker = _level.get_node("BoonPicker")
-	_level.player.global_position = Vector2(999.0, 0.0)
+	_stand_on_exit()
 	_level._on_exit_entered(_level.player)
 	var taken: BoonData = picker.offered(1)
 	picker.choose(1)
@@ -82,16 +91,19 @@ func test_choosing_a_boon_applies_it_then_builds_the_next_level_and_resets_the_p
 
 func test_the_same_level_seed_always_offers_the_same_boons() -> void:
 	var picker: BoonPicker = _level.get_node("BoonPicker")
+	_stand_on_exit()
 	_level._on_exit_entered(_level.player)
 	var first := [picker.offered(0).id, picker.offered(1).id, picker.offered(2).id]
 	picker.choose(0)
 	_level.regenerate(7)
 	_level.player.start_new_run()
+	_stand_on_exit()
 	_level._on_exit_entered(_level.player)
 	assert_array([picker.offered(0).id, picker.offered(1).id, picker.offered(2).id]).is_equal(first)
 
 func test_dying_and_respawning_starts_a_new_run_without_the_boons() -> void:
 	var picker: BoonPicker = _level.get_node("BoonPicker")
+	_stand_on_exit()
 	_level._on_exit_entered(_level.player)
 	var taken: BoonData = picker.offered(0)
 	picker.choose(0)
@@ -100,6 +112,7 @@ func test_dying_and_respawning_starts_a_new_run_without_the_boons() -> void:
 
 func test_the_exit_does_not_stack_a_second_offer_while_one_is_open() -> void:
 	var picker: BoonPicker = _level.get_node("BoonPicker")
+	_stand_on_exit()
 	_level._on_exit_entered(_level.player)
 	var first := picker.offered(0)
 	_level._on_exit_entered(_level.player)
@@ -124,3 +137,22 @@ func test_regenerate_also_replaces_the_boundary_walls() -> void:
 	_level.regenerate(8)
 	await _frames(2)
 	assert_int(_level.get_node("Walls").get_child_count()).is_equal(2)
+
+func test_walking_into_the_exit_offers_boons_once_and_choosing_leaves_the_exit_behind() -> void:
+	var picker: BoonPicker = _level.get_node("BoonPicker")
+	await _frames(30)
+	_stand_on_exit()
+	await _frames(10)
+	assert_bool(picker.is_open()).is_true()
+	picker.choose(0)
+	await _frames(120)
+	assert_bool(picker.is_open()).is_false()
+	assert_int(_level.level_seed).is_equal(8)
+	assert_float(_level.player.global_position.x).is_less(GameConfig.tiles(_level.layout()[0].size_tiles.x))
+
+func test_an_exit_report_from_a_hero_who_is_not_on_the_exit_is_ignored() -> void:
+	var picker: BoonPicker = _level.get_node("BoonPicker")
+	var before := _level.level_seed
+	_level._on_exit_entered(_level.player)  # the hero is at the spawn, far from the exit
+	assert_bool(picker.is_open()).is_false()
+	assert_int(_level.level_seed).is_equal(before)
