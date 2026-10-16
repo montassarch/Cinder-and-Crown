@@ -22,5 +22,7 @@ enum Behaviour { CHASER, FLYER, CHARGER }
 @export var unlock_depth: int = 0
 ## No wave holds more than this many of this enemy.
 @export var max_per_wave: int = 3
+## Cells dropped when it dies (banked for the between-runs shop).
+@export var cell_reward: int = 1
 @export var body_size_tiles: Vector2 = Vector2(1.0, 1.8)
 @export var tint: Color = Color(0.6, 0.6, 0.6)

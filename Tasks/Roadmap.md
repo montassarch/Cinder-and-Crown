@@ -16,7 +16,7 @@
 - [x] Boons: pick one of three after each level, 12 data-driven boons (`Design/Plans/2026-10-16-boons.md`)
 - [x] Parry and riposte (`Design/Plans/2026-10-16-parry.md`)
 - [x] Enemy telegraph, poise, guard-break (`Design/Plans/2026-10-16-poise.md`)
-- [ ] Flask healing, cells shop, threat-budget waves
+- [x] Flask healing, cells shop, threat-budget waves (`Design/Plans/2026-10-16-runs.md`)
 
 ## Phase 2: Content (after the prototype is tested)
 - [ ] 9. Boss framework, then many bosses with different styles

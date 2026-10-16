@@ -23,6 +23,7 @@ var _mana_flash: float = 0.0
 @onready var _weapons: Label = $WeaponLabel
 @onready var _enemies: Label = $EnemyLabel
 var _flask_label: Label
+var _cells_label: Label
 
 
 func _ready() -> void:
@@ -43,12 +44,17 @@ func _ready() -> void:
 	_flask_label = Label.new()
 	_flask_label.name = "FlaskLabel"
 	add_child(_flask_label)
-	for label: Label in [_weapons, _enemies, _flask_label]:
+	_cells_label = Label.new()
+	_cells_label.name = "CellsLabel"
+	add_child(_cells_label)
+	for label: Label in [_weapons, _enemies, _flask_label, _cells_label]:
 		label.theme = theme
 		label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_weapons.position = Vector2(margin, mana_top + mana_bar.y + GameConfig.tiles(0.15))
 	_enemies.position = _weapons.position + Vector2(0.0, GameConfig.tiles(0.8))
 	_flask_label.position = _enemies.position + Vector2(0.0, GameConfig.tiles(0.8))
+	_cells_label.position = _flask_label.position + Vector2(0.0, GameConfig.tiles(0.8))
+	_cells_label.add_theme_color_override("font_color", Color(0.55, 0.95, 1.0))
 	_refresh()
 
 
@@ -96,6 +102,10 @@ func flask_text() -> String:
 	return "Flask: %d/%d" % [_player.flask_charges(), _player.flask_max()]
 
 
+func cells_text() -> String:
+	return "Cells: %d" % MetaSave.cells()
+
+
 func enemy_text() -> String:
 	return "Enemies: %d" % (_enemy_counter.call() if _enemy_counter.is_valid() else 0)
 
@@ -112,6 +122,7 @@ func _refresh() -> void:
 	_weapons.text = weapon_text()
 	_enemies.text = enemy_text()
 	_flask_label.text = flask_text()
+	_cells_label.text = cells_text()
 
 
 func _on_health_changed(current: int, max_health: int) -> void:

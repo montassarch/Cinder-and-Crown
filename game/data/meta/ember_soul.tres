@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="MetaUpgradeData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/meta/meta_upgrade_data.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+id = "ember_soul"
+display_name = "Ember Soul"
+description = "+10 max health per rank."
+effect = 0
+amount_per_rank = 10.0
+costs = Array[int]([5, 12, 22])

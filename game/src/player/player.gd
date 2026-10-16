@@ -104,6 +104,7 @@ var _parry_succeeded: bool = false
 var _parry_cooldown: float = 0.0
 var _riposte_left: float = 0.0
 var _build := RunBuild.new()
+var _run_bonuses: Array[BoonData] = []
 var _base_max_health: int = 0
 
 @onready var _weapon: Weapon = $Weapon
@@ -270,13 +271,21 @@ func apply_boon(boon: BoonData) -> void:
 	_weapon.damage_multiplier = _build.damage_multiplier()
 
 
-## A fresh run: every boon is dropped and health returns to its base cap.
+## Permanent bonuses (bought between runs) that every new run starts with.
+func set_run_bonuses(bonuses: Array[BoonData]) -> void:
+	_run_bonuses = bonuses.duplicate()
+
+
+## A fresh run: the run's boons are dropped, the permanent bonuses are applied, and health
+## and flask come back to their full caps.
 func start_new_run() -> void:
 	_build.clear()
 	_clear_riposte()
-	_weapon.damage_multiplier = 1.0
-	_health.setup(_base_max_health)
-	set_flask_charges(FLASK_BASE_CHARGES)
+	for bonus in _run_bonuses:
+		_build.apply(bonus)
+	_weapon.damage_multiplier = _build.damage_multiplier()
+	_health.setup(_base_max_health + _build.bonus_max_health())
+	set_flask_charges(flask_max())
 
 
 func set_weapon(slot: int, data: WeaponData) -> void:

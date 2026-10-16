@@ -391,3 +391,40 @@ func test_landing_a_sword_hit_restores_mana() -> void:
 
 func test_hero_plays_the_parry_animation_while_parrying() -> void:
 	assert_str(PlayerVisual.animation_for(State.PARRY, 0)).is_equal("parry")
+
+func test_run_bonuses_apply_at_the_start_of_every_run() -> void:
+	var soul := BoonData.new()
+	soul.id = "meta_soul"
+	soul.effect = BoonData.Effect.MAX_HEALTH
+	soul.amount = 20.0
+	var edge := BoonData.new()
+	edge.id = "meta_edge"
+	edge.effect = BoonData.Effect.DAMAGE
+	edge.amount = 0.12
+	var belt := BoonData.new()
+	belt.id = "meta_belt"
+	belt.effect = BoonData.Effect.FLASK_CHARGE
+	belt.amount = 1.0
+	_player.set_run_bonuses([soul, edge, belt] as Array[BoonData])
+	_player.start_new_run()
+	assert_int(_player.get_node("Health").max_health).is_equal(120)
+	assert_int(_player.get_node("Health").current).is_equal(120)
+	assert_float(_player.build().damage_multiplier()).is_equal_approx(1.12, 0.0001)
+	assert_int(_player.flask_max()).is_equal(Player.FLASK_BASE_CHARGES + 1)
+	assert_int(_player.flask_charges()).is_equal(Player.FLASK_BASE_CHARGES + 1)
+
+func test_run_bonuses_outlast_the_boons_of_a_run() -> void:
+	var soul := BoonData.new()
+	soul.id = "meta_soul"
+	soul.effect = BoonData.Effect.MAX_HEALTH
+	soul.amount = 20.0
+	_player.set_run_bonuses([soul] as Array[BoonData])
+	_player.start_new_run()
+	var pick := BoonData.new()
+	pick.id = "pick"
+	pick.effect = BoonData.Effect.DAMAGE
+	pick.amount = 0.5
+	_player.apply_boon(pick)
+	_player.start_new_run()
+	assert_int(_player.get_node("Health").max_health).is_equal(120)
+	assert_float(_player.build().damage_multiplier()).is_equal(1.0)

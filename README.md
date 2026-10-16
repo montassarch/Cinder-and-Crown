@@ -23,9 +23,10 @@ A Dead Cells-style 2D action roguelite, built in Godot 4.7.2. Phase 1 is a playa
 | Storm Blade (40 mana) | U | LB | STORM |
 | Crimson Rend (30 mana) | I | RB | REND |
 | Parry (tap as an enemy's ring closes) | L | Left-stick click | PARRY |
+| Healing flask | F | Right-stick click | FLASK |
 | Sandbox menu | Tab | Start | Menu button |
 
-The **menu** (it pauses the game) spawns enemies, clears them, assigns either weapon to either slot, resets the player, toggles hitbox/hurtbox debug boxes, and switches between the **Sandbox** and a **Generated level**. Reaching the gold exit gate in a generated level pauses on a **pick one of three boons** screen (tap a card, or press 1-3); once you choose, the next level is built from the next seed. Dying or "Reset player" starts a new run and drops your boons.
+The **menu** (it pauses the game) spawns enemies, clears them, assigns either weapon to either slot, resets the player, toggles hitbox/hurtbox debug boxes, and switches between the **Sandbox** and a **Generated level**. In a generated level a wave of enemies appears as you enter each room, and the exit gate stays red until they are all dead. Kills drop cells that you spend in a shop between runs. Reaching the open gold exit gate pauses on a **pick one of three boons** screen (tap a card, or press 1-3); once you choose, the next level is built from the next seed. Dying or "Reset player" starts a new run and drops your boons.
 
 ## Tests
 

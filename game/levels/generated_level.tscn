@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://levels/generated_level.gd" id="1_level"]
 [ext_resource type="PackedScene" path="res://src/ui/hud.tscn" id="2_hud"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" path="res://src/input/touch_controls.tscn" id="4_touch"]
 [ext_resource type="Script" path="res://src/ui/debug_overlay.gd" id="5_overlay"]
 [ext_resource type="Script" path="res://src/ui/boon_picker.gd" id="6_picker"]
+[ext_resource type="Script" path="res://src/ui/meta_shop.gd" id="7_shop"]
 
 [node name="GeneratedLevel" type="Node2D"]
 script = ExtResource("1_level")
@@ -28,3 +29,6 @@ script = ExtResource("5_overlay")
 
 [node name="BoonPicker" type="CanvasLayer" parent="."]
 script = ExtResource("6_picker")
+
+[node name="MetaShop" type="CanvasLayer" parent="."]
+script = ExtResource("7_shop")

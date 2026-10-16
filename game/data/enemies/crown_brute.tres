@@ -18,3 +18,4 @@ tint = Color(0.7, 0.6, 0.15, 1)
 threat = 5
 unlock_depth = 2
 max_per_wave = 1
+cell_reward = 3

@@ -9,6 +9,7 @@ signal level_completed
 const ROOM_DIR := "res://data/rooms"
 const BOON_DIR := "res://data/boons"
 const ENEMY_DIR := "res://data/enemies"
+const META_DIR := "res://data/meta"
 ## Flask charges handed back for clearing a level.
 const FLASK_PER_LEVEL: int = 1
 ## The hero is this far into a room when its wave appears.
@@ -34,10 +35,13 @@ var _encounters: Array[Dictionary] = []
 var _gate_open_color := Color.WHITE
 var _gate_color := Color.WHITE
 var _depth: int = 0
+var _meta_upgrades: Array[MetaUpgradeData] = []
+var _cells_run: int = 0
 
 @onready var _rooms: Node2D = $Rooms
 @onready var _walls: Node2D = $Walls
 @onready var _picker: BoonPicker = $BoonPicker
+@onready var _shop: MetaShop = $MetaShop
 
 
 func _ready() -> void:
@@ -50,7 +54,14 @@ func _ready() -> void:
 		var enemy := load(path) as EnemyData
 		if enemy != null:
 			_enemy_pool.append(enemy)
+	for path in DataScanner.list(META_DIR):
+		var upgrade := load(path) as MetaUpgradeData
+		if upgrade != null:
+			_meta_upgrades.append(upgrade)
 	_picker.chosen.connect(_on_boon_chosen)
+	_shop.start_requested.connect(reset_player)
+	player.set_run_bonuses(MetaSave.bonus_boons(_meta_upgrades))
+	player.start_new_run()
 
 
 func layout() -> Array[RoomData]:
@@ -64,6 +75,11 @@ func depth() -> int:
 
 func set_depth(value: int) -> void:
 	_depth = maxi(value, 0)
+
+
+## Cells picked up since this run began.
+func cells_this_run() -> int:
+	return _cells_run
 
 
 func encounter_room_count() -> int:
@@ -102,7 +118,13 @@ func _spawn_wave(encounter: Dictionary) -> void:
 		var along := (i + 0.5) / wave.size()
 		var x_tiles := lerpf(encounter.start + WAVE_FIRST_SLOT_TILES, encounter.end - WAVE_END_MARGIN_TILES, along)
 		var height := AIR_SPAWN_HEIGHT_TILES if wave[i].behaviour == EnemyData.Behaviour.FLYER else GROUND_SPAWN_HEIGHT_TILES
-		spawn_enemy_at(wave[i], GameConfig.tiles_v(x_tiles, GROUND_TOP_TILES - height))
+		var enemy := spawn_enemy_at(wave[i], GameConfig.tiles_v(x_tiles, GROUND_TOP_TILES - height))
+		enemy.died.connect(_on_enemy_died.bind(wave[i].cell_reward))
+
+
+func _on_enemy_died(reward: int) -> void:
+	_cells_run += reward
+	MetaSave.add_cells(reward)
 
 
 ## The gate glows red while enemies live and shows its normal colour once the level is clear.
@@ -224,8 +246,17 @@ func _on_boon_chosen(boon: BoonData) -> void:
 	regenerate(level_seed + 1, true)
 
 
-## A fresh run: back to depth 0 on a fresh copy of this level, boons dropped.
+## Dying opens the shop; the run restarts when it is closed.
+func _on_player_died() -> void:
+	_touch.release_all()
+	_shop.open(_meta_upgrades, _cells_run)
+
+
+## A fresh run: back to depth 0 on a fresh copy of this level, boons dropped, the permanent
+## upgrades bought so far applied.
 func reset_player() -> void:
 	_depth = 0
+	_cells_run = 0
+	player.set_run_bonuses(MetaSave.bonus_boons(_meta_upgrades))
 	player.start_new_run()
 	regenerate(level_seed)

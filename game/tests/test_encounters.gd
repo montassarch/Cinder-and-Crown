@@ -7,6 +7,7 @@ const SCENE := "res://levels/generated_level.tscn"
 var _level: GeneratedLevel
 
 func before_test() -> void:
+	_use_scratch_save()
 	_level = load(SCENE).instantiate()
 	_level.level_seed = 7
 	_level.room_count = 5
@@ -14,6 +15,7 @@ func before_test() -> void:
 
 func after_test() -> void:
 	get_tree().paused = false
+	MetaSave.path = MetaSave.DEFAULT_PATH
 	_level.queue_free()
 	InputRouter.set_virtual_axis(0.0)
 
@@ -172,3 +174,63 @@ func test_dying_starts_a_new_run_with_full_health_and_flask() -> void:
 	_level.reset_player()
 	assert_int(_level.player.get_node("Health").current).is_equal(100)
 	assert_int(_level.player.flask_charges()).is_equal(Player.FLASK_BASE_CHARGES)
+
+# --- Cells and the shop ---
+
+const SAVE_PATH := "user://test_level_meta.json"
+
+func _use_scratch_save() -> void:
+	MetaSave.path = SAVE_PATH
+	for suffix in ["", ".bak", ".tmp"]:
+		if FileAccess.file_exists(SAVE_PATH + suffix):
+			DirAccess.remove_absolute(SAVE_PATH + suffix)
+	MetaSave.path = SAVE_PATH
+
+func test_killing_an_enemy_banks_its_cells() -> void:
+	_use_scratch_save()
+	await _enter_room(1)
+	var before := MetaSave.cells()
+	var enemy := _enemies()[0]
+	var reward := enemy.data.cell_reward
+	enemy.take_hit(9999, enemy.global_position.x - 10.0)
+	assert_int(MetaSave.cells() - before).is_equal(reward)
+	assert_int(_level.cells_this_run()).is_equal(reward)
+	MetaSave.path = MetaSave.DEFAULT_PATH
+
+func test_dying_opens_the_shop_instead_of_respawning_at_once() -> void:
+	_use_scratch_save()
+	var shop: MetaShop = _level.get_node("MetaShop")
+	_level.player.take_hit(9999, _level.player.global_position.x - 10.0)
+	await _frames(3)
+	assert_bool(shop.is_open()).is_true()
+	MetaSave.path = MetaSave.DEFAULT_PATH
+
+func test_starting_from_the_shop_begins_a_new_run() -> void:
+	_use_scratch_save()
+	var shop: MetaShop = _level.get_node("MetaShop")
+	_level.set_depth(3)
+	_level.player.take_hit(9999, _level.player.global_position.x - 10.0)
+	await _frames(3)
+	shop.press_start()
+	assert_int(_level.depth()).is_equal(0)
+	assert_bool(_level.player.get_node("Health").is_alive()).is_true()
+	assert_int(_level.cells_this_run()).is_equal(0)
+	MetaSave.path = MetaSave.DEFAULT_PATH
+
+func test_upgrades_bought_in_the_shop_apply_to_the_next_run() -> void:
+	_use_scratch_save()
+	MetaSave.add_cells(100)
+	var soul: MetaUpgradeData = load("res://data/meta/ember_soul.tres")
+	MetaSave.buy(soul)
+	_level.player.take_hit(9999, _level.player.global_position.x - 10.0)
+	await _frames(3)
+	(_level.get_node("MetaShop") as MetaShop).press_start()
+	assert_int(_level.player.get_node("Health").max_health).is_equal(100 + int(soul.amount_per_rank))
+	MetaSave.path = MetaSave.DEFAULT_PATH
+
+func test_the_hud_shows_the_banked_cells() -> void:
+	_use_scratch_save()
+	MetaSave.add_cells(9)
+	await _frames(3)
+	assert_str((_level.get_node("Hud") as Hud).cells_text()).contains("9")
+	MetaSave.path = MetaSave.DEFAULT_PATH
