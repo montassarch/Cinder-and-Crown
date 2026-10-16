@@ -2,7 +2,7 @@
 
 A Dead Cells-style 2D action roguelite, built in Godot 4.7.2. Phase 1 is a playable **sandbox prototype**: a player who runs, jumps, rolls and attacks; two weapons; three enemies; a test room with a spawn/swap menu; and randomly assembled rooms with an exit. Everything is placeholder art on purpose. Bosses, classes, equipment, story, dialogue and quests come later ([roadmap](#roadmap)).
 
-**Status:** Phase 1 done and played on an iPhone 14 Pro Max. The iPhone is the main platform.
+**Status:** Phase 1 done and played on an iPhone 14 Pro Max. The iPhone is the main platform. Since then: a black swordsman hero with a plague mask after a hit, Storm Blade and Crimson Rend abilities with mana, a ruined-cathedral backdrop, 12 data-driven boons, parry with riposte, and enemy telegraphs, poise and guard break (see `Design/Plans/`).
 
 **Play it:** https://montassarch.github.io/Cinder-and-Crown/ in Safari. For fullscreen, tap Share > Add to Home Screen and launch it from the icon, in landscape.
 
@@ -22,9 +22,10 @@ A Dead Cells-style 2D action roguelite, built in Godot 4.7.2. Phase 1 is a playa
 | Swap weapon | Q | Y | SWAP |
 | Storm Blade (40 mana) | U | LB | STORM |
 | Crimson Rend (30 mana) | I | RB | REND |
+| Parry (tap as an enemy's ring closes) | L | Left-stick click | PARRY |
 | Sandbox menu | Tab | Start | Menu button |
 
-The **menu** (it pauses the game) spawns enemies, clears them, assigns either weapon to either slot, resets the player, toggles hitbox/hurtbox debug boxes, and switches between the **Sandbox** and a **Generated level**. Reaching the gold exit gate in a generated level builds the next one from the next seed.
+The **menu** (it pauses the game) spawns enemies, clears them, assigns either weapon to either slot, resets the player, toggles hitbox/hurtbox debug boxes, and switches between the **Sandbox** and a **Generated level**. Reaching the gold exit gate in a generated level pauses on a **pick one of three boons** screen (tap a card, or press 1-3); once you choose, the next level is built from the next seed. Dying or "Reset player" starts a new run and drops your boons.
 
 ## Tests
 
