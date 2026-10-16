@@ -92,3 +92,95 @@ func test_a_dash_move_rushes_and_hits_on_contact_without_being_parryable() -> vo
 	await _frames(22)  # one rush: hit lands around frame 12, the next attack cannot start before frame 30
 	assert_int(victim.hits.size()).is_equal(1)
 	assert_int(victim.strikes.size()).is_equal(0)
+
+# --- Strings, patterns, cooldown, interruption ---
+
+func _melee(damage: int) -> EnemyMove:
+	var m := _move(EnemyMove.Kind.MELEE, true)
+	m.damage = damage
+	return m
+
+func _string_data(damages: Array, pattern: EnemyData.Pattern = EnemyData.Pattern.SEQUENCE, cooldown: float = 5.0) -> EnemyData:
+	var moves: Array[EnemyMove] = []
+	for damage in damages:
+		moves.append(_melee(damage))
+	var d := _data(moves)
+	d.behaviour = EnemyData.Behaviour.FLYER  # no gravity: the long rests need no floor
+	d.pattern = pattern
+	d.chain_gap_seconds = 0.1
+	d.cooldown_seconds = cooldown
+	return d
+
+## An enemy with a hero beside it, recording every attack_released damage.
+func _watched(data: EnemyData) -> Array:
+	var enemy := _spawn(data)
+	var victim := _victim_beside(enemy)
+	var released: Array = []
+	enemy.attack_released.connect(func(damage: int) -> void: released.append(damage))
+	return [enemy, victim, released]
+
+func test_a_string_plays_its_moves_in_order() -> void:
+	var w := _watched(_string_data([6, 6, 14]))
+	w[0].begin_telegraph()
+	await _frames(70)
+	assert_array(w[2]).is_equal([6, 6, 14])
+
+func test_the_string_waits_out_its_cooldown_before_starting_again() -> void:
+	var w := _watched(_string_data([4, 5], EnemyData.Pattern.SEQUENCE, 0.8))
+	w[0].begin_telegraph()
+	await _frames(55)  # the two moves are over (about 0.5 s), the 0.8 s rest is not
+	assert_array(w[2]).is_equal([4, 5])
+	await _frames(70)  # now well past the rest: the string starts over
+	assert_int(w[2].size()).is_greater(2)
+
+func test_a_parry_on_the_first_move_cancels_the_rest() -> void:
+	var w := _watched(_string_data([6, 6, 14]))
+	w[1].parry_it = true
+	w[0].begin_telegraph()
+	await _frames(40)
+	assert_int(w[1].strikes.size()).is_equal(1)
+	assert_array(w[2]).is_equal([6])
+	assert_bool(w[0].is_stunned()).is_true()
+	assert_int(w[0].move_index()).is_equal(0)
+
+func test_a_stun_between_moves_ends_the_string() -> void:
+	var w := _watched(_string_data([6, 6, 14]))
+	w[0].begin_telegraph()
+	await _frames(12)  # the first move has struck; the second has not begun
+	assert_array(w[2]).is_equal([6])
+	w[0].stun(1.5)
+	await _frames(40)
+	assert_array(w[2]).is_equal([6])
+
+func test_a_death_between_moves_starts_no_further_move() -> void:
+	var w := _watched(_string_data([6, 6, 14]))
+	w[0].begin_telegraph()
+	await _frames(12)
+	w[0].take_hit(9999, w[0].global_position.x - 10.0)
+	await _frames(70)
+	assert_array(w[2]).is_equal([6])
+
+func test_a_guard_break_ends_the_string() -> void:
+	var data := _string_data([6, 6, 14])
+	data.poise = 1
+	var w := _watched(data)
+	w[0].begin_telegraph()
+	await _frames(12)
+	w[0].take_hit(1, w[0].global_position.x - 10.0)
+	assert_bool(w[0].is_guard_broken()).is_true()
+	await _frames(40)
+	assert_array(w[2]).is_equal([6])
+
+func test_a_random_pattern_only_picks_listed_moves_one_per_attack() -> void:
+	var enemy := _spawn(_string_data([1, 2, 3], EnemyData.Pattern.RANDOM, 0.0))
+	var released: Array = []
+	enemy.attack_released.connect(func(damage: int) -> void: released.append(damage))
+	enemy.rng.seed = 5
+	for i in 12:
+		enemy.begin_telegraph()
+		await _frames(25)
+	assert_int(released.size()).is_equal(12)
+	for damage in released:
+		assert_bool(damage in [1, 2, 3]).is_true()
+	assert_int(released.filter(func(d: int) -> bool: return d == 1).size()).is_less(12)
+	assert_int(released.filter(func(d: int) -> bool: return d == 3).size()).is_greater(0)

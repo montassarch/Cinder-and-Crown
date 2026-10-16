@@ -53,6 +53,10 @@ var data: EnemyData
 var _state: State = State.MOVE
 var _move: EnemyMove
 var _move_index: int = 0
+## Seconds before the enemy may begin another attack (the rest after a whole string).
+var _rest_left: float = 0.0
+## Picks the move of a RANDOM pattern; tests seed it.
+var rng := RandomNumberGenerator.new()
 var _facing: float = 1.0
 var _knockback_x: float = 0.0
 var _strike_time: float = 0.0
@@ -159,17 +163,31 @@ func on_parried(perfect: bool, from_x: float) -> void:
 	_knockback_x = (direction if direction != 0.0 else -_facing) * GameConfig.tiles(sqrt(2.0 * KNOCKBACK_DECAY * PARRY_KNOCKBACK_TILES))
 
 
+## Starts an attack: the first move of a string, or one random move.
 func begin_telegraph() -> void:
-	if data == null or _state != State.MOVE:
+	if data == null or _state != State.MOVE or _rest_left > 0.0:
 		return
+	var moves := data.effective_moves()
+	var index := 0
+	if data.pattern == EnemyData.Pattern.RANDOM and moves.size() > 1:
+		index = rng.randi_range(0, moves.size() - 1)
+	_start_move(index)
+
+
+func _start_move(index: int) -> void:
 	var foe := _current_target()
 	if foe != null:
 		_facing = signf(foe.global_position.x - global_position.x) if foe.global_position.x != global_position.x else _facing
-	_move_index = 0
-	_move = data.effective_moves()[0]
+	_move_index = index
+	_move = data.effective_moves()[index]
 	_state = State.TELEGRAPH
 	_body.color = TELEGRAPH_FLASH
 	_telegraph_timer.start(maxf(_move.telegraph_seconds, 0.001))
+
+
+## A SEQUENCE string goes on to its next move; a RANDOM attack is one move.
+func _has_next_move() -> bool:
+	return data.pattern == EnemyData.Pattern.SEQUENCE and _move_index + 1 < data.effective_moves().size()
 
 
 ## Contract used by Weapon: damage lands, health drops, the body is knocked back.
@@ -213,6 +231,7 @@ func _physics_process(delta: float) -> void:
 	if data == null or _state == State.DEAD:
 		return
 	_age += delta
+	_rest_left = maxf(0.0, _rest_left - delta)
 	_vulnerable_left = maxf(0.0, _vulnerable_left - delta)
 	_tick_poise(delta)
 	_knockback_x = move_toward(_knockback_x, 0.0, GameConfig.tiles(KNOCKBACK_DECAY) * delta)
@@ -318,14 +337,21 @@ func _on_stun_timeout() -> void:
 
 
 func _on_recovery_timeout() -> void:
-	if _state == State.RECOVER:
-		_state = State.MOVE
-		_move = null
+	if _state != State.RECOVER:
+		return
+	if _has_next_move():
+		_start_move(_move_index + 1)
+		return
+	_state = State.MOVE
+	_move = null
+	_move_index = 0
+	_rest_left = data.cooldown_seconds
 
 
 func _start_recovery() -> void:
 	_state = State.RECOVER
-	_recovery_timer.start(maxf(_move.recovery_seconds, 0.001))
+	var wait := _move.recovery_seconds + (data.chain_gap_seconds if _has_next_move() else 0.0)
+	_recovery_timer.start(maxf(wait, 0.001))
 
 
 ## A parryable move goes through take_strike (the hero can deflect it); a dodge-only one is
