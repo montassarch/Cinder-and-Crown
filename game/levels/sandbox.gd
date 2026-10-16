@@ -128,7 +128,9 @@ func assign_weapon(slot: int, data: WeaponData) -> void:
 	player.set_weapon(slot, data)
 
 
+## A fresh run: boons are dropped, so this is not for moving between levels.
 func reset_player() -> void:
+	player.start_new_run()
 	player.reset(spawn_point())
 
 

@@ -7,6 +7,8 @@ extends Sandbox
 signal level_completed
 
 const ROOM_DIR := "res://data/rooms"
+const BOON_DIR := "res://data/boons"
+const OFFER_COUNT: int = 3
 
 @export var level_seed: int = 1
 @export var room_count: int = 6
@@ -14,9 +16,20 @@ const ROOM_DIR := "res://data/rooms"
 var _layout: Array[RoomData] = []
 var _width_tiles: float = 0.0
 var _spawn: Vector2 = Vector2.ZERO
+var _boon_pool: Array[BoonData] = []
 
 @onready var _rooms: Node2D = $Rooms
 @onready var _walls: Node2D = $Walls
+@onready var _picker: BoonPicker = $BoonPicker
+
+
+func _ready() -> void:
+	super()
+	for path in DataScanner.list(BOON_DIR):
+		var boon := load(path) as BoonData
+		if boon != null:
+			_boon_pool.append(boon)
+	_picker.chosen.connect(_on_boon_chosen)
 
 
 func layout() -> Array[RoomData]:
@@ -88,7 +101,21 @@ func _build_arena() -> void:
 	_add_block(Rect2(_width_tiles, wall_top, 1.0, wall_height), GROUND_COLOR, false, _walls)
 
 
+## Reaching the exit offers boons; the next level is built once one is taken.
 func _on_exit_entered(body: Node) -> void:
-	if body is Player:
-		level_completed.emit()
+	if not (body is Player) or _picker.is_open():
+		return
+	level_completed.emit()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = level_seed
+	var offers := player.build().roll_offers(_boon_pool, OFFER_COUNT, rng)
+	if offers.is_empty():
 		regenerate(level_seed + 1)
+		return
+	_touch.release_all()
+	_picker.offer(offers)
+
+
+func _on_boon_chosen(boon: BoonData) -> void:
+	player.apply_boon(boon)
+	regenerate(level_seed + 1)

@@ -59,13 +59,51 @@ func test_player_can_walk_out_of_the_spawn_room_along_the_floor() -> void:
 	assert_float(_level.player.global_position.x).is_greater(first_width)
 	assert_bool(_level.player.is_on_floor()).is_true()
 
-func test_reaching_the_exit_builds_the_next_level_and_resets_the_player() -> void:
+func test_reaching_the_exit_offers_boons_before_building_the_next_level() -> void:
 	var before := _level.level_seed
+	var picker: BoonPicker = _level.get_node("BoonPicker")
+	_level._on_exit_entered(_level.player)
+	assert_bool(picker.is_open()).is_true()
+	assert_int(picker.card_count()).is_equal(3)
+	assert_int(_level.level_seed).is_equal(before)  # not until a boon is chosen
+
+func test_choosing_a_boon_applies_it_then_builds_the_next_level_and_resets_the_player() -> void:
+	var before := _level.level_seed
+	var picker: BoonPicker = _level.get_node("BoonPicker")
 	_level.player.global_position = Vector2(999.0, 0.0)
 	_level._on_exit_entered(_level.player)
+	var taken: BoonData = picker.offered(1)
+	picker.choose(1)
+	assert_int(_level.player.build().times_taken(taken.id)).is_equal(1)
 	assert_int(_level.level_seed).is_equal(before + 1)
 	assert_vector(_level.player.global_position).is_equal(_level.spawn_point())
 	assert_int(_level.layout().size()).is_equal(5)
+	assert_bool(get_tree().paused).is_false()
+
+func test_the_same_level_seed_always_offers_the_same_boons() -> void:
+	var picker: BoonPicker = _level.get_node("BoonPicker")
+	_level._on_exit_entered(_level.player)
+	var first := [picker.offered(0).id, picker.offered(1).id, picker.offered(2).id]
+	picker.choose(0)
+	_level.regenerate(7)
+	_level.player.start_new_run()
+	_level._on_exit_entered(_level.player)
+	assert_array([picker.offered(0).id, picker.offered(1).id, picker.offered(2).id]).is_equal(first)
+
+func test_dying_and_respawning_starts_a_new_run_without_the_boons() -> void:
+	var picker: BoonPicker = _level.get_node("BoonPicker")
+	_level._on_exit_entered(_level.player)
+	var taken: BoonData = picker.offered(0)
+	picker.choose(0)
+	_level.reset_player()
+	assert_int(_level.player.build().times_taken(taken.id)).is_equal(0)
+
+func test_the_exit_does_not_stack_a_second_offer_while_one_is_open() -> void:
+	var picker: BoonPicker = _level.get_node("BoonPicker")
+	_level._on_exit_entered(_level.player)
+	var first := picker.offered(0)
+	_level._on_exit_entered(_level.player)
+	assert_object(picker.offered(0)).is_same(first)
 
 func test_something_other_than_the_player_entering_the_exit_does_nothing() -> void:
 	var before := _level.level_seed
