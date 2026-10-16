@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="BoonData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/boons/boon_data.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+id = "cinder_heart"
+display_name = "Cinder Heart"
+description = "Heal 30 health now."
+effect = 1
+amount = 30.0
+rarity = 0
+unique = false

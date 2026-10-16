@@ -20,6 +20,15 @@ func setup(new_max: int) -> void:
 	health_changed.emit(current, max_health)
 
 
+## Raise the cap and give the same amount of health (a max-health upgrade).
+func raise_max(amount: int) -> void:
+	if amount <= 0:
+		return
+	max_health += amount
+	current += amount
+	health_changed.emit(current, max_health)
+
+
 func take_damage(amount: int) -> int:
 	var absorbed := clampi(amount, 0, current)
 	if absorbed == 0:

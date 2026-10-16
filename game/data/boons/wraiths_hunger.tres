@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="BoonData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/boons/boon_data.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+id = "wraiths_hunger"
+display_name = "Wraith's Hunger"
+description = "Heal 3 health on every sword hit."
+effect = 4
+amount = 3.0
+rarity = 2
+unique = true

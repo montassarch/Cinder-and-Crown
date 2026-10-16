@@ -76,6 +76,8 @@ var _mask_left: float = 0.0
 var _mana: Mana
 var _storm_left: float = 0.0
 var _cast_fired: bool = false
+var _build := RunBuild.new()
+var _base_max_health: int = 0
 
 @onready var _weapon: Weapon = $Weapon
 @onready var _health: Health = $Health
@@ -92,6 +94,7 @@ func _ready() -> void:
 	_body.size = size
 	_body.position = -size / 2.0
 	_body.visible = false  # the animated hero replaces the placeholder box
+	_base_max_health = _health.max_health
 	_health.died.connect(func() -> void: died.emit())
 	for slot in mini(WEAPON_SLOTS, starting_weapons.size()):
 		_weapons[slot] = starting_weapons[slot]
@@ -102,7 +105,7 @@ func _ready() -> void:
 	_mana.regen_per_second = MANA_REGEN
 	add_child(_mana)
 	_mana.refill()
-	_weapon.hit_landed.connect(func(_target: Node, _damage: int) -> void: _mana.gain(MANA_PER_HIT))
+	_weapon.hit_landed.connect(_on_hit_landed)
 	var storm_effect := StormEffect.new()
 	storm_effect.name = "StormEffect"
 	storm_effect.z_index = 2
@@ -181,10 +184,32 @@ func reset(at: Vector2) -> void:
 	_coyote = 0.0
 	_hurt_pending = false
 	_mask_left = 0.0
-	_health.setup(_health.max_health)
+	_health.setup(_base_max_health + _build.bonus_max_health())
 	_mana.refill()
 	_storm_left = 0.0
 	_apply_storm_to_weapon()
+
+
+func build() -> RunBuild:
+	return _build
+
+
+## Take a boon for the rest of the run.
+func apply_boon(boon: BoonData) -> void:
+	_build.apply(boon)
+	match boon.effect:
+		BoonData.Effect.MAX_HEALTH:
+			_health.raise_max(roundi(boon.amount))
+		BoonData.Effect.HEAL:
+			_health.heal(roundi(boon.amount))
+	_weapon.damage_multiplier = _build.damage_multiplier()
+
+
+## A fresh run: every boon is dropped and health returns to its base cap.
+func start_new_run() -> void:
+	_build.clear()
+	_weapon.damage_multiplier = 1.0
+	_health.setup(_base_max_health)
 
 
 func set_weapon(slot: int, data: WeaponData) -> void:
@@ -229,6 +254,15 @@ func take_hit(damage: int, source_x: float) -> void:
 	if _state != State.ROLL:
 		_hurt_pending = true
 		_hit_direction = signf(global_position.x - source_x)
+
+
+func _on_hit_landed(_target: Node, _damage: int) -> void:
+	_mana.gain(MANA_PER_HIT * _build.mana_gain_multiplier())
+	_health.heal(_build.lifesteal())
+
+
+func _run_speed() -> float:
+	return GameConfig.tiles(RUN_SPEED) * _build.speed_multiplier()
 
 
 func _idle_while_dead(delta: float) -> void:
@@ -307,9 +341,9 @@ func _apply_velocity(delta: float) -> void:
 		State.STORM, State.REND:
 			velocity.x = 0.0
 		State.ATTACK:
-			velocity.x = axis * GameConfig.tiles(RUN_SPEED) * ATTACK_MOVE_FACTOR
+			velocity.x = axis * _run_speed() * ATTACK_MOVE_FACTOR
 		_:
-			velocity.x = axis * GameConfig.tiles(RUN_SPEED)
+			velocity.x = axis * _run_speed()
 
 	velocity.y += GameConfig.tiles(GRAVITY) * delta
 	if _state == State.JUMP and velocity.y < 0.0 and not InputRouter.jump_held():

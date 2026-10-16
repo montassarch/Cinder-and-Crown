@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="BoonData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/boons/boon_data.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+id = "crown_of_cinders"
+display_name = "Crown of Cinders"
+description = "Sword hits deal 60% more damage."
+effect = 2
+amount = 0.6
+rarity = 2
+unique = true

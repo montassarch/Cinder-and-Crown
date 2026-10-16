@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="BoonData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/boons/boon_data.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+id = "whetstone"
+display_name = "Whetstone"
+description = "Sword hits deal 15% more damage."
+effect = 2
+amount = 0.15
+rarity = 0
+unique = false
