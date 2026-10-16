@@ -27,6 +27,10 @@ const STUN_TINT := Color(0.55, 0.8, 1.0)
 ## Past this share of its wind-up an enemy is committed: hits no longer stop the strike.
 const COMMIT_FRACTION: float = 0.5
 const FLINCH_SECONDS: float = 0.2
+## A ranged enemy tolerates the hero this far either side of its preferred range.
+const KEEP_DISTANCE_MARGIN_TILES: float = 1.0
+## Where a shot leaves the enemy, ahead of its body.
+const SHOT_MUZZLE_TILES: float = 0.8
 ## A broken guard: how long the enemy reels, and how much harder it is hit meanwhile.
 const BREAK_STAGGER: float = 1.6
 const BREAK_DAMAGE_MULTIPLIER: float = 1.5
@@ -300,11 +304,33 @@ func _think_move(foe: Node2D, _delta: float) -> float:
 				begin_telegraph()
 				return 0.0
 			return signf(offset.x) * speed
+		EnemyData.Behaviour.KEEP_DISTANCE:
+			return _keep_distance(offset, speed)
 		_:
 			if absf(offset.x) <= reach * 0.9 and absf(offset.y) <= GameConfig.tiles(2.0):
 				begin_telegraph()
 				return 0.0
 			return signf(offset.x) * speed
+
+
+## Ranged enemies stand at their preferred range: back off when the hero is closer than
+## that (less a margin), close in when farther, and shoot from the band in between. Backed
+## against a wall they shoot rather than stand idle.
+func _keep_distance(offset: Vector2, speed: float) -> float:
+	var distance := absf(offset.x)
+	var preferred := GameConfig.tiles(data.preferred_range_tiles)
+	var margin := GameConfig.tiles(KEEP_DISTANCE_MARGIN_TILES)
+	var level := absf(offset.y) <= GameConfig.tiles(2.0)
+	if distance < preferred - margin:
+		if is_on_wall() and level:
+			begin_telegraph()
+			return 0.0
+		return -signf(offset.x) * speed
+	if distance > preferred + margin:
+		return signf(offset.x) * speed
+	if level:
+		begin_telegraph()
+	return 0.0
 
 
 ## A rush (DASH): runs at the hero for the move's duration and hits on contact.
@@ -333,12 +359,21 @@ func _on_telegraph_timeout() -> void:
 			_strike_time = 0.0
 			_struck = false
 			return
+		EnemyMove.Kind.PROJECTILE:
+			_fire_projectile(_move)
 		EnemyMove.Kind.MELEE:
 			var foe := _current_target()
 			if foe != null and global_position.distance_to(foe.global_position) <= GameConfig.tiles(_move.reach_tiles * STRIKE_REACH_FACTOR):
 				_hit_hero(foe, _move)
 	if _state != State.STUNNED:  # a parried strike leaves the attacker staggered, not recovering
 		_start_recovery()
+
+
+func _fire_projectile(move: EnemyMove) -> void:
+	var shot := EnemyProjectile.new()
+	get_parent().add_child(shot)
+	shot.global_position = global_position + Vector2(_facing * GameConfig.tiles(SHOT_MUZZLE_TILES), 0.0)
+	shot.launch(_facing, GameConfig.tiles(move.speed_tiles), GameConfig.tiles(move.range_tiles), move.damage, self)
 
 
 func _on_stun_timeout() -> void:

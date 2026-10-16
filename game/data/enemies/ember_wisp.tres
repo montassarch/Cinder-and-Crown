@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://src/enemies/enemy_data.gd" id="1_data"]
+[ext_resource type="Script" path="res://src/enemies/enemy_move.gd" id="2_move"]
+[ext_resource type="Resource" path="res://data/moves/wisp_bolt.tres" id="3_a"]
+
+[resource]
+script = ExtResource("1_data")
+display_name = "Ember Wisp"
+max_health = 16
+move_speed_tiles = 3.0
+attack_damage = 8
+attack_range_tiles = 14.0
+telegraph_seconds = 0.6
+recovery_seconds = 0.5
+behaviour = 3
+moves = Array[ExtResource("2_move")]([ExtResource("3_a")])
+pattern = 0
+cooldown_seconds = 1.8
+preferred_range_tiles = 7.0
+threat = 3
+unlock_depth = 2
+max_per_wave = 2
+cell_reward = 2
+body_size_tiles = Vector2(0.8, 1.2)
+tint = Color(0.65, 0.4, 0.85, 1)

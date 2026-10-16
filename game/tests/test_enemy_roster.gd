@@ -32,3 +32,13 @@ func test_the_crown_guard_is_unlocked_by_depth_one() -> void:
 func test_the_crown_guard_starts_its_string_within_its_own_reach() -> void:
 	var guard := _enemy("crown_guard")
 	assert_float(guard.attack_range_tiles).is_greater_equal(guard.moves[0].reach_tiles)
+
+func test_the_wisp_data_is_valid_and_unlocked_at_depth_two() -> void:
+	var wisp := _enemy("ember_wisp")
+	assert_int(wisp.behaviour).is_equal(EnemyData.Behaviour.KEEP_DISTANCE)
+	assert_int(wisp.unlock_depth).is_equal(2)
+	assert_int(wisp.moves.size()).is_equal(1)
+	assert_int(wisp.moves[0].kind).is_equal(EnemyMove.Kind.PROJECTILE)
+	assert_bool(wisp.moves[0].parryable).is_true()
+	assert_float(wisp.preferred_range_tiles).is_greater(0.0)
+	assert_float(wisp.moves[0].range_tiles).is_greater(wisp.preferred_range_tiles)

@@ -4,6 +4,12 @@ extends GdUnitTestSuite
 const ENEMY_SCENE := "res://src/enemies/enemy.tscn"
 const RECORDER := preload("res://tests/support/strike_recorder.gd")
 
+## Shots an enemy fires are added beside it, so tests must clear them out themselves.
+func after_test() -> void:
+	for child in get_children():
+		if child is EnemyProjectile:
+			child.queue_free()
+
 func _move(kind: EnemyMove.Kind = EnemyMove.Kind.MELEE, parryable: bool = true) -> EnemyMove:
 	var m := EnemyMove.new()
 	m.id = "test"
@@ -184,3 +190,112 @@ func test_a_random_pattern_only_picks_listed_moves_one_per_attack() -> void:
 		assert_bool(damage in [1, 2, 3]).is_true()
 	assert_int(released.filter(func(d: int) -> bool: return d == 1).size()).is_less(12)
 	assert_int(released.filter(func(d: int) -> bool: return d == 3).size()).is_greater(0)
+
+# --- Projectile moves and keep-distance movement ---
+
+func _shooter(behaviour: EnemyData.Behaviour = EnemyData.Behaviour.CHASER) -> EnemyData:
+	var m := _move(EnemyMove.Kind.PROJECTILE, true)
+	m.damage = 8
+	m.speed_tiles = 6.0
+	m.range_tiles = 14.0
+	var d := _data([m] as Array[EnemyMove])
+	d.behaviour = behaviour
+	d.move_speed_tiles = 3.0
+	d.preferred_range_tiles = 7.0
+	d.attack_range_tiles = 14.0
+	return d
+
+func _shots_in(node: Node) -> Array[EnemyProjectile]:
+	var found: Array[EnemyProjectile] = []
+	for child in node.get_children():
+		if child is EnemyProjectile:
+			found.append(child)
+	return found
+
+func test_a_projectile_move_spawns_a_shot_that_flies_toward_the_hero() -> void:
+	var enemy := _spawn(_shooter())
+	var victim := _victim_beside(enemy)
+	victim.global_position = enemy.global_position + GameConfig.tiles_v(5.0, 0.0)
+	enemy.begin_telegraph()
+	await _frames(10)  # the 0.1 s wind-up is over: the shot is out
+	var shots := _shots_in(self)
+	assert_int(shots.size()).is_equal(1)
+	assert_int(shots[0].damage).is_equal(8)
+	var x_before := shots[0].global_position.x
+	await _frames(10)
+	assert_float(shots[0].global_position.x).is_greater(x_before + 5.0)
+
+func test_a_shot_aimed_at_a_hero_on_the_left_flies_left() -> void:
+	var enemy := _spawn(_shooter())
+	var victim := _victim_beside(enemy)
+	victim.global_position = enemy.global_position + GameConfig.tiles_v(-5.0, 0.0)
+	enemy.begin_telegraph()
+	await _frames(10)
+	var shots := _shots_in(self)
+	var x_before := shots[0].global_position.x
+	await _frames(10)
+	assert_float(shots[0].global_position.x).is_less(x_before - 5.0)
+
+func test_the_shot_carries_the_moves_range() -> void:
+	var enemy := _spawn(_shooter())
+	var victim := _victim_beside(enemy)
+	victim.global_position = enemy.global_position + GameConfig.tiles_v(5.0, 0.0)
+	enemy.begin_telegraph()
+	await _frames(10)
+	var shot := _shots_in(self)[0]
+	var start_x := shot.global_position.x
+	var farthest := start_x
+	for i in 400:
+		await _frames(1)
+		if not is_instance_valid(shot) or shot.is_queued_for_deletion():
+			break
+		farthest = shot.global_position.x
+	assert_bool(not is_instance_valid(shot) or shot.is_queued_for_deletion()).is_true()
+	assert_float(farthest - start_x).is_between(GameConfig.tiles(14.0) - 20.0, GameConfig.tiles(14.0) + 5.0)
+
+func test_a_keep_distance_enemy_backs_off_when_the_hero_is_too_close() -> void:
+	var enemy := _spawn(_shooter(EnemyData.Behaviour.KEEP_DISTANCE))
+	var victim := _victim_beside(enemy)
+	victim.global_position = enemy.global_position + GameConfig.tiles_v(2.0, 0.0)
+	var x_before := enemy.global_position.x
+	await _frames(15)
+	assert_float(enemy.global_position.x).is_less(x_before - 5.0)
+
+func test_a_keep_distance_enemy_closes_in_when_the_hero_is_far() -> void:
+	var enemy := _spawn(_shooter(EnemyData.Behaviour.KEEP_DISTANCE))
+	var victim := _victim_beside(enemy)
+	victim.global_position = enemy.global_position + GameConfig.tiles_v(14.0, 0.0)
+	var x_before := enemy.global_position.x
+	await _frames(15)
+	assert_float(enemy.global_position.x).is_greater(x_before + 5.0)
+
+func test_a_keep_distance_enemy_holds_and_shoots_at_its_preferred_range() -> void:
+	var enemy := _spawn(_shooter(EnemyData.Behaviour.KEEP_DISTANCE))
+	var victim := _victim_beside(enemy)
+	victim.global_position = enemy.global_position + GameConfig.tiles_v(7.0, 0.0)
+	await _frames(5)
+	assert_bool(enemy.is_telegraphing()).is_true()
+
+func test_a_cornered_keep_distance_enemy_shoots_instead_of_standing_idle() -> void:
+	var wall: StaticBody2D = auto_free(StaticBody2D.new())
+	var shape := CollisionShape2D.new()
+	var rect := RectangleShape2D.new()
+	rect.size = Vector2(16.0, 400.0)
+	shape.shape = rect
+	wall.add_child(shape)
+	wall.position = Vector2(-16.0, 0.0)
+	add_child(wall)
+	var floor_body: StaticBody2D = auto_free(StaticBody2D.new())
+	var floor_shape := CollisionShape2D.new()
+	var floor_rect := RectangleShape2D.new()
+	floor_rect.size = Vector2(800.0, 16.0)
+	floor_shape.shape = floor_rect
+	floor_body.add_child(floor_shape)
+	floor_body.position = Vector2(300.0, 24.0)
+	add_child(floor_body)
+	var enemy := _spawn(_shooter(EnemyData.Behaviour.KEEP_DISTANCE))
+	enemy.global_position = Vector2(8.0, 0.0)  # touching the wall on its left
+	var victim := _victim_beside(enemy)
+	victim.global_position = enemy.global_position + GameConfig.tiles_v(2.0, 0.0)
+	await _frames(40)
+	assert_bool(enemy.is_telegraphing() or _shots_in(self).size() > 0).is_true()
