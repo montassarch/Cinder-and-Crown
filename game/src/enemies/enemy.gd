@@ -7,6 +7,9 @@ signal attack_released(damage: int)
 signal died
 ## The poise ran out: the enemy is staggered and takes extra damage for a moment.
 signal guard_broken
+## The enemy blew itself up. It is gone without being killed, so `died` is not emitted
+## (a self-destruct pays no cells).
+signal exploded
 
 enum State { MOVE, TELEGRAPH, STRIKE, RECOVER, DEAD, STUNNED }
 
@@ -35,6 +38,8 @@ const SHOT_MUZZLE_TILES: float = 0.8
 const SLAM_TELL_RADIUS_TILES: float = 2.0
 ## A dive ends when it is this close to the spot it was aimed at.
 const DIVE_ARRIVE_TILES: float = 0.3
+const BLAST_COLOR := Color(1.0, 0.55, 0.1, 0.6)
+const BLAST_FLASH_SECONDS: float = 0.3
 ## A broken guard: how long the enemy reels, and how much harder it is hit meanwhile.
 const BREAK_STAGGER: float = 1.6
 const BREAK_DAMAGE_MULTIPLIER: float = 1.5
@@ -421,6 +426,12 @@ func _on_telegraph_timeout() -> void:
 			_fire_projectile(_move)
 		EnemyMove.Kind.SLAM:
 			_launch_waves(_move)
+		EnemyMove.Kind.EXPLODE:
+			var target_foe := _current_target()
+			if target_foe != null and global_position.distance_to(target_foe.global_position) <= GameConfig.tiles(_move.reach_tiles):
+				_hit_hero(target_foe, _move)
+			_explode(_move)
+			return
 		EnemyMove.Kind.MELEE:
 			var foe := _current_target()
 			if foe != null and global_position.distance_to(foe.global_position) <= GameConfig.tiles(_move.reach_tiles * STRIKE_REACH_FACTOR):
@@ -511,6 +522,12 @@ func _hit_hero(foe: Node, move: EnemyMove) -> void:
 
 ## Health.died is the single place a wind-up is cancelled: a dead enemy deals nothing.
 func _on_health_died() -> void:
+	_leave_play()
+	died.emit()
+
+
+## Takes the enemy out of the fight: no more timers, no body, no hurtbox, freed shortly.
+func _leave_play() -> void:
 	_state = State.DEAD
 	_move = null
 	_telegraph_timer.stop()
@@ -520,8 +537,24 @@ func _on_health_died() -> void:
 	_hurtbox.set_deferred("monitorable", false)
 	_shape.set_deferred("disabled", true)
 	_hurtbox_shape.set_deferred("disabled", true)
-	died.emit()
 	get_tree().create_timer(DEATH_LINGER).timeout.connect(queue_free)
+
+
+## The fuse ran out: a flash the size of the blast, then the enemy is gone (not "killed").
+func _explode(move: EnemyMove) -> void:
+	var radius := GameConfig.tiles(move.reach_tiles)
+	var flash := Polygon2D.new()
+	var ring := PackedVector2Array()
+	for i in 24:
+		ring.append(Vector2.from_angle(TAU * float(i) / 24.0) * radius)
+	flash.polygon = ring
+	flash.color = BLAST_COLOR
+	get_parent().add_child(flash)
+	flash.global_position = global_position
+	flash.create_tween().tween_property(flash, "modulate:a", 0.0, BLAST_FLASH_SECONDS)
+	get_tree().create_timer(BLAST_FLASH_SECONDS + 0.05).timeout.connect(flash.queue_free)
+	_leave_play()
+	exploded.emit()
 
 
 func _current_target() -> Node2D:

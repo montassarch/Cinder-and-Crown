@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://src/enemies/enemy_data.gd" id="1_data"]
+[ext_resource type="Script" path="res://src/enemies/enemy_move.gd" id="2_move"]
+[ext_resource type="Resource" path="res://data/moves/pilgrim_blast.tres" id="3_a"]
+
+[resource]
+script = ExtResource("1_data")
+display_name = "Powder Pilgrim"
+max_health = 12
+move_speed_tiles = 3.5
+attack_damage = 18
+attack_range_tiles = 2.0
+telegraph_seconds = 0.8
+recovery_seconds = 0.5
+behaviour = 0
+moves = Array[ExtResource("2_move")]([ExtResource("3_a")])
+pattern = 0
+threat = 3
+unlock_depth = 3
+max_per_wave = 1
+cell_reward = 2
+body_size_tiles = Vector2(0.9, 1.4)
+tint = Color(0.75, 0.45, 0.2, 1)

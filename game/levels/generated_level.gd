@@ -118,8 +118,14 @@ func _spawn_wave(encounter: Dictionary) -> void:
 		var along := (i + 0.5) / wave.size()
 		var x_tiles := lerpf(encounter.start + WAVE_FIRST_SLOT_TILES, encounter.end - WAVE_END_MARGIN_TILES, along)
 		var height := AIR_SPAWN_HEIGHT_TILES if wave[i].behaviour == EnemyData.Behaviour.FLYER else GROUND_SPAWN_HEIGHT_TILES
-		var enemy := spawn_enemy_at(wave[i], GameConfig.tiles_v(x_tiles, GROUND_TOP_TILES - height))
-		enemy.died.connect(_on_enemy_died.bind(wave[i].cell_reward))
+		spawn_wave_enemy(wave[i], GameConfig.tiles_v(x_tiles, GROUND_TOP_TILES - height))
+
+
+## An enemy of the level's own waves: killing it pays its cells (a menu-spawned one does not).
+func spawn_wave_enemy(data: EnemyData, at: Vector2) -> Enemy:
+	var enemy := spawn_enemy_at(data, at)
+	enemy.died.connect(_on_enemy_died.bind(data.cell_reward))
+	return enemy
 
 
 func _on_enemy_died(reward: int) -> void:

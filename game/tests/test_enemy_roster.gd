@@ -107,3 +107,13 @@ func test_the_penitent_data_is_valid() -> void:
 	assert_bool(penitent.moves[0].parryable).is_true()
 	assert_int(penitent.unlock_depth).is_equal(3)
 	assert_int(penitent.max_per_wave).is_equal(1)
+
+func test_the_pilgrim_data_is_valid() -> void:
+	var pilgrim := _enemy("powder_pilgrim")
+	assert_int(pilgrim.moves.size()).is_equal(1)
+	assert_int(pilgrim.moves[0].kind).is_equal(EnemyMove.Kind.EXPLODE)
+	assert_bool(pilgrim.moves[0].parryable).is_false()
+	assert_float(pilgrim.moves[0].telegraph_seconds).is_greater(0.5)  # a fuse you can read
+	assert_int(pilgrim.unlock_depth).is_equal(3)
+	assert_int(pilgrim.max_per_wave).is_equal(1)
+	assert_int(pilgrim.max_health).is_less(20)

@@ -400,3 +400,72 @@ func test_a_dive_and_a_dash_draw_a_dashed_path_while_winding_up_and_nothing_else
 	var melee := _spawn(_data([_move()] as Array[EnemyMove]))
 	melee.begin_telegraph()
 	assert_int(melee.path_tell().size()).is_equal(0)
+
+# --- Explosion ---
+
+func _bomber() -> EnemyData:
+	var m := _move(EnemyMove.Kind.EXPLODE, false)
+	m.telegraph_seconds = 0.4
+	m.reach_tiles = 2.5
+	m.damage = 18
+	var d := _data([m] as Array[EnemyMove])
+	d.behaviour = EnemyData.Behaviour.FLYER
+	return d
+
+func test_the_blast_hurts_the_hero_inside_its_radius_only() -> void:
+	var near := _spawn(_bomber())
+	var near_hero := _victim_beside(near)
+	near_hero.global_position = near.global_position + GameConfig.tiles_v(2.0, 0.0)
+	near.begin_telegraph()
+	await _frames(35)
+	assert_int(near_hero.hits.size()).is_equal(1)
+	assert_int(near_hero.hits[0][0]).is_equal(18)
+	assert_int(near_hero.strikes.size()).is_equal(0)
+	var far := _spawn(_bomber())
+	far.global_position = Vector2(2000.0, 0.0)
+	var far_hero := _victim_beside(far)
+	far_hero.global_position = far.global_position + GameConfig.tiles_v(5.0, 0.0)
+	far.begin_telegraph()
+	await _frames(35)
+	assert_int(far_hero.hits.size()).is_equal(0)
+
+func test_the_blast_does_not_hurt_other_enemies() -> void:
+	var bomber := _spawn(_bomber())
+	var hero := _victim_beside(bomber)
+	hero.global_position = bomber.global_position + GameConfig.tiles_v(2.0, 0.0)
+	var bystander: Node2D = auto_free(load("res://tests/support/hurtable_dummy.gd").new())
+	add_child(bystander)
+	bystander.global_position = bomber.global_position + GameConfig.tiles_v(1.0, 0.0)
+	var other := _spawn(_data())
+	other.global_position = bomber.global_position + GameConfig.tiles_v(-1.0, 0.0)
+	bomber.begin_telegraph()
+	await _frames(35)
+	assert_int(bystander.hits.size()).is_equal(0)
+	assert_int(other.health().current).is_equal(100)
+
+func test_killing_the_bomber_before_the_fuse_ends_cancels_the_blast() -> void:
+	var bomber := _spawn(_bomber())
+	var hero := _victim_beside(bomber)
+	hero.global_position = bomber.global_position + GameConfig.tiles_v(1.0, 0.0)
+	var blasts := [0]
+	bomber.exploded.connect(func() -> void: blasts[0] += 1)
+	bomber.begin_telegraph()
+	await _frames(10)
+	bomber.take_hit(9999, bomber.global_position.x - 10.0)
+	await _frames(40)
+	assert_int(hero.hits.size()).is_equal(0)
+	assert_int(blasts[0]).is_equal(0)
+
+func test_the_exploding_bomber_is_gone_and_announces_it() -> void:
+	var bomber := _spawn(_bomber())
+	var hero := _victim_beside(bomber)
+	hero.global_position = bomber.global_position + GameConfig.tiles_v(1.0, 0.0)
+	var blasts := [0]
+	var deaths := [0]
+	bomber.exploded.connect(func() -> void: blasts[0] += 1)
+	bomber.died.connect(func() -> void: deaths[0] += 1)
+	bomber.begin_telegraph()
+	await _frames(35)
+	assert_int(blasts[0]).is_equal(1)
+	assert_int(deaths[0]).is_equal(0)  # a self-destruct is not a kill
+	assert_bool(bomber.is_dead()).is_true()

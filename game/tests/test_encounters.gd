@@ -234,3 +234,30 @@ func test_the_hud_shows_the_banked_cells() -> void:
 	await _frames(3)
 	assert_str((_level.get_node("Hud") as Hud).cells_text()).contains("9")
 	MetaSave.path = MetaSave.DEFAULT_PATH
+
+# --- Self-destructing enemies ---
+
+func test_an_exploding_pilgrim_pays_no_cells_but_opens_the_gate() -> void:
+	await _enter_room(1)
+	_kill_all()
+	var cells_before := MetaSave.cells()
+	var run_before := _level.cells_this_run()
+	var pilgrim := _level.spawn_wave_enemy(load("res://data/enemies/powder_pilgrim.tres"), _level.player.global_position + Vector2(24.0, 0.0))
+	assert_int(_level.enemy_count()).is_equal(1)
+	await _frames(int(0.8 * 60.0) + 20)  # the fuse burns down
+	assert_bool(pilgrim.is_dead()).is_true()
+	assert_int(_level.enemy_count()).is_equal(0)
+	assert_int(MetaSave.cells()).is_equal(cells_before)
+	assert_int(_level.cells_this_run()).is_equal(run_before)
+	_stand_on_exit()
+	_level._on_exit_entered(_level.player)
+	assert_bool((_level.get_node("BoonPicker") as BoonPicker).is_open()).is_true()
+
+func test_a_pilgrim_killed_by_the_hero_pays_its_cells() -> void:
+	await _enter_room(1)
+	_kill_all()
+	var cells_before := MetaSave.cells()
+	var data: EnemyData = load("res://data/enemies/powder_pilgrim.tres")
+	var pilgrim := _level.spawn_wave_enemy(data, _level.player.global_position + Vector2(200.0, 0.0))
+	pilgrim.take_hit(9999, pilgrim.global_position.x - 10.0)
+	assert_int(MetaSave.cells() - cells_before).is_equal(data.cell_reward)
