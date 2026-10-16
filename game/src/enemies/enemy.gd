@@ -31,6 +31,8 @@ const FLINCH_SECONDS: float = 0.2
 const KEEP_DISTANCE_MARGIN_TILES: float = 1.0
 ## Where a shot leaves the enemy, ahead of its body.
 const SHOT_MUZZLE_TILES: float = 0.8
+## The floor ring that warns of a slam.
+const SLAM_TELL_RADIUS_TILES: float = 2.0
 ## A broken guard: how long the enemy reels, and how much harder it is hit meanwhile.
 const BREAK_STAGGER: float = 1.6
 const BREAK_DAMAGE_MULTIPLIER: float = 1.5
@@ -361,6 +363,8 @@ func _on_telegraph_timeout() -> void:
 			return
 		EnemyMove.Kind.PROJECTILE:
 			_fire_projectile(_move)
+		EnemyMove.Kind.SLAM:
+			_launch_waves(_move)
 		EnemyMove.Kind.MELEE:
 			var foe := _current_target()
 			if foe != null and global_position.distance_to(foe.global_position) <= GameConfig.tiles(_move.reach_tiles * STRIKE_REACH_FACTOR):
@@ -374,6 +378,28 @@ func _fire_projectile(move: EnemyMove) -> void:
 	get_parent().add_child(shot)
 	shot.global_position = global_position + Vector2(_facing * GameConfig.tiles(SHOT_MUZZLE_TILES), 0.0)
 	shot.launch(_facing, GameConfig.tiles(move.speed_tiles), GameConfig.tiles(move.range_tiles), move.damage, self)
+
+
+## A slam sends a shockwave along the floor each way.
+func _launch_waves(move: EnemyMove) -> void:
+	var feet_y := global_position.y + GameConfig.tiles(data.body_size_tiles.y) / 2.0
+	for direction in [-1.0, 1.0]:
+		var wave := FloorWave.new()
+		get_parent().add_child(wave)
+		wave.global_position = Vector2(global_position.x + direction * GameConfig.tiles(SHOT_MUZZLE_TILES), feet_y - FloorWave.STRIP_SIZE.y / 2.0)
+		wave.launch(direction, GameConfig.tiles(move.speed_tiles), GameConfig.tiles(move.range_tiles), move.damage)
+
+
+## Radius of the ring on the floor while a slam or an explosion winds up; 0 otherwise.
+func ground_tell_radius() -> float:
+	if _state != State.TELEGRAPH or _move == null:
+		return 0.0
+	match _move.kind:
+		EnemyMove.Kind.SLAM:
+			return GameConfig.tiles(SLAM_TELL_RADIUS_TILES)
+		EnemyMove.Kind.EXPLODE:
+			return GameConfig.tiles(_move.reach_tiles)
+	return 0.0
 
 
 func _on_stun_timeout() -> void:
@@ -453,6 +479,10 @@ func _draw() -> void:
 		draw_arc(center, radius, 0.0, TAU, 20, color, 2.0)
 		draw_rect(Rect2(center.x - 1.0, center.y - 4.0, 2.0, 5.0), color)
 		draw_rect(Rect2(center.x - 1.0, center.y + 2.0, 2.0, 2.0), color)
+	var ground := ground_tell_radius()
+	if ground > 0.0:
+		var feet := Vector2(0.0, -top)
+		draw_arc(feet, ground, 0.0, TAU, 32, tell_color(), 1.5)
 	if data.poise > 0:
 		var width := data.poise * POISE_PIP_SIZE + (data.poise - 1) * POISE_PIP_GAP
 		var left := -width / 2.0

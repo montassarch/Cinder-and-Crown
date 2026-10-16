@@ -7,7 +7,7 @@ const RECORDER := preload("res://tests/support/strike_recorder.gd")
 ## Shots an enemy fires are added beside it, so tests must clear them out themselves.
 func after_test() -> void:
 	for child in get_children():
-		if child is EnemyProjectile:
+		if child is EnemyProjectile or child is FloorWave:
 			child.queue_free()
 
 func _move(kind: EnemyMove.Kind = EnemyMove.Kind.MELEE, parryable: bool = true) -> EnemyMove:
@@ -299,3 +299,41 @@ func test_a_cornered_keep_distance_enemy_shoots_instead_of_standing_idle() -> vo
 	victim.global_position = enemy.global_position + GameConfig.tiles_v(2.0, 0.0)
 	await _frames(40)
 	assert_bool(enemy.is_telegraphing() or _shots_in(self).size() > 0).is_true()
+
+# --- Slam ---
+
+func _slammer() -> EnemyData:
+	var m := _move(EnemyMove.Kind.SLAM, false)
+	m.damage = 16
+	m.speed_tiles = 9.0
+	m.range_tiles = 10.0
+	return _data([m] as Array[EnemyMove])
+
+func _waves_in(node: Node) -> Array[FloorWave]:
+	var found: Array[FloorWave] = []
+	for child in node.get_children():
+		if child is FloorWave:
+			found.append(child)
+	return found
+
+func test_a_slam_move_launches_one_wave_each_way() -> void:
+	var data := _slammer()
+	data.behaviour = EnemyData.Behaviour.FLYER
+	var enemy := _spawn(data)
+	enemy.begin_telegraph()
+	await _frames(10)
+	var waves := _waves_in(self)
+	assert_int(waves.size()).is_equal(2)
+	var x_before := [waves[0].global_position.x, waves[1].global_position.x]
+	await _frames(6)
+	var moved := [waves[0].global_position.x - x_before[0], waves[1].global_position.x - x_before[1]]
+	assert_bool(moved[0] * moved[1] < 0.0).is_true()  # opposite directions
+
+func test_a_slam_telegraph_marks_the_floor_and_a_melee_one_does_not() -> void:
+	var slam := _spawn(_slammer())
+	slam.begin_telegraph()
+	assert_float(slam.ground_tell_radius()).is_greater(0.0)
+	var melee := _spawn(_data([_move()] as Array[EnemyMove]))
+	melee.begin_telegraph()
+	assert_float(melee.ground_tell_radius()).is_equal(0.0)
+	assert_float(_spawn(_slammer()).ground_tell_radius()).is_equal(0.0)  # not winding up
