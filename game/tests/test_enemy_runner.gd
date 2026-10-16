@@ -337,3 +337,66 @@ func test_a_slam_telegraph_marks_the_floor_and_a_melee_one_does_not() -> void:
 	melee.begin_telegraph()
 	assert_float(melee.ground_tell_radius()).is_equal(0.0)
 	assert_float(_spawn(_slammer()).ground_tell_radius()).is_equal(0.0)  # not winding up
+
+# --- Dive ---
+
+func _diver() -> EnemyData:
+	var m := _move(EnemyMove.Kind.DIVE, false)
+	m.telegraph_seconds = 0.3
+	m.active_seconds = 0.6
+	m.recovery_seconds = 0.6
+	m.speed_tiles = 20.0
+	m.reach_tiles = 1.0
+	m.damage = 7
+	m.exposed_seconds = 0.6
+	var d := _data([m] as Array[EnemyMove])
+	d.behaviour = EnemyData.Behaviour.FLYER
+	d.cooldown_seconds = 5.0
+	return d
+
+func test_a_dive_flies_to_where_the_hero_was_not_where_he_is_now() -> void:
+	var enemy := _spawn(_diver())
+	var victim := _victim_beside(enemy)
+	victim.global_position = enemy.global_position + GameConfig.tiles_v(6.0, 0.0)
+	var start_x := enemy.global_position.x
+	enemy.begin_telegraph()
+	await _frames(14)  # past the commit point (0.15 s): the target is latched
+	victim.global_position = enemy.global_position + GameConfig.tiles_v(12.0, 0.0)
+	await _frames(50)  # the dive is over: it landed where the hero was, 6 tiles out, not 12
+	assert_float(enemy.global_position.x - start_x).is_between(GameConfig.tiles(5.7), GameConfig.tiles(6.3))
+
+func test_a_dive_hurts_on_contact_through_take_hit() -> void:
+	var enemy := _spawn(_diver())
+	var victim := _victim_beside(enemy)
+	victim.global_position = enemy.global_position + GameConfig.tiles_v(6.0, 0.0)
+	enemy.begin_telegraph()
+	await _frames(40)
+	assert_int(victim.hits.size()).is_equal(1)
+	assert_int(victim.strikes.size()).is_equal(0)
+
+func test_the_diver_takes_extra_damage_after_landing_and_then_recovers() -> void:
+	var enemy := _spawn(_diver())
+	var victim := _victim_beside(enemy)
+	victim.global_position = enemy.global_position + GameConfig.tiles_v(6.0, 0.0)
+	enemy.begin_telegraph()
+	await _frames(40)  # landed: exposed
+	var before := enemy.health().current
+	enemy.take_hit(10, enemy.global_position.x - 10.0)
+	assert_int(before - enemy.health().current).is_equal(ceili(10 * Enemy.BREAK_DAMAGE_MULTIPLIER))
+	await _frames(60)  # the exposure is over
+	before = enemy.health().current
+	enemy.take_hit(10, enemy.global_position.x - 10.0)
+	assert_int(before - enemy.health().current).is_equal(10)
+
+func test_a_dive_and_a_dash_draw_a_dashed_path_while_winding_up_and_nothing_else_does() -> void:
+	var diver := _spawn(_diver())
+	assert_int(diver.path_tell().size()).is_equal(0)
+	diver.begin_telegraph()
+	assert_int(diver.path_tell().size()).is_equal(2)
+	var dash := _move(EnemyMove.Kind.DASH, false)
+	var dasher := _spawn(_data([dash] as Array[EnemyMove]))
+	dasher.begin_telegraph()
+	assert_int(dasher.path_tell().size()).is_equal(2)
+	var melee := _spawn(_data([_move()] as Array[EnemyMove]))
+	melee.begin_telegraph()
+	assert_int(melee.path_tell().size()).is_equal(0)

@@ -1,6 +1,9 @@
-[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="EnemyData" load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://src/enemies/enemy_data.gd" id="1_data"]
+[ext_resource type="Script" path="res://src/enemies/enemy_move.gd" id="2_move"]
+[ext_resource type="Resource" path="res://data/moves/brute_charge.tres" id="3_a"]
+[ext_resource type="Resource" path="res://data/moves/brute_slam.tres" id="4_b"]
 
 [resource]
 script = ExtResource("1_data")
@@ -16,6 +19,10 @@ poise = 4
 body_size_tiles = Vector2(1.6, 2.4)
 tint = Color(0.7, 0.6, 0.15, 1)
 threat = 5
-unlock_depth = 2
+unlock_depth = 4
 max_per_wave = 1
 cell_reward = 3
+moves = Array[ExtResource("2_move")]([ExtResource("3_a"), ExtResource("4_b")])
+pattern = 0
+chain_gap_seconds = 0.1
+cooldown_seconds = 1.5

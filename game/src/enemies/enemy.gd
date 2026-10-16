@@ -33,6 +33,8 @@ const KEEP_DISTANCE_MARGIN_TILES: float = 1.0
 const SHOT_MUZZLE_TILES: float = 0.8
 ## The floor ring that warns of a slam.
 const SLAM_TELL_RADIUS_TILES: float = 2.0
+## A dive ends when it is this close to the spot it was aimed at.
+const DIVE_ARRIVE_TILES: float = 0.3
 ## A broken guard: how long the enemy reels, and how much harder it is hit meanwhile.
 const BREAK_STAGGER: float = 1.6
 const BREAK_DAMAGE_MULTIPLIER: float = 1.5
@@ -61,6 +63,9 @@ var data: EnemyData
 var _state: State = State.MOVE
 var _move: EnemyMove
 var _move_index: int = 0
+## A dive latches the hero's position when its wind-up commits, then flies there.
+var _dive_target: Vector2 = Vector2.ZERO
+var _dive_velocity: Vector2 = Vector2.ZERO
 ## Seconds before the enemy may begin another attack (the rest after a whole string).
 var _rest_left: float = 0.0
 ## Picks the move of a RANDOM pattern; tests seed it.
@@ -255,6 +260,8 @@ func _physics_process(delta: float) -> void:
 	_knockback_x = move_toward(_knockback_x, 0.0, GameConfig.tiles(KNOCKBACK_DECAY) * delta)
 
 	var foe := _current_target()
+	if _state == State.TELEGRAPH and _move != null and _move.kind == EnemyMove.Kind.DIVE and not is_committed() and foe != null:
+		_dive_target = foe.global_position
 	var move_x := 0.0
 	match _state:
 		State.MOVE:
@@ -269,6 +276,8 @@ func _physics_process(delta: float) -> void:
 		velocity.y += GameConfig.tiles(GRAVITY) * delta
 	elif _state != State.MOVE:
 		velocity.y = 0.0  # a wind-up or recovery must not drift; only MOVE steers a flyer
+	if _state == State.STRIKE and _move != null and _move.kind == EnemyMove.Kind.DIVE:
+		velocity.y = _dive_velocity.y
 	move_and_slide()
 	if _state == State.TELEGRAPH or data.poise > 0:
 		queue_redraw()
@@ -337,6 +346,8 @@ func _keep_distance(offset: Vector2, speed: float) -> float:
 
 ## A rush (DASH): runs at the hero for the move's duration and hits on contact.
 func _think_strike(foe: Node2D, delta: float) -> float:
+	if _move.kind == EnemyMove.Kind.DIVE:
+		return _think_dive(foe, delta)
 	_strike_time += delta
 	if foe != null and not _struck:
 		if global_position.distance_to(foe.global_position) <= GameConfig.tiles(_move.reach_tiles):
@@ -350,16 +361,37 @@ func _think_strike(foe: Node2D, delta: float) -> float:
 	return _facing * GameConfig.tiles(_move.speed_tiles)
 
 
+## A dive flies at the spot the hero stood when the wind-up committed, hurts on contact, and
+## lands there: the enemy is then exposed (see _start_recovery).
+func _think_dive(foe: Node2D, delta: float) -> float:
+	_strike_time += delta
+	if foe != null and not _struck and global_position.distance_to(foe.global_position) <= GameConfig.tiles(_move.reach_tiles):
+		_struck = true
+		_hit_hero(foe, _move)
+	if _state == State.STUNNED:
+		_dive_velocity = Vector2.ZERO
+		return 0.0
+	if _strike_time >= _move.active_seconds or global_position.distance_to(_dive_target) <= GameConfig.tiles(DIVE_ARRIVE_TILES):
+		_dive_velocity = Vector2.ZERO
+		_start_recovery()
+		return 0.0
+	return _dive_velocity.x
+
+
 func _on_telegraph_timeout() -> void:
 	if _state != State.TELEGRAPH:
 		return
 	_body.color = data.tint
 	attack_released.emit(_move.damage)
 	match _move.kind:
-		EnemyMove.Kind.DASH:
+		EnemyMove.Kind.DASH, EnemyMove.Kind.DIVE:
 			_state = State.STRIKE
 			_strike_time = 0.0
 			_struck = false
+			if _move.kind == EnemyMove.Kind.DIVE:
+				var aim := _dive_target - global_position
+				var heading := aim.normalized() if aim.length() > 1.0 else Vector2(_facing, 0.0)
+				_dive_velocity = heading * GameConfig.tiles(_move.speed_tiles)
 			return
 		EnemyMove.Kind.PROJECTILE:
 			_fire_projectile(_move)
@@ -388,6 +420,19 @@ func _launch_waves(move: EnemyMove) -> void:
 		get_parent().add_child(wave)
 		wave.global_position = Vector2(global_position.x + direction * GameConfig.tiles(SHOT_MUZZLE_TILES), feet_y - FloorWave.STRIP_SIZE.y / 2.0)
 		wave.launch(direction, GameConfig.tiles(move.speed_tiles), GameConfig.tiles(move.range_tiles), move.damage)
+
+
+## The line a rush or dive will follow, as two points relative to the enemy; empty when the
+## enemy is not winding up one.
+func path_tell() -> PackedVector2Array:
+	if _state != State.TELEGRAPH or _move == null:
+		return PackedVector2Array()
+	match _move.kind:
+		EnemyMove.Kind.DASH:
+			return PackedVector2Array([Vector2.ZERO, Vector2(_facing * GameConfig.tiles(_move.speed_tiles) * _move.active_seconds, 0.0)])
+		EnemyMove.Kind.DIVE:
+			return PackedVector2Array([Vector2.ZERO, _dive_target - global_position])
+	return PackedVector2Array()
 
 
 ## Radius of the ring on the floor while a slam or an explosion winds up; 0 otherwise.
@@ -419,10 +464,14 @@ func _on_recovery_timeout() -> void:
 	_move = null
 	_move_index = 0
 	_rest_left = data.cooldown_seconds
+	_body.color = data.tint
 
 
 func _start_recovery() -> void:
 	_state = State.RECOVER
+	if _move.exposed_seconds > 0.0:
+		_vulnerable_left = maxf(_vulnerable_left, _move.exposed_seconds)
+		_body.color = BREAK_TINT
 	var wait := _move.recovery_seconds + (data.chain_gap_seconds if _has_next_move() else 0.0)
 	_recovery_timer.start(maxf(wait, 0.001))
 
@@ -479,6 +528,9 @@ func _draw() -> void:
 		draw_arc(center, radius, 0.0, TAU, 20, color, 2.0)
 		draw_rect(Rect2(center.x - 1.0, center.y - 4.0, 2.0, 5.0), color)
 		draw_rect(Rect2(center.x - 1.0, center.y + 2.0, 2.0, 2.0), color)
+	var path := path_tell()
+	if path.size() == 2:
+		draw_dashed_line(path[0], path[1], tell_color(), 1.5, 4.0)
 	var ground := ground_tell_radius()
 	if ground > 0.0:
 		var feet := Vector2(0.0, -top)

@@ -1,6 +1,8 @@
-[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="EnemyData" load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://src/enemies/enemy_data.gd" id="1_data"]
+[ext_resource type="Script" path="res://src/enemies/enemy_move.gd" id="2_move"]
+[ext_resource type="Resource" path="res://data/moves/bat_dive.tres" id="3_a"]
 
 [resource]
 script = ExtResource("1_data")
@@ -8,7 +10,7 @@ display_name = "Cinder Bat"
 max_health = 12
 move_speed_tiles = 5.5
 attack_damage = 5
-attack_range_tiles = 1.2
+attack_range_tiles = 5.0
 telegraph_seconds = 0.3
 recovery_seconds = 0.6
 behaviour = 1
@@ -18,3 +20,6 @@ threat = 3
 unlock_depth = 1
 max_per_wave = 2
 cell_reward = 1
+moves = Array[ExtResource("2_move")]([ExtResource("3_a")])
+pattern = 0
+cooldown_seconds = 1.0

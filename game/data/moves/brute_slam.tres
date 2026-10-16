@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="EnemyMove" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/enemies/enemy_move.gd" id="1_move"]
+
+[resource]
+script = ExtResource("1_move")
+id = "brute_slam"
+kind = 2
+telegraph_seconds = 0.7
+active_seconds = 0.15
+recovery_seconds = 1.0
+damage = 16
+reach_tiles = 1.5
+speed_tiles = 9.0
+range_tiles = 10.0
+parryable = false
+exposed_seconds = 0.0

@@ -42,3 +42,58 @@ func test_the_wisp_data_is_valid_and_unlocked_at_depth_two() -> void:
 	assert_bool(wisp.moves[0].parryable).is_true()
 	assert_float(wisp.preferred_range_tiles).is_greater(0.0)
 	assert_float(wisp.moves[0].range_tiles).is_greater(wisp.preferred_range_tiles)
+
+func _floor() -> void:
+	var floor_body: StaticBody2D = auto_free(StaticBody2D.new())
+	var shape := CollisionShape2D.new()
+	var rect := RectangleShape2D.new()
+	rect.size = GameConfig.tiles_v(60.0, 1.0)
+	shape.shape = rect
+	floor_body.add_child(shape)
+	floor_body.position = GameConfig.tiles_v(10.0, 6.0)
+	add_child(floor_body)
+
+func test_the_brute_charges_then_slams() -> void:
+	var brute := _enemy("crown_brute")
+	assert_int(brute.moves.size()).is_equal(2)
+	assert_int(brute.moves[0].kind).is_equal(EnemyMove.Kind.DASH)
+	assert_int(brute.moves[1].kind).is_equal(EnemyMove.Kind.SLAM)
+	assert_bool(brute.moves[0].parryable).is_false()
+	assert_bool(brute.moves[1].parryable).is_false()
+	assert_int(brute.pattern).is_equal(EnemyData.Pattern.SEQUENCE)
+
+func test_the_real_brute_plays_its_charge_then_its_slam() -> void:
+	_floor()
+	var brute: Enemy = auto_free(load("res://src/enemies/enemy.tscn").instantiate())
+	add_child(brute)
+	brute.configure(load("res://data/enemies/crown_brute.tres"))
+	brute.global_position = GameConfig.tiles_v(3.0, 3.0)
+	var hero: Node2D = auto_free(load("res://tests/support/strike_recorder.gd").new())
+	add_child(hero)
+	hero.global_position = GameConfig.tiles_v(7.0, 5.0)
+	brute.target = hero
+	var released: Array = []
+	brute.attack_released.connect(func(damage: int) -> void: released.append(damage))
+	await get_tree().create_timer(0.0).timeout
+	for i in 300:
+		await get_tree().physics_frame
+		if released.size() >= 2:
+			break
+	assert_array(released.slice(0, 2)).is_equal([20, 16])
+
+func test_the_bat_dives_and_is_exposed_afterwards() -> void:
+	var bat := _enemy("cinder_bat")
+	assert_int(bat.moves.size()).is_equal(1)
+	assert_int(bat.moves[0].kind).is_equal(EnemyMove.Kind.DIVE)
+	assert_bool(bat.moves[0].parryable).is_false()
+	assert_float(bat.moves[0].exposed_seconds).is_greater(0.0)
+
+func test_the_migrated_enemies_keep_their_threat_and_cell_reward() -> void:
+	assert_int(_enemy("crown_brute").threat).is_equal(5)
+	assert_int(_enemy("crown_brute").cell_reward).is_equal(3)
+	assert_int(_enemy("cinder_bat").threat).is_equal(3)
+	assert_int(_enemy("cinder_bat").cell_reward).is_equal(1)
+
+func test_the_brute_unlocks_at_depth_four_and_the_bat_at_one() -> void:
+	assert_int(_enemy("crown_brute").unlock_depth).is_equal(4)
+	assert_int(_enemy("cinder_bat").unlock_depth).is_equal(1)
