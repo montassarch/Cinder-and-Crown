@@ -112,6 +112,11 @@ func health() -> Health:
 	return _health
 
 
+## +1 when the enemy faces right, -1 left.
+func facing() -> float:
+	return _facing
+
+
 ## The attack being played (winding up, striking or recovering); null between attacks.
 func current_move() -> EnemyMove:
 	return _move
@@ -217,6 +222,9 @@ func _has_next_move() -> bool:
 func take_hit(damage: int, source_x: float, knockback_tiles: float = 0.0) -> void:
 	if _state == State.DEAD:
 		return
+	if data.shielded and not is_guard_broken() and _is_front_hit(source_x):
+		_absorb_with_shield()
+		return
 	if is_guard_broken():
 		damage = ceili(damage * BREAK_DAMAGE_MULTIPLIER)
 	_health.take_damage(damage)
@@ -226,6 +234,18 @@ func take_hit(damage: int, source_x: float, knockback_tiles: float = 0.0) -> voi
 		var direction := signf(global_position.x - source_x)
 		_knockback_x = direction * GameConfig.tiles(sqrt(2.0 * KNOCKBACK_DECAY * knockback_tiles))
 	_react_to_hit()
+
+
+## True when a hit came from the side the enemy faces (its shield side).
+func _is_front_hit(source_x: float) -> bool:
+	return (source_x - global_position.x) * _facing >= 0.0
+
+
+## A shield takes the whole blow, but a poised enemy's poise still wears down, so a guard can
+## still be broken from the front.
+func _absorb_with_shield() -> void:
+	if data.poise > 0:
+		_react_to_hit()
 
 
 ## Poised enemies wear their poise down and break; light ones flinch unless they are already
@@ -262,6 +282,10 @@ func _physics_process(delta: float) -> void:
 	var foe := _current_target()
 	if _state == State.TELEGRAPH and _move != null and _move.kind == EnemyMove.Kind.DIVE and not is_committed() and foe != null:
 		_dive_target = foe.global_position
+	if data.shielded and foe != null and (_state == State.MOVE or _state == State.RECOVER):
+		var side := foe.global_position.x - global_position.x
+		if side != 0.0:
+			_facing = signf(side)
 	var move_x := 0.0
 	match _state:
 		State.MOVE:

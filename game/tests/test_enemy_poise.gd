@@ -176,3 +176,62 @@ func test_the_crown_brute_has_poise_and_the_light_enemies_do_not() -> void:
 	assert_int((load("res://data/enemies/crown_brute.tres") as EnemyData).poise).is_greater(1)
 	assert_int((load("res://data/enemies/shambler.tres") as EnemyData).poise).is_equal(0)
 	assert_int((load("res://data/enemies/cinder_bat.tres") as EnemyData).poise).is_equal(0)
+
+# --- Shield ---
+
+func _shielded(poise: int = 0) -> Enemy:
+	var data := _data(poise)
+	data.shielded = true
+	data.behaviour = EnemyData.Behaviour.FLYER  # no gravity: needs no floor
+	return _spawn(data)
+
+func test_a_hit_from_the_front_is_absorbed() -> void:
+	var enemy := _shielded()
+	assert_float(enemy.facing()).is_equal(1.0)
+	enemy.take_hit(10, enemy.global_position.x + 10.0)  # from the side it faces
+	assert_int(enemy.health().current).is_equal(100)
+
+func test_a_hit_from_behind_deals_full_damage() -> void:
+	var enemy := _shielded()
+	enemy.take_hit(10, enemy.global_position.x - 10.0)
+	assert_int(enemy.health().current).is_equal(90)
+
+func test_a_front_hit_still_wears_poise_down_until_the_guard_breaks() -> void:
+	var enemy := _shielded(2)
+	enemy.take_hit(10, enemy.global_position.x + 10.0)
+	assert_int(enemy.poise()).is_equal(1)
+	assert_bool(enemy.is_guard_broken()).is_false()
+	enemy.take_hit(10, enemy.global_position.x + 10.0)
+	assert_bool(enemy.is_guard_broken()).is_true()
+	assert_int(enemy.health().current).is_equal(100)  # nothing got through yet
+
+func test_a_broken_shield_takes_full_damage_from_the_front() -> void:
+	var enemy := _shielded(1)
+	enemy.take_hit(10, enemy.global_position.x + 10.0)  # breaks the guard
+	assert_bool(enemy.is_guard_broken()).is_true()
+	enemy.take_hit(10, enemy.global_position.x + 10.0)
+	assert_int(enemy.health().current).is_equal(100 - ceili(10 * Enemy.BREAK_DAMAGE_MULTIPLIER))
+
+func test_a_non_shielded_enemy_is_hurt_from_the_front_as_always() -> void:
+	var enemy := _spawn(_data(0))
+	enemy.take_hit(10, enemy.global_position.x + 10.0)
+	assert_int(enemy.health().current).is_equal(90)
+
+func test_the_shield_follows_the_hero_even_after_the_enemy_is_knocked_past_him() -> void:
+	var data := _data(0)
+	data.shielded = true
+	data.behaviour = EnemyData.Behaviour.FLYER
+	var enemy := _spawn(data)
+	var hero: Node2D = auto_free(Node2D.new())
+	add_child(hero)
+	hero.global_position = enemy.global_position + Vector2(100.0, 0.0)
+	enemy.target = hero
+	await _frames(3)
+	assert_float(enemy.facing()).is_equal(1.0)
+	enemy.global_position = hero.global_position + Vector2(100.0, 0.0)  # knocked back past the hero
+	await _frames(3)
+	assert_float(enemy.facing()).is_equal(-1.0)
+	enemy.take_hit(10, hero.global_position.x)  # the hero is on its left: its front
+	assert_int(enemy.health().current).is_equal(100)
+	enemy.take_hit(10, enemy.global_position.x + 50.0)  # from its right: its back
+	assert_int(enemy.health().current).is_equal(90)

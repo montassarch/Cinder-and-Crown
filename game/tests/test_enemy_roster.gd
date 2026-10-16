@@ -97,3 +97,13 @@ func test_the_migrated_enemies_keep_their_threat_and_cell_reward() -> void:
 func test_the_brute_unlocks_at_depth_four_and_the_bat_at_one() -> void:
 	assert_int(_enemy("crown_brute").unlock_depth).is_equal(4)
 	assert_int(_enemy("cinder_bat").unlock_depth).is_equal(1)
+
+func test_the_penitent_data_is_valid() -> void:
+	var penitent := _enemy("penitent")
+	assert_bool(penitent.shielded).is_true()
+	assert_int(penitent.poise).is_greater(1)
+	assert_int(penitent.moves.size()).is_equal(1)
+	assert_int(penitent.moves[0].kind).is_equal(EnemyMove.Kind.MELEE)
+	assert_bool(penitent.moves[0].parryable).is_true()
+	assert_int(penitent.unlock_depth).is_equal(3)
+	assert_int(penitent.max_per_wave).is_equal(1)

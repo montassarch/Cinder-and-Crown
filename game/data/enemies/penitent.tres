@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://src/enemies/enemy_data.gd" id="1_data"]
+[ext_resource type="Script" path="res://src/enemies/enemy_move.gd" id="2_move"]
+[ext_resource type="Resource" path="res://data/moves/penitent_thrust.tres" id="3_a"]
+
+[resource]
+script = ExtResource("1_data")
+display_name = "Penitent"
+max_health = 40
+move_speed_tiles = 1.6
+attack_damage = 12
+attack_range_tiles = 1.8
+telegraph_seconds = 0.8
+recovery_seconds = 0.7
+behaviour = 0
+moves = Array[ExtResource("2_move")]([ExtResource("3_a")])
+pattern = 0
+cooldown_seconds = 0.8
+shielded = true
+poise = 3
+threat = 5
+unlock_depth = 3
+max_per_wave = 1
+cell_reward = 3
+body_size_tiles = Vector2(1.2, 2)
+tint = Color(0.55, 0.5, 0.4, 1)
