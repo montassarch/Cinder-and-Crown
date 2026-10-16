@@ -14,3 +14,6 @@ recovery_seconds = 0.7
 behaviour = 0
 body_size_tiles = Vector2(1.0, 1.8)
 tint = Color(0.45, 0.6, 0.35, 1)
+threat = 2
+unlock_depth = 0
+max_per_wave = 3

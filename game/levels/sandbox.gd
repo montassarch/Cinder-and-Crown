@@ -97,17 +97,21 @@ func platform_rects_tiles() -> Array[Rect2]:
 	]
 
 
-func spawn_enemy(data: EnemyData) -> Enemy:
+func spawn_enemy_at(data: EnemyData, at: Vector2) -> Enemy:
 	var enemy: Enemy = ENEMY_SCENE.instantiate()
 	add_child(enemy)
 	enemy.configure(data)
 	enemy.target = player
+	enemy.global_position = at
+	return enemy
+
+
+func spawn_enemy(data: EnemyData) -> Enemy:
 	var toward_center := 1.0 if player.global_position.x < GameConfig.tiles(arena_width_tiles() / 2.0) else -1.0
 	var x := player.global_position.x + toward_center * GameConfig.tiles(SPAWN_DISTANCE_TILES)
 	x = clampf(x, GameConfig.tiles(2.0), GameConfig.tiles(arena_width_tiles() - 2.0))
 	var height := AIR_SPAWN_HEIGHT_TILES if data.behaviour == EnemyData.Behaviour.FLYER else GROUND_SPAWN_HEIGHT_TILES
-	enemy.global_position = Vector2(x, GameConfig.tiles(GROUND_TOP_TILES - height))
-	return enemy
+	return spawn_enemy_at(data, Vector2(x, GameConfig.tiles(GROUND_TOP_TILES - height)))
 
 
 func clear_enemies() -> void:

@@ -8,6 +8,7 @@ func before_test() -> void:
 	_level = load(SCENE).instantiate()
 	_level.level_seed = 7
 	_level.room_count = 5
+	_level.encounters_enabled = false  # these tests are about layout and the exit, not combat
 	add_child(_level)
 
 func after_test() -> void:

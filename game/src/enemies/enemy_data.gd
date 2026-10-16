@@ -16,5 +16,11 @@ enum Behaviour { CHASER, FLYER, CHARGER }
 ## Sword hits it shrugs off before its guard breaks. 0: every hit that lands while it is not
 ## yet committed to a strike makes it flinch.
 @export var poise: int = 0
+## How much of a wave's budget this enemy costs.
+@export var threat: int = 2
+## The first level (0 = the first of a run) this enemy can turn up in.
+@export var unlock_depth: int = 0
+## No wave holds more than this many of this enemy.
+@export var max_per_wave: int = 3
 @export var body_size_tiles: Vector2 = Vector2(1.0, 1.8)
 @export var tint: Color = Color(0.6, 0.6, 0.6)
