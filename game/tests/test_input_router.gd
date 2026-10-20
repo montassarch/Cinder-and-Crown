@@ -2,6 +2,12 @@ extends GdUnitTestSuite
 
 const ROUTER_SCRIPT := "res://src/input/input_router.gd"
 
+## Waits on the same clock the router reads (Time.get_ticks_msec), so a slow or fast test run cannot disagree with it.
+func _wait_ms(ms: int) -> void:
+	var until := Time.get_ticks_msec() + ms
+	while Time.get_ticks_msec() < until:
+		await get_tree().process_frame
+
 func _make_router() -> Node:
 	return auto_free(load(ROUTER_SCRIPT).new())
 
@@ -33,7 +39,7 @@ func test_jump_buffer_expires_after_buffer_seconds() -> void:
 	var router := _make_router()
 	router.set_virtual_button(&"jump", true)
 	assert_bool(router.jump_buffered()).is_true()
-	await await_millis(int(router.BUFFER_SECONDS * 1000.0) + 80)
+	await _wait_ms(int(router.BUFFER_SECONDS * 1000.0) + 80)
 	assert_bool(router.jump_buffered()).is_false()
 
 func test_consume_jump_clears_the_buffer() -> void:
@@ -45,7 +51,7 @@ func test_consume_jump_clears_the_buffer() -> void:
 func test_buffer_survives_shorter_than_buffer_seconds() -> void:
 	var router := _make_router()
 	router.set_virtual_button(&"jump", true)
-	await await_millis(30)
+	await _wait_ms(30)
 	assert_bool(router.jump_buffered()).is_true()
 
 func test_virtual_jump_held_follows_press_and_release() -> void:
@@ -92,7 +98,7 @@ func test_a_parry_press_expires_after_the_buffer_window() -> void:
 	var router := _make_router()
 	router.set_virtual_button(&"parry", true)
 	assert_bool(router.parry_buffered()).is_true()
-	await await_millis(int(router.BUFFER_SECONDS * 1000.0) + 80)
+	await _wait_ms(int(router.BUFFER_SECONDS * 1000.0) + 80)
 	assert_bool(router.parry_buffered()).is_false()
 
 func test_the_parry_action_exists_with_a_key_and_a_pad_button() -> void:

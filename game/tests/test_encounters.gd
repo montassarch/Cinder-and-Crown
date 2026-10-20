@@ -244,11 +244,15 @@ func test_an_exploding_pilgrim_pays_no_cells_but_opens_the_gate() -> void:
 	var run_before := _level.cells_this_run()
 	var pilgrim := _level.spawn_wave_enemy(load("res://data/enemies/powder_pilgrim.tres"), _level.player.global_position + Vector2(24.0, 0.0))
 	assert_int(_level.enemy_count()).is_equal(1)
-	await _frames(int(0.8 * 60.0) + 20)  # the fuse burns down
+	for i in 600:  # the fuse burns down; wait for it, however fast frames run
+		if pilgrim.is_dead():
+			break
+		await _frames(1)
 	assert_bool(pilgrim.is_dead()).is_true()
-	assert_int(_level.enemy_count()).is_equal(0)
+	assert_bool(_enemies().has(pilgrim)).is_false()  # the blast removed it from play
 	assert_int(MetaSave.cells()).is_equal(cells_before)
 	assert_int(_level.cells_this_run()).is_equal(run_before)
+	_kill_all()  # anything else that wandered in during the wait must not hide what is being checked
 	_stand_on_exit()
 	_level._on_exit_entered(_level.player)
 	assert_bool((_level.get_node("BoonPicker") as BoonPicker).is_open()).is_true()
