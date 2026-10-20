@@ -1,15 +1,15 @@
 class_name PlayerVisual
 extends AnimatedSprite2D
-## The black swordsman's hand-drawn animations: Hero Knight by Sven Thole, recolored to black
-## armor (see art/black_swordsman/CREDITS.md and tools/art/black_swordsman.py).
-## Every frame exists twice: plain, and with the plague mask on (worn briefly after a hit).
+## The skeleton knight's animations: Quaternius's free hooded outfit and animation library, posed and
+## rendered in Blender, then shrunk to pixel art (see art/skeleton_knight/CREDITS.md and the
+## skeleton_knight_*.py tools). Every frame exists twice: plain, and washed red (shown briefly after a hit).
 ## Reads the player's state and plays the matching animation; attacks and the roll are
 ## stretched to last exactly as long as the gameplay action.
 
-const ART_DIR := "res://art/black_swordsman"
-const FRAME := Vector2i(100, 55)
+const ART_DIR := "res://art/skeleton_knight"
+const FRAME := Vector2i(100, 64)
 ## Where the feet sit inside each frame, in art pixels (art data, not gameplay).
-const FEET := Vector2(40.0, 53.0)
+const FEET := Vector2(40.0, 62.0)
 const ANIMS := {
 	&"idle": {"dir": "Idle", "count": 8, "fps": 10.0, "loop": true},
 	&"run": {"dir": "Run", "count": 10, "fps": 18.0, "loop": true},
@@ -107,7 +107,7 @@ func _build_frames(variant: String) -> SpriteFrames:
 		frames.set_animation_speed(anim, spec["fps"])
 		frames.set_animation_loop(anim, spec["loop"])
 		for i in _frame_indices(spec):
-			frames.add_frame(anim, load("%s/%s/%s/HeroKnight_%s_%d.png" % [ART_DIR, variant, spec["dir"], spec["dir"], i]))
+			frames.add_frame(anim, load("%s/%s/%s/SkeletonKnight_%s_%d.png" % [ART_DIR, variant, spec["dir"], spec["dir"], i]))
 	return frames
 
 
