@@ -97,21 +97,22 @@ def build_sword(sign=-1):
 
 build_skull()
 SWORD = build_sword()   # [grip, crossguard, blade, blade tip, pommel]
-rig.rotation_euler[2] = math.radians(float(os.environ.get('FACE_ROT', '0')))
+# (Turning the rig does nothing: the animation overrides it. The skeleton faces -Y, so the camera and lights
+# sit on the -X side instead, which puts the face on the right of the image, the way the game expects.)
 sc.render.engine = 'CYCLES'; sc.cycles.samples = 40; sc.cycles.device = 'CPU'; sc.cycles.use_denoising = False
 sc.render.film_transparent = True; sc.render.resolution_x = 800; sc.render.resolution_y = 576
 sc.render.image_settings.color_mode = 'RGBA'
 cam_d = bpy.data.cameras.new('c'); cam_d.type = 'ORTHO'; cam_d.ortho_scale = 100 / 25.0
 cam = bpy.data.objects.new('c', cam_d); sc.collection.objects.link(cam)
-cam.location = (6, CAM_Y, 1.36); cam.rotation_euler = (math.radians(90), 0, math.radians(90)); sc.camera = cam
+cam.location = (-6, -CAM_Y, 1.36); cam.rotation_euler = (math.radians(90), 0, math.radians(-90)); sc.camera = cam
 def light(name, loc, energy, color, size=0.6):
     d = bpy.data.lights.new(name, 'AREA'); d.energy = energy; d.color = color; d.size = size * 3
     o = bpy.data.objects.new(name, d); o.location = loc
     o.rotation_euler = (math.radians(90), 0, math.radians(90)) if loc[0] > 0 else (math.radians(90), 0, math.radians(-90))
     sc.collection.objects.link(o)
-light('key', (3.5, 1.5, 2.2), 1000, (1.0, 0.86, 0.72))
-light('rim', (-3.5, -1.2, 2.2), 1100, (0.5, 0.6, 1.0))
-light('fill', (3.5, -2, 0.6), 200, (0.9, 0.8, 1.0))
+light('key', (-3.5, -1.5, 2.2), 1000, (1.0, 0.86, 0.72))
+light('rim', (3.5, 1.2, 2.2), 1100, (0.5, 0.6, 1.0))
+light('fill', (-3.5, 2, 0.6), 200, (0.9, 0.8, 1.0))
 sc.world = bpy.data.worlds.new('w'); sc.world.use_nodes = True
 sc.world.node_tree.nodes['Background'].inputs['Color'].default_value = (0.04, 0.04, 0.06, 1)
 sc.world.node_tree.nodes['Background'].inputs['Strength'].default_value = 0.6
