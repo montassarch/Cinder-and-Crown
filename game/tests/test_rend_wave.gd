@@ -52,3 +52,32 @@ func test_a_wall_stops_the_wave() -> void:
 	_wave(1.0)
 	await _frames(45)
 	assert_int(behind.hits.size()).is_equal(0)
+
+# --- Pre-rendered red lightning (the old drawn bolts are gone) ---
+
+func test_nothing_is_drawn_per_frame_any_more() -> void:
+	assert_bool(_wave().has_method("_draw")).is_false()
+
+func test_the_wave_is_a_red_lightning_sprite_facing_the_way_it_travels() -> void:
+	var right: AnimatedSprite2D = _wave(1.0).get_node("Art")
+	var left: AnimatedSprite2D = _wave(-1.0).get_node("Art")
+	assert_int(right.sprite_frames.get_frame_count(&"default")).is_equal(6)
+	assert_vector(Vector2(right.sprite_frames.get_frame_texture(&"default", 0).get_size())).is_equal(Vector2(64, 48))
+	assert_bool(right.flip_h).is_false()
+	assert_bool(left.flip_h).is_true()
+
+func test_the_sprite_head_sits_at_the_front_of_the_wave() -> void:
+	var right: AnimatedSprite2D = _wave(1.0).get_node("Art")
+	var left: AnimatedSprite2D = _wave(-1.0).get_node("Art")
+	# art faces right with its head on the right edge; the head must be at the node's origin
+	assert_float(right.position.x + 62.0).is_equal_approx(0.0, 1.0)
+	assert_float(left.position.x + 1.0).is_equal_approx(0.0, 1.0)
+
+func test_the_wave_fades_toward_the_end_of_its_range() -> void:
+	var wave := _wave()
+	var art: AnimatedSprite2D = wave.get_node("Art")
+	await _frames(2)
+	assert_float(art.modulate.a).is_equal(1.0)
+	wave._travelled = GameConfig.tiles(RendWave.RANGE_TILES) * 0.95
+	await _frames(1)
+	assert_float(art.modulate.a).is_less(0.6)
