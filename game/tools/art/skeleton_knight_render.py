@@ -2,10 +2,10 @@
 # art/skeleton_knight/CREDITS.md), tints it dark, adds a skull face with red eyes and a sword, plays the
 # Universal Animation Library actions on it and renders every game animation from the side.
 #   blender -b -P skeleton_knight_render.py -- <UAL1_Standard.glb> <Male_Ranger.gltf> <out_dir> [anim_dir ...]
-# Output: <out_dir>/<AnimDir>/<n>.png  (800x512, transparent; skeleton_knight_pixel.py shrinks them to game frames)
+# Output: <out_dir>/<AnimDir>/<n>.png  (800x576, transparent; skeleton_knight_pixel.py shrinks them to game frames)
 import bpy, math, os, sys, mathutils
-CAM_Y = float(os.environ.get('CAM_Y', '0.4545'))   # shifts the character left of centre (feet at x=40 of 100)
-SCALE_NOTE = '22 px per metre'
+CAM_Y = float(os.environ.get('CAM_Y', '0.40'))   # shifts the character left of centre (feet at x=40 of 100; 25 px per metre)
+SCALE_NOTE = '25 px per metre'
 args = sys.argv[sys.argv.index('--') + 1:]
 ua, outfit, out = args[:3]
 only = set(args[3:])
@@ -27,9 +27,9 @@ for m in bpy.data.materials:
     tex = [n for n in m.node_tree.nodes if n.type == 'TEX_IMAGE']
     mix = m.node_tree.nodes.new('ShaderNodeMix'); mix.data_type = 'RGBA'; mix.blend_type = 'MULTIPLY'
     mix.inputs['Factor'].default_value = 1.0
-    mix.inputs['B'].default_value = (0.30, 0.20, 0.46, 1)
+    mix.inputs['B'].default_value = (0.24, 0.22, 0.40, 1)
     hs = m.node_tree.nodes.new('ShaderNodeHueSaturation')
-    hs.inputs['Saturation'].default_value = 0.4; hs.inputs['Value'].default_value = 0.95
+    hs.inputs['Saturation'].default_value = 0.5; hs.inputs['Value'].default_value = 0.95
     if b.inputs['Base Color'].links:
         src = b.inputs['Base Color'].links[0].from_socket
         m.node_tree.links.new(src, hs.inputs['Color'])
@@ -99,17 +99,17 @@ build_skull()
 SWORD = build_sword()   # [grip, crossguard, blade, blade tip, pommel]
 rig.rotation_euler[2] = math.radians(float(os.environ.get('FACE_ROT', '0')))
 sc.render.engine = 'CYCLES'; sc.cycles.samples = 40; sc.cycles.device = 'CPU'; sc.cycles.use_denoising = False
-sc.render.film_transparent = True; sc.render.resolution_x = 800; sc.render.resolution_y = 512
+sc.render.film_transparent = True; sc.render.resolution_x = 800; sc.render.resolution_y = 576
 sc.render.image_settings.color_mode = 'RGBA'
-cam_d = bpy.data.cameras.new('c'); cam_d.type = 'ORTHO'; cam_d.ortho_scale = 100 / 22.0
+cam_d = bpy.data.cameras.new('c'); cam_d.type = 'ORTHO'; cam_d.ortho_scale = 100 / 25.0
 cam = bpy.data.objects.new('c', cam_d); sc.collection.objects.link(cam)
-cam.location = (6, CAM_Y, 1.364); cam.rotation_euler = (math.radians(90), 0, math.radians(90)); sc.camera = cam
+cam.location = (6, CAM_Y, 1.36); cam.rotation_euler = (math.radians(90), 0, math.radians(90)); sc.camera = cam
 def light(name, loc, energy, color, size=0.6):
     d = bpy.data.lights.new(name, 'AREA'); d.energy = energy; d.color = color; d.size = size * 3
     o = bpy.data.objects.new(name, d); o.location = loc
     o.rotation_euler = (math.radians(90), 0, math.radians(90)) if loc[0] > 0 else (math.radians(90), 0, math.radians(-90))
     sc.collection.objects.link(o)
-light('key', (3.5, 1.5, 2.2), 1000, (1.0, 0.72, 0.5))
+light('key', (3.5, 1.5, 2.2), 1000, (1.0, 0.86, 0.72))
 light('rim', (-3.5, -1.2, 2.2), 1100, (0.5, 0.6, 1.0))
 light('fill', (3.5, -2, 0.6), 200, (0.9, 0.8, 1.0))
 sc.world = bpy.data.worlds.new('w'); sc.world.use_nodes = True
@@ -137,7 +137,7 @@ BLADES = {}
 
 
 def blade_pixels():
-    # guard and tip of the sword in frame pixels (100 x 64, y down), for effects that follow the blade
+    # guard and tip of the sword in frame pixels (100 x 72, y down), for effects that follow the blade
     dg = bpy.context.evaluated_depsgraph_get(); dg.update()
     guard = SWORD[1].evaluated_get(dg).matrix_world.translation
     blade = SWORD[2].evaluated_get(dg)
@@ -145,7 +145,7 @@ def blade_pixels():
     tip = max(ends, key=lambda e: (e - guard).length)
     def px(v):
         c = world_to_camera_view(sc, cam, v)
-        return [round(c.x * 100, 1), round((1 - c.y) * 64, 1)]
+        return [round(c.x * 100, 1), round((1 - c.y) * 72, 1)]
     return px(guard) + px(tip)
 
 for game_anim, (action, count, loops, backwards) in JOBS.items():

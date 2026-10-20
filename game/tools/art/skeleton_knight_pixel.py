@@ -1,7 +1,7 @@
 # Turns the Blender renders (skeleton_knight_render.py) into the game's pixel-art frames.
 #   python3 game/tools/art/skeleton_knight_pixel.py <raw_dir> [--preview out.png]
-# raw: <raw_dir>/<AnimDir>/<n>.png (800x512).  Output: game/art/skeleton_knight/{plain,masked}/<AnimDir>/SkeletonKnight_<AnimDir>_<n>.png
-# Every frame is shrunk 8x (100x64), hard-edged, mapped onto one shared 28-colour palette, and given a dark outline.
+# raw: <raw_dir>/<AnimDir>/<n>.png (800x576).  Output: game/art/skeleton_knight/{plain,masked}/<AnimDir>/SkeletonKnight_<AnimDir>_<n>.png
+# Every frame is shrunk 8x (100x72), hard-edged, mapped onto one shared 28-colour palette, and given a dark outline.
 # "masked" is the brief hurt flash after a hit (the game swaps to it for a moment): the same frame washed red.
 from PIL import Image, ImageEnhance
 import glob, json, os, shutil, sys
@@ -17,7 +17,10 @@ def load(path):
     im = Image.open(path).convert('RGBA')
     small = im.resize((im.width // SHRINK, im.height // SHRINK), Image.BOX)
     a = small.getchannel('A').point(lambda v: 255 if v > 96 else 0)
-    rgb = ImageEnhance.Color(ImageEnhance.Brightness(small.convert('RGB')).enhance(0.92)).enhance(1.12)
+    rgb = small.convert('RGB')
+    rgb = ImageEnhance.Contrast(rgb).enhance(1.3)
+    rgb = ImageEnhance.Color(rgb).enhance(1.2)
+    rgb = ImageEnhance.Brightness(rgb).enhance(1.1)
     return rgb, a
 
 
@@ -102,10 +105,10 @@ def main():
     if '--preview' in sys.argv:
         path = sys.argv[sys.argv.index('--preview') + 1]
         cols = max(len(l) for l in frames.values())
-        sheet = Image.new('RGBA', (cols * 100, len(frames) * 64), (46, 42, 58, 255))
+        sheet = Image.new('RGBA', (cols * 100, len(frames) * 72), (46, 42, 58, 255))
         for r, (d, lst) in enumerate(frames.items()):
             for c in range(len(lst)):
-                sheet.alpha_composite(Image.open(os.path.join(OUT, 'plain', d, f'SkeletonKnight_{d}_{c}.png')), (c * 100, r * 64))
+                sheet.alpha_composite(Image.open(os.path.join(OUT, 'plain', d, f'SkeletonKnight_{d}_{c}.png')), (c * 100, r * 72))
         sheet.resize((sheet.width * 2, sheet.height * 2), Image.NEAREST).save(path)
 
 

@@ -7,9 +7,9 @@ extends AnimatedSprite2D
 ## stretched to last exactly as long as the gameplay action.
 
 const ART_DIR := "res://art/skeleton_knight"
-const FRAME := Vector2i(100, 64)
+const FRAME := Vector2i(100, 72)
 ## Where the feet sit inside each frame, in art pixels (art data, not gameplay).
-const FEET := Vector2(40.0, 62.0)
+const FEET := Vector2(40.0, 70.0)
 const ANIMS := {
 	&"idle": {"dir": "Idle", "count": 8, "fps": 10.0, "loop": true},
 	&"run": {"dir": "Run", "count": 10, "fps": 18.0, "loop": true},
