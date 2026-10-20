@@ -18,9 +18,11 @@ def load(path):
     small = im.resize((im.width // SHRINK, im.height // SHRINK), Image.BOX)
     a = small.getchannel('A').point(lambda v: 255 if v > 96 else 0)
     rgb = small.convert('RGB')
-    rgb = ImageEnhance.Contrast(rgb).enhance(1.3)
-    rgb = ImageEnhance.Color(rgb).enhance(1.2)
-    rgb = ImageEnhance.Brightness(rgb).enhance(1.1)
+    rgb = ImageEnhance.Contrast(rgb).enhance(1.45)
+    rgb = ImageEnhance.Color(rgb).enhance(1.7)
+    rgb = ImageEnhance.Brightness(rgb).enhance(0.78)
+    r, g, b = rgb.split()
+    rgb = Image.merge('RGB', (r.point(lambda v: int(v * 0.95)), g.point(lambda v: int(v * 0.88)), b.point(lambda v: min(255, int(v * 1.12)))))
     return rgb, a
 
 

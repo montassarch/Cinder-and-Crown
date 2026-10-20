@@ -88,8 +88,8 @@ def build_sword(sign=-1):
     parts = [
         add('cube', (hx, hy, hz), (0.030, 0.17, 0.030), GRIP),                           # grip
         add('cube', (hx, hy - 0.19, hz), (0.020, 0.030, 0.19), STEEL),                   # crossguard
-        add('cube', (hx, hy - 0.54, hz), (0.010, 0.60, 0.045), STEEL),                   # blade
-        add('cube', (hx, hy - 0.90, hz), (0.006, 0.03, 0.016), STEEL, rot=(0, 0, 0)),
+        add('cube', (hx, hy - 0.67, hz), (0.010, 0.90, 0.045), STEEL),                   # blade
+        add('cube', (hx, hy - 1.13, hz), (0.006, 0.03, 0.016), STEEL, rot=(0, 0, 0)),
         add('sphere', (hx, hy + 0.17, hz), (0.018, 0.018, 0.018), RUBY),                 # pommel gem
     ]
     for p in parts: attach(p, 'hand_r' if sign < 0 else 'hand_l')
