@@ -14,4 +14,12 @@ Test builds: `/skeleton-1/` (first), `/skeleton-2/` (facing fix + new lightning)
 ## Known limits
 - One sword swing in the library: attack 2 plays it backwards, attack 3 is a slower copy.
 - The hero is dark purple on a dark cathedral and the skull is a few pixels: a brighter palette or rim light would help.
-- Enemies are still coloured boxes. They need sprites and code to draw them.
+- Enemy attack animations are one swing re-used (wind-up, strike and recover are slices of it), so the Guard's three-hit string looks the same each hit.
+
+## Enemies (test build `/skeleton-3/`)
+All seven enemies are drawn from pre-rendered sprites (`art/enemies/<id>/`), built with `tools/art/enemy_render.py` and `enemy_pixel.py`:
+- Shambler, Crown Guard (Peasant outfit), Penitent (hooded Ranger outfit + shield + spear), Powder Pilgrim (Puglin + keg), Crown Brute (Imp + crown).
+- Ember Wisp and Cinder Bat are built from scratch in Blender.
+- Each has idle, move, wind-up, strike, recover, stun, death (and dash for the chargers). `EnemyVisual` stretches wind-up, strike and recovery to the gameplay timings.
+- Every enemy has a painted glowing eye so tests can check which way it faces (`tests/test_enemy_visual.gd`).
+- Credits: `game/art/enemies/CREDITS.md`.
