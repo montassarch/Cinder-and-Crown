@@ -1,5 +1,7 @@
 # Roadmap
 
+The full working list (decisions, art gaps, code leftovers) is in [Backlog](Backlog.md).
+
 ## Phase 1: Prototype sandbox
 - [x] 1. Install Godot 4.3+ and create the project in `game/`, with a folder structure built for growth
 - [x] 2. Player: run, jump, roll, melee attack, health
