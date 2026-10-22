@@ -8,6 +8,7 @@
 [resource]
 script = ExtResource("1_data")
 display_name = "Crown Brute"
+art = "crown_brute"
 max_health = 80
 move_speed_tiles = 1.8
 attack_damage = 20

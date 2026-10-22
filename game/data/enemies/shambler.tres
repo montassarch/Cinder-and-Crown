@@ -5,6 +5,7 @@
 [resource]
 script = ExtResource("1_data")
 display_name = "Shambler"
+art = "shambler"
 max_health = 30
 move_speed_tiles = 2.5
 attack_damage = 8

@@ -7,6 +7,7 @@
 [resource]
 script = ExtResource("1_data")
 display_name = "Penitent"
+art = "penitent"
 max_health = 40
 move_speed_tiles = 1.6
 attack_damage = 12

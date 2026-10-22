@@ -90,6 +90,8 @@ var _shield_flash_left: float = 0.0
 var _poise: int = 0
 var _poise_idle: float = 0.0
 var _vulnerable_left: float = 0.0
+## The sprite, when this enemy has art (the coloured box is then hidden but keeps carrying the state colour).
+var _art: EnemyVisual
 
 @onready var _health: Health = $Health
 @onready var _body: ColorRect = $Body
@@ -126,6 +128,12 @@ func health() -> Health:
 
 func body_color() -> Color:
 	return _body.color
+
+
+## Highest point of the enemy: its sprite's head when it has one, else the top of its box.
+func head_top() -> float:
+	var hitbox_top := -GameConfig.tiles(data.body_size_tiles.y) / 2.0
+	return minf(hitbox_top, _art.head_top()) if _art != null else hitbox_top
 
 
 ## +1 when the enemy faces right, -1 left.
@@ -336,6 +344,17 @@ func _physics_process(delta: float) -> void:
 		velocity.y = _dive_velocity.y
 	move_and_slide()
 	queue_redraw()  # the tell and the poise pips change with the state, so redraw every frame
+	_update_art()
+
+
+## Shows the sprite for what the enemy is doing, tinted when it is stunned, broken or blocking.
+func _update_art() -> void:
+	if _art == null:
+		return
+	var move: EnemyMove = _move if _move != null else data.effective_moves()[0]
+	var colour := _body.color
+	var tint := Color.WHITE if colour == data.tint or colour == TELEGRAPH_FLASH else colour.lerp(Color.WHITE, 0.2)
+	_art.show_state(_state, _facing, absf(velocity.x) > 1.0, move.kind, move.telegraph_seconds, move.active_seconds, move.recovery_seconds, tint)
 
 
 func _tick_poise(delta: float) -> void:
@@ -564,13 +583,18 @@ func _on_health_died() -> void:
 
 
 ## Takes the enemy out of the fight: no more timers, no body, no hurtbox, freed shortly.
-func _leave_play() -> void:
+func _leave_play(show_death: bool = true) -> void:
 	_state = State.DEAD
 	_move = null
 	_telegraph_timer.stop()
 	_recovery_timer.stop()
 	_stun_timer.stop()
 	_body.visible = false
+	if _art != null:
+		if show_death:
+			_art.play_death()
+		else:
+			_art.visible = false
 	_hurtbox.set_deferred("monitorable", false)
 	_shape.set_deferred("disabled", true)
 	_hurtbox_shape.set_deferred("disabled", true)
@@ -591,7 +615,7 @@ func _explode(move: EnemyMove) -> void:
 	flash.global_position = global_position
 	flash.create_tween().tween_property(flash, "modulate:a", 0.0, BLAST_FLASH_SECONDS)
 	get_tree().create_timer(BLAST_FLASH_SECONDS + 0.05).timeout.connect(flash.queue_free)
-	_leave_play()
+	_leave_play(false)
 	exploded.emit()
 
 
@@ -610,13 +634,24 @@ func _apply_data() -> void:
 	_body.color = data.tint
 	_poise = data.poise
 	_health.setup(data.max_health)
+	if _art != null:
+		_art.queue_free()
+		_art = null
+	_body.visible = true
+	if data.art != "" and EnemyVisual.has_art(data.art):
+		_art = EnemyVisual.new()
+		_art.name = "Art"
+		add_child(_art)
+		_art.setup(data.art, size.y / 2.0)
+		_body.visible = false
 
 
 func _draw() -> void:
 	draw_count += 1
 	if data == null or _state == State.DEAD:
 		return
-	var top := -GameConfig.tiles(data.body_size_tiles.y) / 2.0
+	var hitbox_top := -GameConfig.tiles(data.body_size_tiles.y) / 2.0
+	var top := head_top()
 	if _state == State.TELEGRAPH:
 		var color := tell_color()
 		var center := Vector2(0.0, top - TELL_HEIGHT_PIXELS)
@@ -629,7 +664,7 @@ func _draw() -> void:
 		draw_dashed_line(path[0], path[1], tell_color(), 1.5, 4.0)
 	var ground := ground_tell_radius()
 	if ground > 0.0:
-		var feet := Vector2(0.0, -top)
+		var feet := Vector2(0.0, -hitbox_top)
 		draw_arc(feet, ground, 0.0, TAU, 32, tell_color(), 1.5)
 	if data.poise > 0:
 		var width := data.poise * POISE_PIP_SIZE + (data.poise - 1) * POISE_PIP_GAP

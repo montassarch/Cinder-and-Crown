@@ -7,6 +7,8 @@ enum Behaviour { CHASER, FLYER, CHARGER, KEEP_DISTANCE }
 enum Pattern { SEQUENCE, RANDOM }
 
 @export var display_name: String = ""
+## Folder of this enemy's sprites under art/enemies/ ("" draws a plain coloured box).
+@export var art: String = ""
 @export var max_health: int = 20
 @export var move_speed_tiles: float = 2.0
 @export var attack_damage: int = 5
