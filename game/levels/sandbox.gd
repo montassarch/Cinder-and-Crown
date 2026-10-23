@@ -54,6 +54,7 @@ func _ready() -> void:
 	_camera.global_position = player.global_position
 
 	_hud.bind(player, enemy_count)
+	_touch.bind(player)
 	_menu.spawn_requested.connect(spawn_enemy)
 	_menu.clear_requested.connect(clear_enemies)
 	_menu.weapon_assigned.connect(assign_weapon)
