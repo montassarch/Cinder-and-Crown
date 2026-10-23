@@ -80,10 +80,32 @@ func test_the_bolt_lands_on_the_sword_tip() -> void:
 	var bolt: AnimatedSprite2D = effect.get_node("Bolt")
 	player.storm_struck.emit()
 	await _frames(2)
-	var tip := effect.blade()[1]
-	# the sprite's bottom edge sits on the tip, horizontally centred
-	var size := Vector2(bolt.sprite_frames.get_frame_texture(&"default", 0).get_size())
-	assert_vector(bolt.position + Vector2(size.x / 2.0, size.y)).is_equal_approx(tip, Vector2(1.5, 1.5))
+	# the art's pivot is the bolt's foot, so the sprite sits right on the tip
+	assert_vector(bolt.position).is_equal_approx(effect.blade()[1], Vector2(0.01, 0.01))
+
+
+func test_the_blade_lightning_lies_along_the_sword() -> void:
+	var player := _player()
+	var effect: StormEffect = player.get_node("StormEffect")
+	player._storm_left = Player.STORM_SECONDS
+	await _frames(2)
+	var seg := effect.blade()
+	var sprite: AnimatedSprite2D = effect.get_node("Blue").get_child(0)
+	assert_vector(sprite.position).is_equal_approx(seg[0], Vector2(0.01, 0.01))
+	assert_float(sprite.rotation).is_equal_approx((seg[1] - seg[0]).angle(), 0.01)
+	# the art is 0.93 m of blade; it is scaled so that length matches the real sword
+	assert_float(sprite.scale.x * StormEffect.ART_BLADE_PIXELS).is_equal_approx(seg[0].distance_to(seg[1]), 0.05)
+
+
+func test_the_lightning_is_added_over_the_scene() -> void:
+	var effect: StormEffect = _player().get_node("StormEffect")
+	var sprites: Array[AnimatedSprite2D] = [effect.get_node("Bolt")]
+	for group in ["Blue", "Red"]:
+		for child in effect.get_node(group).get_children():
+			sprites.append(child)
+	for sprite in sprites:
+		assert_object(sprite.material).is_instanceof(CanvasItemMaterial)
+		assert_int((sprite.material as CanvasItemMaterial).blend_mode).is_equal(CanvasItemMaterial.BLEND_MODE_ADD)
 
 
 func test_the_sword_crackles_blue_while_charged_and_stops_when_the_charge_ends() -> void:

@@ -1,15 +1,15 @@
 class_name StormEffect
 extends Node2D
-## The hero's sword lightning, played from pre-rendered sprites (see LightningArt): a blue bolt falls from the
-## sky onto the sword tip when the Storm strikes, the blade crackles blue while the charge lasts (fading over the
-## final STORM_FADE_SECONDS), and it crackles red during Crimson Rend (the wave itself is RendWave).
-## HeroBlade has the blade's position in every animation frame, so the sprites follow the real sword.
+## The hero's sword lightning, played from pre-rendered, smooth glowing sprites (see LightningArt): a blue bolt falls
+## from the sky onto the sword tip when the Storm strikes, blue lightning is wrapped round the blade while the
+## charge lasts (fading over the final STORM_FADE_SECONDS), and it is red during Crimson Rend (the wave itself is
+## RendWave). HeroBlade has the blade's position in every animation frame; the blade lightning is laid along it.
 
 const BOLT_SECONDS: float = 0.22
 const BOLT_FPS: float = 8.0 / BOLT_SECONDS
-const CRACKLE_FPS: float = 18.0
-## Where along the blade (guard 0 .. tip 1) each crackle sits.
-const CRACKLE_AT: Array[float] = [1.0, 0.5]
+const BLADE_FPS: float = 20.0
+## The blade lightning art is drawn round a blade this long, in texture pixels (0.93 m at 150 px/m).
+const ART_BLADE_PIXELS: float = 139.5
 
 const State := PlayerStateMachine.PlayerState
 
@@ -24,20 +24,18 @@ var _red: Node2D
 func _ready() -> void:
 	_bolt = LightningArt.sprite(&"bolt_blue", BOLT_FPS, false)
 	_bolt.name = "Bolt"
-	_bolt.centered = false
 	_bolt.visible = false
 	add_child(_bolt)
-	_blue = _crackles(&"crackle_blue", "Blue")
-	_red = _crackles(&"crackle_red", "Red")
+	_blue = _blade_lightning(&"blade_blue", "Blue")
+	_red = _blade_lightning(&"blade_red", "Red")
 
 
-func _crackles(art: StringName, node_name: String) -> Node2D:
+func _blade_lightning(art: StringName, node_name: String) -> Node2D:
 	var group := Node2D.new()
 	group.name = node_name
-	for at in CRACKLE_AT:
-		var sprite := LightningArt.sprite(art, CRACKLE_FPS, true)
-		sprite.visible = false
-		group.add_child(sprite)
+	var sprite := LightningArt.sprite(art, BLADE_FPS, true)
+	sprite.visible = false
+	group.add_child(sprite)
 	add_child(group)
 	return group
 
@@ -90,20 +88,23 @@ func _physics_process(delta: float) -> void:
 	if _bolt_left <= 0.0:
 		_bolt.visible = false
 	else:
-		var size := Vector2(_bolt.sprite_frames.get_frame_texture(&"default", 0).get_size())
-		_bolt.position = seg[1] - Vector2(size.x / 2.0, size.y)
+		_bolt.position = seg[1]
 	var raging := _player.state() == State.REND
 	var alpha := 1.0 if raging else charge_alpha()
 	_place_crackles(_blue, seg, alpha if not raging else 0.0)
 	_place_crackles(_red, seg, alpha if raging else 0.0)
 
 
-## Shows a group of crackles along the blade at `alpha`, or hides it.
+## Lays a group's lightning along the blade (guard to tip) at `alpha`, or hides it.
 func _place_crackles(group: Node2D, seg: PackedVector2Array, alpha: float) -> void:
 	var on := alpha > 0.0
-	for i in group.get_child_count():
-		var sprite := group.get_child(i) as AnimatedSprite2D
+	var along := seg[1] - seg[0]
+	for child in group.get_children():
+		var sprite := child as AnimatedSprite2D
 		sprite.visible = on
 		if on:
 			sprite.modulate.a = alpha
-			sprite.position = seg[0].lerp(seg[1], CRACKLE_AT[i])
+			sprite.position = seg[0]
+			sprite.rotation = along.angle()
+			var s := maxf(along.length(), 1.0) / ART_BLADE_PIXELS
+			sprite.scale = Vector2(s, s)

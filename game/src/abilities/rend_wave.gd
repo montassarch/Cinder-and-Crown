@@ -15,10 +15,7 @@ const LIFT_TILES: float = 0.1
 const WORLD_MASK: int = 1
 const ENEMY_HURTBOX_MASK: int = 16
 
-## The art is 64 x 48 px, faces right, with its head on the right edge and its bottom on the ground.
 const ART_FPS: float = 20.0
-const ART_SIZE := Vector2(64.0, 48.0)
-const ART_HEAD_X: float = 62.0
 
 var direction: float = 1.0
 
@@ -41,17 +38,15 @@ func _init() -> void:
 	_shape = shape
 	_art = LightningArt.sprite(&"wave_red", ART_FPS, true)
 	_art.name = "Art"
-	_art.centered = false
-	_art.flip_h = direction < 0.0
 	add_child(_art)
 
 
 func _ready() -> void:
 	area_entered.connect(_on_area_entered)
-	# `direction` is set after _init, so the sprite is placed now
-	_art.flip_h = direction < 0.0
-	var head_x := ART_HEAD_X if direction >= 0.0 else ART_SIZE.x - ART_HEAD_X - 1.0
-	_art.position = Vector2(-head_x, -ART_SIZE.y - GameConfig.tiles(LIFT_TILES))
+	# `direction` is set after _init, so the sprite is turned now: its pivot (the head on the ground) is the node's
+	# origin, and a negative x scale mirrors the art about it
+	_art.scale.x = absf(_art.scale.x) * signf(direction)
+	_art.position = Vector2(0.0, -GameConfig.tiles(LIFT_TILES))
 
 
 func _physics_process(delta: float) -> void:

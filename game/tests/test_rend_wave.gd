@@ -62,16 +62,19 @@ func test_the_wave_is_a_red_lightning_sprite_facing_the_way_it_travels() -> void
 	var right: AnimatedSprite2D = _wave(1.0).get_node("Art")
 	var left: AnimatedSprite2D = _wave(-1.0).get_node("Art")
 	assert_int(right.sprite_frames.get_frame_count(&"default")).is_equal(6)
-	assert_vector(Vector2(right.sprite_frames.get_frame_texture(&"default", 0).get_size())).is_equal(Vector2(64, 48))
-	assert_bool(right.flip_h).is_false()
-	assert_bool(left.flip_h).is_true()
+	assert_vector(Vector2(right.sprite_frames.get_frame_texture(&"default", 0).get_size())).is_equal(Vector2(384, 288))
+	assert_float(signf(right.scale.x)).is_equal(1.0)
+	assert_float(signf(left.scale.x)).is_equal(-1.0)
+	assert_int((right.material as CanvasItemMaterial).blend_mode).is_equal(CanvasItemMaterial.BLEND_MODE_ADD)
 
 func test_the_sprite_head_sits_at_the_front_of_the_wave() -> void:
 	var right: AnimatedSprite2D = _wave(1.0).get_node("Art")
 	var left: AnimatedSprite2D = _wave(-1.0).get_node("Art")
-	# art faces right with its head on the right edge; the head must be at the node's origin
-	assert_float(right.position.x + 62.0).is_equal_approx(0.0, 1.0)
-	assert_float(left.position.x + 1.0).is_equal_approx(0.0, 1.0)
+	# the art's pivot is the wave's head on the ground; mirroring about the node keeps the head at the origin
+	assert_vector(right.offset).is_equal(-LightningArt.PIVOTS[&"wave_red"])
+	assert_vector(left.offset).is_equal(-LightningArt.PIVOTS[&"wave_red"])
+	assert_float(right.position.x).is_equal_approx(0.0, 0.01)
+	assert_float(left.position.x).is_equal_approx(0.0, 0.01)
 
 func test_the_wave_fades_toward_the_end_of_its_range() -> void:
 	var wave := _wave()
