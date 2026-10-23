@@ -36,7 +36,7 @@ class Painter:
 
     def tube(self, pts, r):
         for scale, m in ((0.5, self.mats[2]), (0.2, self.mats[1]), (0.075, self.mats[0])):
-            cu = bpy.data.curves.new('t', 'CURVE'); cu.dimensions = '3D'; cu.bevel_depth = r * scale * 1.5; cu.bevel_resolution = 3; cu.fill_mode = 'FULL'
+            cu = bpy.data.curves.new('t', 'CURVE'); cu.dimensions = '3D'; cu.bevel_depth = r * scale * 2.7; cu.bevel_resolution = 3; cu.fill_mode = 'FULL'
             sp = cu.splines.new('POLY'); sp.points.add(len(pts) - 1)
             n = max(len(pts) - 1, 1)
             for i, (p, co) in enumerate(zip(sp.points, pts)):
@@ -86,7 +86,7 @@ sc.world.node_tree.nodes['Background'].inputs['Strength'].default_value = 0.0
 sc.use_nodes = True; nt = sc.node_tree
 for n in list(nt.nodes): nt.nodes.remove(n)
 rl = nt.nodes.new('CompositorNodeRLayers'); gl = nt.nodes.new('CompositorNodeGlare'); comp = nt.nodes.new('CompositorNodeComposite')
-gl.glare_type = 'FOG_GLOW'; gl.quality = 'HIGH'; gl.threshold = 0.5; gl.size = 7; gl.mix = 0.0
+gl.glare_type = 'FOG_GLOW'; gl.quality = 'HIGH'; gl.threshold = 0.4; gl.size = 8; gl.mix = 0.0
 nt.links.new(rl.outputs['Image'], gl.inputs['Image']); nt.links.new(gl.outputs['Image'], comp.inputs['Image'])
 
 def save(setname, i):
