@@ -11,6 +11,16 @@ Written 2026-10-22. The roadmap (`Roadmap.md`) has the big phases; this is the f
 - [ ] The Windows build exports but was never launched.
 - [ ] Licence note: the repo holds derived Quaternius frames (QAL: fine in a game, not redistributable as assets) and the Hero Knight source (keep the repo private or remove `tools/art/source/` before making it public).
 
+## Found by playtesting (2026-10-24; bot runs plus a real-browser session on the touch-ui build)
+- [ ] **HIGH: the hero is hidden under the controls at the ends of a level.** The camera stops at the level edges, so at the exit the hero stands at the right edge under the thumb cluster, and at the start at the left edge under the stick. Fix: let the camera run past the ends (about 8 tiles right, 4 left) so the hero can stand mid-screen.
+- [ ] **MEDIUM: a Cinder Bat can hover on a ledge above the hero** and stall the fight: it cannot dive through the platform and the hero cannot reach it. It happened in every early bot run where a bat appeared. Fix: dive only with a clear line to the hero, else slide off the ledge edge.
+- [ ] **MEDIUM: the floating stick ring is fairly opaque** and can cover the hero when it lands there. Lighten the ring or show only the rim.
+- [ ] Waves stack: rushing through rooms left up to 15 enemies alive at once. Consider capping live enemies or gating the next wave.
+- [ ] Balance: the bot averaged ~45 s per level, rarely needed the flask, and survived 10 minutes at depths 0-7 (it dies 1-2 times in 400 s starting at depth 8). Early depths look easy for a competent player.
+- [ ] Web build is 43 MB (39.5 MB is the engine); first load time on a phone is not measured.
+- Clean results: no script errors in 14 bot runs (about 2 hours of game time), no leaked nodes (node count stays flat, zero orphans), every enemy type appeared and died, the shop, boons and level changes all worked.
+- Playtest bot: `game/tools/playtest_bot.gd` (usage in its header).
+
 ## Art and feel (known gaps)
 - [ ] Hero: dark purple on a dark cathedral, skull is a few pixels. Brighter palette, rim light, or a larger render. The painted-eye trick used on enemies could help.
 - [ ] Combat animations: the library has one sword swing. Attack 2 plays it backwards, attack 3 is a slow copy; the Guard's three-hit string and the Penitent's thrust reuse it. Needs custom posed animations (scripted in Blender).
