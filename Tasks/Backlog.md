@@ -12,9 +12,10 @@ Written 2026-10-22. The roadmap (`Roadmap.md`) has the big phases; this is the f
 - [ ] Licence note: the repo holds derived Quaternius frames (QAL: fine in a game, not redistributable as assets) and the Hero Knight source (keep the repo private or remove `tools/art/source/` before making it public).
 
 ## Found by playtesting (2026-10-24; bot runs plus a real-browser session on the touch-ui build)
-- [ ] **HIGH: the hero is hidden under the controls at the ends of a level.** The camera stops at the level edges, so at the exit the hero stands at the right edge under the thumb cluster, and at the start at the left edge under the stick. Fix: let the camera run past the ends (about 8 tiles right, 4 left) so the hero can stand mid-screen.
-- [ ] **MEDIUM: a Cinder Bat can hover on a ledge above the hero** and stall the fight: it cannot dive through the platform and the hero cannot reach it. It happened in every early bot run where a bat appeared. Fix: dive only with a clear line to the hero, else slide off the ledge edge.
-- [ ] **MEDIUM: the floating stick ring is fairly opaque** and can cover the hero when it lands there. Lighten the ring or show only the rim.
+- [x] **HIGH (fixed, `/touch-2/`): the hero is hidden under the controls at the ends of a level.** The camera stops at the level edges, so at the exit the hero stands at the right edge under the thumb cluster, and at the start at the left edge under the stick. Fix: let the camera run past the ends (about 8 tiles right, 4 left) so the hero can stand mid-screen.
+- [x] **MEDIUM (fixed): a Cinder Bat can hover on a ledge above the hero** and stall the fight: it cannot dive through the platform and the hero cannot reach it. It happened in every early bot run where a bat appeared. Fix: dive only with a clear line to the hero, else slide off the ledge edge.
+- [x] **MEDIUM (fixed): the floating stick ring is fairly opaque** and can cover the hero when it lands there. Lighten the ring or show only the rim.
+- [ ] **New: ledge safe spot.** Ground enemies cannot path up to a hero standing on a ledge; they gather underneath, unable to hit or be hit. Consider making ground enemies jump or wait at the edge, or letting the hero strike down.
 - [ ] Waves stack: rushing through rooms left up to 15 enemies alive at once. Consider capping live enemies or gating the next wave.
 - [ ] Balance: the bot averaged ~45 s per level, rarely needed the flask, and survived 10 minutes at depths 0-7 (it dies 1-2 times in 400 s starting at depth 8). Early depths look easy for a competent player.
 - [ ] Web build is 43 MB (39.5 MB is the engine); first load time on a phone is not measured.
