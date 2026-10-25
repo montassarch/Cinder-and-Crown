@@ -331,9 +331,11 @@ func _physics_process(delta: float) -> void:
 	var foe := _current_target()
 	if _state == State.TELEGRAPH and _move != null and _move.kind == EnemyMove.Kind.DIVE and not is_committed() and foe != null:
 		_dive_target = foe.global_position
-	if data.shielded and foe != null and _state == State.MOVE:  # not while recovering: its back stays open
+	# Every enemy looks at the hero while it walks toward him. Not while winding up, striking or recovering: its
+	# direction is then fixed (a shielded enemy's back stays open while it recovers).
+	if foe != null and _state == State.MOVE:
 		var side := foe.global_position.x - global_position.x
-		if side != 0.0:
+		if absf(side) > 1.0:
 			_facing = signf(side)
 	var move_x := 0.0
 	match _state:
