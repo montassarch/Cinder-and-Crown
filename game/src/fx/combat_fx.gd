@@ -3,7 +3,6 @@ extends Node
 ## The combat effects: a slash arc on every swing, a spark and a damage number where a hit lands, a burst when an
 ## enemy dies, a ring when the hero parries, screen shake for all of it. Everything is added over the scene.
 
-const SLASH_ART := [&"slash_a", &"slash_b", &"slash_c"]
 const SLASH_TINT := Color(0.86, 0.94, 1.0)
 const SLASH_STORM_TINT := Color(0.45, 0.72, 1.0)
 const SLASH_FORWARD_PIXELS: float = 9.0
@@ -27,7 +26,7 @@ func bind(level: Node2D, player: Player, camera: Camera2D) -> void:
 	_shake = CameraShake.new()
 	_shake.name = "CameraShake"
 	camera.add_child(_shake)
-	player.swung.connect(_on_swung)
+	player.move_started.connect(_on_move_started)
 	player.hit_landed.connect(_on_hit_landed)
 	player.parried.connect(_on_parried)
 	var health: Health = player.get_node("Health")
@@ -44,11 +43,13 @@ func watch_enemy(enemy: Enemy) -> void:
 	enemy.died.connect(_on_enemy_died.bind(enemy))
 
 
-func _on_swung(step: int, facing: float) -> void:
+func _on_move_started(move: WeaponMove, facing: float) -> void:
+	if move == null or move.fx == &"":
+		return
 	var tint := SLASH_STORM_TINT if _player.storm_seconds_left() > 0.0 else SLASH_TINT
-	var at := _player.global_position + Vector2(facing * SLASH_FORWARD_PIXELS, SLASH_CHEST_PIXELS)
-	var size := 1.18 if step == 2 else 1.0
-	FxSprite.spawn(_level, SLASH_ART[clampi(step, 0, SLASH_ART.size() - 1)], at, 0.0, facing < 0.0, tint, size)
+	var forward := SLASH_FORWARD_PIXELS + GameConfig.tiles(move.fx_forward_tiles)
+	var at := _player.global_position + Vector2(facing * forward, SLASH_CHEST_PIXELS)
+	FxSprite.spawn(_level, move.fx, at, 0.0, facing < 0.0, tint, move.fx_scale)
 
 
 func _on_hit_landed(target: Node, damage: int) -> void:

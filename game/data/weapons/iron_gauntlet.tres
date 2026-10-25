@@ -1,0 +1,97 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="Script" path="res://src/weapons/weapon_data.gd" id="1_data"]
+[ext_resource type="Script" path="res://src/weapons/weapon_move.gd" id="2_move"]
+
+[sub_resource type="Resource" id="move_1"]
+script = ExtResource("2_move")
+display_name = "Jab"
+damage_multiplier = 1.0
+duration = 0.22
+hit_window = Vector2(0.05, 0.13)
+hitbox_size_tiles = Vector2(1.1, 1.0)
+hitbox_offset_tiles = Vector2(0.9, 0)
+knockback_tiles = 0.6
+hit_stop_seconds = 0.04
+lunge_tiles_per_second = 2.0
+dive_speed_tiles = 0.0
+anim = &"attack1"
+fx = &"slash_a"
+fx_scale = 0.7
+fx_forward_tiles = 0.0
+
+[sub_resource type="Resource" id="move_2"]
+script = ExtResource("2_move")
+display_name = "Cross"
+damage_multiplier = 1.2
+duration = 0.24
+hit_window = Vector2(0.06, 0.15)
+hitbox_size_tiles = Vector2(1.2, 1.1)
+hitbox_offset_tiles = Vector2(0.9, 0)
+knockback_tiles = 1.0
+hit_stop_seconds = 0.05
+lunge_tiles_per_second = 3.0
+dive_speed_tiles = 0.0
+anim = &"attack2"
+fx = &"slash_b"
+fx_scale = 0.8
+fx_forward_tiles = 0.0
+
+[sub_resource type="Resource" id="move_3"]
+script = ExtResource("2_move")
+display_name = "Uppercut"
+damage_multiplier = 2.2
+duration = 0.4
+hit_window = Vector2(0.1, 0.24)
+hitbox_size_tiles = Vector2(1.1, 2.0)
+hitbox_offset_tiles = Vector2(0.8, -0.5)
+knockback_tiles = 3.0
+hit_stop_seconds = 0.1
+lunge_tiles_per_second = 0.0
+dive_speed_tiles = 0.0
+anim = &"attack3"
+fx = &"slash_c"
+fx_scale = 0.9
+fx_forward_tiles = 0.0
+
+[sub_resource type="Resource" id="move_4"]
+script = ExtResource("2_move")
+display_name = "Ground Slam"
+damage_multiplier = 2.0
+duration = 0.45
+hit_window = Vector2(0.12, 0.34)
+hitbox_size_tiles = Vector2(2.6, 1.4)
+hitbox_offset_tiles = Vector2(0.3, 0.8)
+knockback_tiles = 2.5
+hit_stop_seconds = 0.1
+lunge_tiles_per_second = 0.0
+dive_speed_tiles = 28.0
+anim = &"attack3"
+fx = &"slash_c"
+fx_scale = 1.0
+fx_forward_tiles = 0.0
+
+[sub_resource type="Resource" id="move_5"]
+script = ExtResource("2_move")
+display_name = "Shoulder Charge"
+damage_multiplier = 1.5
+duration = 0.35
+hit_window = Vector2(0.05, 0.28)
+hitbox_size_tiles = Vector2(1.6, 1.6)
+hitbox_offset_tiles = Vector2(0.9, 0)
+knockback_tiles = 3.5
+hit_stop_seconds = 0.08
+lunge_tiles_per_second = 9.0
+dive_speed_tiles = 0.0
+anim = &"attack1"
+fx = &"slash_a"
+fx_scale = 1.0
+fx_forward_tiles = 0.0
+
+[resource]
+script = ExtResource("1_data")
+display_name = "Iron Gauntlet"
+damage = 6
+chain = Array[ExtResource("2_move")]([SubResource("move_1"), SubResource("move_2"), SubResource("move_3")])
+air_move = SubResource("move_4")
+roll_move = SubResource("move_5")

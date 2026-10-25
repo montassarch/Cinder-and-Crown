@@ -1,0 +1,116 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="Script" path="res://src/weapons/weapon_data.gd" id="1_data"]
+[ext_resource type="Script" path="res://src/weapons/weapon_move.gd" id="2_move"]
+
+[sub_resource type="Resource" id="move_1"]
+script = ExtResource("2_move")
+display_name = "Bolt"
+kind = 1
+damage_multiplier = 1.0
+duration = 0.4
+hit_window = Vector2(0.15, 0.25)
+hitbox_size_tiles = Vector2(1.5, 1.0)
+hitbox_offset_tiles = Vector2(1.0, 0.0)
+knockback_tiles = 0.6
+hit_stop_seconds = 0.05
+lunge_tiles_per_second = -1.0
+dive_speed_tiles = 0.0
+anim = &"storm"
+fx = &""
+fx_scale = 1.0
+fx_forward_tiles = 0.0
+projectile_count = 1
+projectile_angle_degrees = 0.0
+projectile_spread_degrees = 0.0
+projectile_speed_tiles = 14.0
+projectile_range_tiles = 12.0
+projectile_pierce = 0
+projectile_tint = Color(0.75, 0.55, 1.0, 1)
+projectile_radius = 3.0
+
+[sub_resource type="Resource" id="move_2"]
+script = ExtResource("2_move")
+display_name = "Arc Orb"
+kind = 1
+damage_multiplier = 1.6
+duration = 0.6
+hit_window = Vector2(0.3, 0.4)
+hitbox_size_tiles = Vector2(1.5, 1.0)
+hitbox_offset_tiles = Vector2(1.0, 0.0)
+knockback_tiles = 1.5
+hit_stop_seconds = 0.07
+lunge_tiles_per_second = 0.0
+dive_speed_tiles = 0.0
+anim = &"storm"
+fx = &""
+fx_scale = 1.0
+fx_forward_tiles = 0.0
+projectile_count = 1
+projectile_angle_degrees = 0.0
+projectile_spread_degrees = 0.0
+projectile_speed_tiles = 8.0
+projectile_range_tiles = 8.0
+projectile_pierce = 3
+projectile_tint = Color(0.9, 0.6, 1.0, 1)
+projectile_radius = 5.0
+
+[sub_resource type="Resource" id="move_3"]
+script = ExtResource("2_move")
+display_name = "Meteor Spark"
+kind = 1
+damage_multiplier = 1.4
+duration = 0.4
+hit_window = Vector2(0.12, 0.22)
+hitbox_size_tiles = Vector2(1.5, 1.0)
+hitbox_offset_tiles = Vector2(1.0, 0.0)
+knockback_tiles = 1.0
+hit_stop_seconds = 0.05
+lunge_tiles_per_second = 0.0
+dive_speed_tiles = 0.0
+anim = &"storm"
+fx = &""
+fx_scale = 1.0
+fx_forward_tiles = 0.0
+projectile_count = 1
+projectile_angle_degrees = 55.0
+projectile_spread_degrees = 0.0
+projectile_speed_tiles = 16.0
+projectile_range_tiles = 10.0
+projectile_pierce = 0
+projectile_tint = Color(1.0, 0.65, 0.4, 1)
+projectile_radius = 3.5
+
+[sub_resource type="Resource" id="move_4"]
+script = ExtResource("2_move")
+display_name = "Scatter"
+kind = 1
+damage_multiplier = 0.5
+duration = 0.4
+hit_window = Vector2(0.1, 0.2)
+hitbox_size_tiles = Vector2(1.5, 1.0)
+hitbox_offset_tiles = Vector2(1.0, 0.0)
+knockback_tiles = 0.5
+hit_stop_seconds = 0.05
+lunge_tiles_per_second = 0.0
+dive_speed_tiles = 0.0
+anim = &"storm"
+fx = &""
+fx_scale = 1.0
+fx_forward_tiles = 0.0
+projectile_count = 5
+projectile_angle_degrees = 0.0
+projectile_spread_degrees = 40.0
+projectile_speed_tiles = 14.0
+projectile_range_tiles = 9.0
+projectile_pierce = 0
+projectile_tint = Color(0.6, 0.8, 1.0, 1)
+projectile_radius = 2.5
+
+[resource]
+script = ExtResource("1_data")
+display_name = "Ash Wand"
+damage = 6
+chain = Array[ExtResource("2_move")]([SubResource("move_1"), SubResource("move_2")])
+air_move = SubResource("move_3")
+roll_move = SubResource("move_4")

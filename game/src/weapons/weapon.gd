@@ -7,6 +7,9 @@ extends Node2D
 signal hit_landed(target: Node, damage: int)
 
 const ENEMY_HURTBOX_MASK: int = 16
+## Where a shot leaves the hero, ahead of him, in pixels.
+const MUZZLE_FORWARD_PIXELS: float = 10.0
+const MUZZLE_HEIGHT_PIXELS: float = -4.0
 
 var data: WeaponData
 ## Temporary modifiers from abilities (Storm Blade sets these while the blade is charged).
@@ -18,11 +21,15 @@ var damage_multiplier: float = 1.0
 ## Scales the next landed hit only (a riposte); whoever sets it clears it.
 var next_hit_multiplier: float = 1.0
 var rng := RandomNumberGenerator.new()
+## Where shots are added (the level); the current scene when unset.
+var projectile_parent: Node
 
 var _elapsed: float = 0.0
 ## Real seconds per second of swing time; > 1 plays the whole swing (and its hit window) slower.
 var _duration_scale: float = 1.0
 var _attacking: bool = false
+var _fired: bool = false
+var _move: WeaponMove
 var _facing: float = 1.0
 var _hit_targets: Array[Node] = []
 var _hitbox: Area2D
@@ -51,6 +58,7 @@ func _physics_process(delta: float) -> void:
 func equip(new_data: WeaponData) -> void:
 	cancel_attack()
 	data = new_data
+	_move = data.chain_move(0) if data != null else null
 	_apply_geometry()
 
 
@@ -59,10 +67,18 @@ func set_facing(facing: float) -> void:
 	_apply_geometry()
 
 
+## The weapon's first strike (the plain swing).
 func start_attack(duration_scale: float = 1.0) -> void:
-	if data == null:
+	start_move(data.chain_move(0) if data != null else null, duration_scale)
+
+
+func start_move(move: WeaponMove, duration_scale: float = 1.0) -> void:
+	if data == null or move == null:
 		return
+	_move = move
+	_apply_geometry()
 	_hit_targets.clear()
+	_fired = false
 	_duration_scale = maxf(duration_scale, 0.01)
 	_elapsed = 0.0
 	_attacking = true
@@ -71,6 +87,7 @@ func start_attack(duration_scale: float = 1.0) -> void:
 
 func cancel_attack() -> void:
 	_attacking = false
+	_fired = false
 	_elapsed = 0.0
 	_hit_targets.clear()
 	_sync_hitbox()
@@ -80,19 +97,27 @@ func advance(delta: float) -> void:
 	if not _attacking:
 		return
 	_elapsed += delta / _duration_scale
-	if _elapsed >= data.attack_duration:
+	if _elapsed >= _move.duration:
 		cancel_attack()
 		return
+	if _move.kind == WeaponMove.Kind.PROJECTILE and not _fired and _elapsed >= _move.hit_window.x:
+		_fired = true
+		_fire()
 	_sync_hitbox()
 
 
+func current_move() -> WeaponMove:
+	return _move
+
+
 func is_hitbox_active() -> bool:
-	return _attacking and data != null and _elapsed >= data.hit_window.x and _elapsed < data.hit_window.y
+	return _attacking and _move != null and _move.kind == WeaponMove.Kind.MELEE \
+			and _elapsed >= _move.hit_window.x and _elapsed < _move.hit_window.y
 
 
 ## The hit has come and gone; the rest of the swing is follow-through.
 func is_recovering() -> bool:
-	return _attacking and data != null and _elapsed >= data.hit_window.y
+	return _attacking and _move != null and _elapsed >= _move.hit_window.y
 
 
 func hitbox_size() -> Vector2:
@@ -110,10 +135,10 @@ func hitbox_global_rect() -> Rect2:
 
 
 func _apply_geometry() -> void:
-	if data == null:
+	if _move == null:
 		return
-	(_shape.shape as RectangleShape2D).size = GameConfig.tiles_v(data.hitbox_size_tiles.x, data.hitbox_size_tiles.y)
-	_hitbox.position = GameConfig.tiles_v(data.hitbox_offset_tiles.x * _facing, data.hitbox_offset_tiles.y)
+	(_shape.shape as RectangleShape2D).size = GameConfig.tiles_v(_move.hitbox_size_tiles.x, _move.hitbox_size_tiles.y)
+	_hitbox.position = GameConfig.tiles_v(_move.hitbox_offset_tiles.x * _facing, _move.hitbox_offset_tiles.y)
 
 
 func _sync_hitbox() -> void:
@@ -128,10 +153,30 @@ func _on_area_entered(area: Area2D) -> void:
 	if target == null or _hit_targets.has(target):
 		return
 	_hit_targets.append(target)
-	var damage := Damage.compute(data.damage + bonus_damage, damage_multiplier * next_hit_multiplier, 0)
+	strike(target, _move, global_position.x)
+
+
+## Lands one hit of `move` on `target`: damage, knockback, stun chance, the hit signal and the hit stop.
+func strike(target: Node, move: WeaponMove, source_x: float) -> void:
+	var base := roundi(data.damage * move.damage_multiplier) + bonus_damage
+	var damage := Damage.compute(base, damage_multiplier * next_hit_multiplier, 0)
 	if target.has_method("take_hit"):
-		target.take_hit(damage, global_position.x, data.knockback_tiles)
+		target.take_hit(damage, source_x, move.knockback_tiles)
 	if stun_chance > 0.0 and rng.randf() < stun_chance and target.has_method("stun"):
 		target.stun(stun_seconds)
 	hit_landed.emit(target, damage)
-	HitStop.freeze(data.hit_stop_seconds)
+	HitStop.freeze(move.hit_stop_seconds)
+
+
+func _fire() -> void:
+	var parent := projectile_parent if projectile_parent != null else get_tree().current_scene
+	if parent == null:
+		return
+	var count := maxi(_move.projectile_count, 1)
+	for i in count:
+		var fan := 0.0 if count == 1 else _move.projectile_spread_degrees * (float(i) / float(count - 1) - 0.5)
+		var angle := deg_to_rad(_move.projectile_angle_degrees + fan)
+		var shot := PlayerProjectile.new()
+		parent.add_child(shot)
+		shot.global_position = global_position + Vector2(_facing * MUZZLE_FORWARD_PIXELS, MUZZLE_HEIGHT_PIXELS)
+		shot.launch(self, _move, Vector2(_facing * cos(angle), sin(angle)))

@@ -11,6 +11,14 @@ Written 2026-10-22. The roadmap (`Roadmap.md`) has the big phases; this is the f
 - [ ] The Windows build exports but was never launched.
 - [ ] Licence note: the repo holds derived Quaternius frames (QAL: fine in a game, not redistributable as assets) and the Hero Knight source (keep the repo private or remove `tools/art/source/` before making it public).
 
+## Weapons (2026-10-25)
+- [x] Five weapons with 4-5 moves each (see `Design/Plans/2026-10-25-weapons.md`): sword, spear, gauntlet, bow, wand.
+- [ ] Play each in the sandbox (Menu, Slot A / Slot B) and tell me what feels wrong: reach, speed, damage, the lunges.
+- [ ] Per-weapon hero animations and weapon models (the hero always holds a sword; the new weapons reuse its swings).
+- [ ] Magic: real wand effects and animation (you wanted to discuss this later).
+- [ ] How the hero finds weapons in a run (drops, shop, starting choice) and whether weapons get upgrades.
+- [ ] Real arrow art for the bow.
+
 ## Found by playtesting (2026-10-24; bot runs plus a real-browser session on the touch-ui build)
 - [x] **HIGH (fixed, `/touch-2/`): the hero is hidden under the controls at the ends of a level.** The camera stops at the level edges, so at the exit the hero stands at the right edge under the thumb cluster, and at the start at the left edge under the stick. Fix: let the camera run past the ends (about 8 tiles right, 4 left) so the hero can stand mid-screen.
 - [x] **MEDIUM (fixed): a Cinder Bat can hover on a ledge above the hero** and stall the fight: it cannot dive through the platform and the hero cannot reach it. It happened in every early bot run where a bat appeared. Fix: dive only with a clear line to the hero, else slide off the ledge edge.

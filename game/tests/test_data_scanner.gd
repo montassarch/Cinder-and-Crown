@@ -23,7 +23,10 @@ func test_lists_every_shipped_enemy_and_weapon() -> void:
 		"res://data/enemies/shambler.tres",
 	])
 	assert_array(DataScanner.list("res://data/weapons")).contains_exactly([
+		"res://data/weapons/ash_wand.tres",
 		"res://data/weapons/ember_spear.tres",
+		"res://data/weapons/hunters_bow.tres",
+		"res://data/weapons/iron_gauntlet.tres",
 		"res://data/weapons/rusty_blade.tres",
 	])
 

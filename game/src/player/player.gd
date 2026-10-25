@@ -7,7 +7,9 @@ signal died
 signal mana_denied
 ## Storm Blade's bolt has struck the sword (for the lightning effect).
 signal storm_struck
-## A sword swing began (`step` is its place in the combo, 0..2; `facing` is +1 right, -1 left).
+## Every strike or shot he starts, whatever kind of move it is (the effects listen to this one).
+signal move_started(move: WeaponMove, facing: float)
+## An attack began (`step` is its place in the weapon's tap chain; `facing` is +1 right, -1 left).
 signal swung(step: int, facing: float)
 ## The sword hit something (the combat effects listen).
 signal hit_landed(target: Node, damage: int)
@@ -39,9 +41,8 @@ const DEFAULT_ATTACK_DURATION: float = 0.3
 const WEAPON_SLOTS: int = 2
 ## Attacks started within this many seconds of the last one ending continue the combo.
 const COMBO_WINDOW: float = 0.4
-const COMBO_STEPS: int = 3
-## The last hit of the combo is a heavier, slower swing.
-const FINISHER_DURATION_SCALE: float = 1.8
+## An attack this soon after a roll ends is the weapon's roll move.
+const ROLL_ATTACK_WINDOW: float = 0.25
 ## After taking a hit he pulls on the plague mask for this long.
 const MASK_SECONDS: float = 3.0
 
@@ -96,9 +97,11 @@ var _active_slot: int = 0
 var _combo_step: int = 0
 var _clock: float = 0.0
 var _last_attack_end: float = -1000.0
+var _last_roll_end: float = -1000.0
+## False after an air or roll move: the next tap starts the chain over.
+var _chain_open: bool = false
 ## A tap during a swing, kept until the swing ends (input buffering alone would expire it).
 var _attack_queued: bool = false
-var _attack_scale: float = 1.0
 var _mask_left: float = 0.0
 var _mana: Mana
 var _storm_left: float = 0.0
@@ -131,6 +134,7 @@ func _ready() -> void:
 	for slot in mini(WEAPON_SLOTS, starting_weapons.size()):
 		_weapons[slot] = starting_weapons[slot]
 	_weapon.equip(_weapons[_active_slot])
+	_weapon.projectile_parent = get_parent()
 	_mana = Mana.new()
 	_mana.name = "Mana"
 	_mana.max_mana = MANA_MAX
@@ -185,8 +189,11 @@ func _physics_process(delta: float) -> void:
 
 func _update_visual() -> void:
 	var action := ROLL_DURATION
-	if _state == State.ATTACK and _weapon.data != null:
-		action = _weapon.data.attack_duration * _attack_scale
+	var move := _weapon.current_move()
+	var anim := &""
+	if _state == State.ATTACK and move != null:
+		action = move.duration
+		anim = move.anim
 	elif _state == State.STORM:
 		action = STORM_CAST_SECONDS
 	elif _state == State.REND:
@@ -194,7 +201,7 @@ func _update_visual() -> void:
 	elif _state == State.PARRY:
 		action = PARRY_DURATION
 	_visual.modulate = HEAL_TINT if _state == State.HEAL else Color.WHITE
-	_visual.show_state(_state, _facing, GameConfig.tiles(BODY_SIZE_TILES.y) / 2.0, action, _combo_step, not _health.is_alive(), _mask_left > 0.0)
+	_visual.show_state(_state, _facing, GameConfig.tiles(BODY_SIZE_TILES.y) / 2.0, action, _combo_step, not _health.is_alive(), _mask_left > 0.0, anim)
 
 
 func state() -> State:
@@ -424,7 +431,7 @@ func _build_context(hurt_now: bool) -> Dictionary:
 		"coyote_time": _coyote,
 		"hurt": hurt_now,
 		"vel_y": velocity.y / GameConfig.TILE_SIZE,
-		"attack_duration": _weapon.data.attack_duration * _attack_scale if _weapon.data != null else DEFAULT_ATTACK_DURATION,
+		"attack_duration": _weapon.current_move().duration if _weapon.current_move() != null else DEFAULT_ATTACK_DURATION,
 	}
 
 
@@ -433,6 +440,8 @@ func _enter_state(next: State) -> void:
 		_drink()
 	if _state == State.PARRY and next != State.PARRY:
 		_parry_cooldown = PARRY_COOLDOWN
+	if _state == State.ROLL and next != State.ROLL:
+		_last_roll_end = _clock
 	if _state == State.ATTACK and next != State.ATTACK:
 		_weapon.cancel_attack()
 		_last_attack_end = _clock
@@ -450,12 +459,7 @@ func _enter_state(next: State) -> void:
 		State.ATTACK:
 			InputRouter.consume_attack()
 			_attack_queued = false
-			var chained := _clock - _last_attack_end <= COMBO_WINDOW
-			_combo_step = (_combo_step + 1) % COMBO_STEPS if chained else 0
-			_weapon.set_facing(_facing)
-			_attack_scale = FINISHER_DURATION_SCALE if _combo_step == COMBO_STEPS - 1 else 1.0
-			_weapon.start_attack(_attack_scale)
-			swung.emit(_combo_step, _facing)
+			_start_move()
 		State.STORM:
 			InputRouter.consume_skill(1)
 			_mana.spend(STORM_COST)
@@ -473,6 +477,34 @@ func _enter_state(next: State) -> void:
 			velocity.x = _hit_direction * GameConfig.tiles(HURT_KNOCKBACK_SPEED)
 
 
+## Picks the weapon's move for this attack: in the air, the air move; just after a roll, the roll move;
+## otherwise the next strike of the tap chain.
+func _start_move() -> void:
+	var data := _weapon.data
+	var move: WeaponMove
+	if data != null and not is_on_floor() and data.air_move != null:
+		move = data.air_move
+		_chain_open = false
+	elif data != null and _clock - _last_roll_end <= ROLL_ATTACK_WINDOW and data.roll_move != null:
+		move = data.roll_move
+		_chain_open = false
+	else:
+		var chained := _chain_open and _clock - _last_attack_end <= COMBO_WINDOW
+		_combo_step = data.next_chain_step(_combo_step, chained) if data != null else 0
+		move = data.chain_move(_combo_step) if data != null else null
+		_chain_open = true
+	_weapon.set_facing(_facing)
+	_weapon.start_move(move)
+	if move != null and move.dive_speed_tiles > 0.0:
+		velocity.y = maxf(velocity.y, GameConfig.tiles(move.dive_speed_tiles))
+	swung.emit(_combo_step, _facing)
+	move_started.emit(move, _facing)
+
+
+func current_move() -> WeaponMove:
+	return _weapon.current_move()
+
+
 func _apply_velocity(delta: float) -> void:
 	var axis := InputRouter.move_axis()
 	if absf(axis) > PlayerStateMachine.AXIS_EPSILON and _state != State.ROLL and _state != State.HURT:
@@ -487,6 +519,9 @@ func _apply_velocity(delta: float) -> void:
 			velocity.x = 0.0
 		State.ATTACK:
 			velocity.x = axis * _run_speed() * ATTACK_MOVE_FACTOR
+			var lunge := _weapon.current_move()
+			if lunge != null and lunge.lunge_tiles_per_second != 0.0 and _state_time <= lunge.hit_window.y:
+				velocity.x += _facing * GameConfig.tiles(lunge.lunge_tiles_per_second)
 		_:
 			velocity.x = axis * _run_speed()
 

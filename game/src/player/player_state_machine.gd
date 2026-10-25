@@ -73,6 +73,8 @@ static func next_state(current: PlayerState, ctx: Dictionary) -> PlayerState:
 			return _settled_state(ctx)
 		PlayerState.JUMP:
 			if ctx.get("vel_y", 0.0) < 0.0:
+				if ctx.get("attack_buffered", false):
+					return PlayerState.ATTACK
 				return PlayerState.JUMP
 			return _settled_state(ctx)
 		_:

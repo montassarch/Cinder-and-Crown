@@ -1,0 +1,116 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="Script" path="res://src/weapons/weapon_data.gd" id="1_data"]
+[ext_resource type="Script" path="res://src/weapons/weapon_move.gd" id="2_move"]
+
+[sub_resource type="Resource" id="move_1"]
+script = ExtResource("2_move")
+display_name = "Shot"
+kind = 1
+damage_multiplier = 1.0
+duration = 0.45
+hit_window = Vector2(0.2, 0.3)
+hitbox_size_tiles = Vector2(1.5, 1.0)
+hitbox_offset_tiles = Vector2(1.0, 0.0)
+knockback_tiles = 0.8
+hit_stop_seconds = 0.05
+lunge_tiles_per_second = -2.0
+dive_speed_tiles = 0.0
+anim = &"parry"
+fx = &""
+fx_scale = 1.0
+fx_forward_tiles = 0.0
+projectile_count = 1
+projectile_angle_degrees = 0.0
+projectile_spread_degrees = 0.0
+projectile_speed_tiles = 24.0
+projectile_range_tiles = 14.0
+projectile_pierce = 0
+projectile_tint = Color(0.85, 1.0, 0.7, 1)
+projectile_radius = 2.5
+
+[sub_resource type="Resource" id="move_2"]
+script = ExtResource("2_move")
+display_name = "Power Shot"
+kind = 1
+damage_multiplier = 2.2
+duration = 0.7
+hit_window = Vector2(0.4, 0.5)
+hitbox_size_tiles = Vector2(1.5, 1.0)
+hitbox_offset_tiles = Vector2(1.0, 0.0)
+knockback_tiles = 2.5
+hit_stop_seconds = 0.08
+lunge_tiles_per_second = -3.0
+dive_speed_tiles = 0.0
+anim = &"parry"
+fx = &""
+fx_scale = 1.0
+fx_forward_tiles = 0.0
+projectile_count = 1
+projectile_angle_degrees = 0.0
+projectile_spread_degrees = 0.0
+projectile_speed_tiles = 34.0
+projectile_range_tiles = 18.0
+projectile_pierce = 2
+projectile_tint = Color(1.0, 0.95, 0.5, 1)
+projectile_radius = 3.5
+
+[sub_resource type="Resource" id="move_3"]
+script = ExtResource("2_move")
+display_name = "Falling Shot"
+kind = 1
+damage_multiplier = 1.3
+duration = 0.4
+hit_window = Vector2(0.15, 0.25)
+hitbox_size_tiles = Vector2(1.5, 1.0)
+hitbox_offset_tiles = Vector2(1.0, 0.0)
+knockback_tiles = 1.0
+hit_stop_seconds = 0.05
+lunge_tiles_per_second = -1.0
+dive_speed_tiles = 0.0
+anim = &"parry"
+fx = &""
+fx_scale = 1.0
+fx_forward_tiles = 0.0
+projectile_count = 1
+projectile_angle_degrees = 40.0
+projectile_spread_degrees = 0.0
+projectile_speed_tiles = 24.0
+projectile_range_tiles = 14.0
+projectile_pierce = 0
+projectile_tint = Color(0.85, 1.0, 0.7, 1)
+projectile_radius = 2.5
+
+[sub_resource type="Resource" id="move_4"]
+script = ExtResource("2_move")
+display_name = "Volley"
+kind = 1
+damage_multiplier = 0.7
+duration = 0.4
+hit_window = Vector2(0.12, 0.22)
+hitbox_size_tiles = Vector2(1.5, 1.0)
+hitbox_offset_tiles = Vector2(1.0, 0.0)
+knockback_tiles = 0.6
+hit_stop_seconds = 0.05
+lunge_tiles_per_second = -4.0
+dive_speed_tiles = 0.0
+anim = &"parry"
+fx = &""
+fx_scale = 1.0
+fx_forward_tiles = 0.0
+projectile_count = 3
+projectile_angle_degrees = 0.0
+projectile_spread_degrees = 24.0
+projectile_speed_tiles = 24.0
+projectile_range_tiles = 12.0
+projectile_pierce = 0
+projectile_tint = Color(0.85, 1.0, 0.7, 1)
+projectile_radius = 2.5
+
+[resource]
+script = ExtResource("1_data")
+display_name = "Hunter's Bow"
+damage = 7
+chain = Array[ExtResource("2_move")]([SubResource("move_1"), SubResource("move_2")])
+air_move = SubResource("move_3")
+roll_move = SubResource("move_4")

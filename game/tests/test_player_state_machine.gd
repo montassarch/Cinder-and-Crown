@@ -161,3 +161,8 @@ func test_a_drink_is_committed_until_it_ends() -> void:
 
 func test_a_hit_interrupts_a_drink() -> void:
 	assert_int(PlayerStateMachine.next_state(State.HEAL, _ctx({"state_time": 0.2, "heal_duration": 0.55, "hurt": true}))).is_equal(State.HURT)
+
+
+func test_a_rising_hero_may_start_an_attack() -> void:
+	var rising := _ctx({"vel_y": -5.0, "on_floor": false, "attack_buffered": true})
+	assert_int(PlayerStateMachine.next_state(State.JUMP, rising)).is_equal(State.ATTACK)

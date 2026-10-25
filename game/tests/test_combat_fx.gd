@@ -53,17 +53,45 @@ func test_the_player_announces_each_swing_with_its_combo_step() -> void:
 	assert_int(seen[0][0]).is_equal(0)
 
 
-func test_each_combo_step_gets_its_own_slash_arc_on_the_heros_side() -> void:
+func _sword_move(step: int) -> WeaponMove:
+	return _level.player.weapon_in_slot(0).chain_move(step)
+
+
+func test_each_move_shows_the_arc_it_asks_for_on_the_heros_side() -> void:
 	var player := _level.player
-	for pair in [[0, &"slash_a"], [1, &"slash_b"], [2, &"slash_c"]]:
-		player.swung.emit(pair[0], 1.0)
-		var arcs := _fx_of(pair[1])
+	for step in 3:
+		var move := _sword_move(step)
+		player.move_started.emit(move, 1.0)
+		var arcs := _fx_of(move.fx)
 		assert_int(arcs.size()).is_equal(1)
 		assert_float(arcs[0].global_position.x).is_greater(player.global_position.x)   # ahead of him
-	player.swung.emit(0, -1.0)
+	player.move_started.emit(_sword_move(0), -1.0)
 	var left := _fx_of(&"slash_a")
 	assert_float(left[left.size() - 1].global_position.x).is_less(player.global_position.x)
 	assert_float(left[left.size() - 1].scale.x).is_less(0.0)
+
+
+func test_a_move_without_an_arc_shows_none() -> void:
+	var bow := load("res://data/weapons/hunters_bow.tres") as WeaponData
+	_level.player.move_started.emit(bow.chain[0], 1.0)
+	for art in [&"slash_a", &"slash_b", &"slash_c"]:
+		assert_int(_fx_of(art).size()).is_equal(0)
+
+
+func test_a_longer_reaching_move_draws_its_arc_further_out_and_bigger() -> void:
+	var player := _level.player
+	var plain := WeaponMove.new()
+	plain.fx = &"slash_a"
+	player.move_started.emit(plain, 1.0)
+	var far := WeaponMove.new()
+	far.fx = &"slash_b"
+	far.fx_forward_tiles = 2.0
+	far.fx_scale = 2.0
+	player.move_started.emit(far, 1.0)
+	var near_arc = _fx_of(&"slash_a")[0]
+	var far_arc = _fx_of(&"slash_b")[0]
+	assert_float(far_arc.global_position.x - near_arc.global_position.x).is_greater(GameConfig.tiles(1.5))
+	assert_float(far_arc.scale.x).is_greater(near_arc.scale.x * 1.5)
 
 
 func test_a_landed_hit_sparks_shows_the_damage_and_shakes_the_screen() -> void:

@@ -72,9 +72,12 @@ func frame_image(anim: StringName, index: int, masked: bool) -> Image:
 
 ## feet_y: where the player's feet are, relative to the player's origin.
 ## action_seconds: how long the current attack or roll lasts, so its frames fit exactly.
-func show_state(state: State, facing: float, feet_y: float, action_seconds: float, combo_step: int = 0, dead: bool = false, masked: bool = false) -> void:
+## attack_anim: the animation the current attack asks for (empty: the combo step's own).
+func show_state(state: State, facing: float, feet_y: float, action_seconds: float, combo_step: int = 0, dead: bool = false, masked: bool = false, attack_anim: StringName = &"") -> void:
 	set_masked(masked)
 	var anim := &"death" if dead else animation_for(state, combo_step)
+	if state == State.ATTACK and not dead and ANIMS.has(attack_anim):
+		anim = attack_anim
 	if anim != animation:
 		if anim in FITTED and action_seconds > 0.0:
 			for frames in [_plain, _masked]:
