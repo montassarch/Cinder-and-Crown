@@ -30,6 +30,7 @@ const GROUND_TEXTURE := preload("res://art/cathedral/ground_tile.png")
 const LEDGE_TEXTURE := preload("res://art/cathedral/ledge_tile.png")
 
 var player: Player
+var _fx: CombatFx
 
 @onready var _camera: Camera2D = $Camera
 @onready var _hud: Hud = $Hud
@@ -56,6 +57,10 @@ func _ready() -> void:
 	_apply_camera_limits()
 	_camera.global_position = player.global_position
 
+	_fx = CombatFx.new()
+	_fx.name = "CombatFx"
+	add_child(_fx)
+	_fx.bind(self, player, _camera)
 	_hud.bind(player, enemy_count)
 	_touch.bind(player)
 	_menu.spawn_requested.connect(spawn_enemy)
@@ -107,6 +112,7 @@ func spawn_enemy_at(data: EnemyData, at: Vector2) -> Enemy:
 	enemy.configure(data)
 	enemy.target = player
 	enemy.global_position = at
+	_fx.watch_enemy(enemy)
 	return enemy
 
 

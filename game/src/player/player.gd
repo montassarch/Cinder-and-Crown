@@ -7,6 +7,10 @@ signal died
 signal mana_denied
 ## Storm Blade's bolt has struck the sword (for the lightning effect).
 signal storm_struck
+## A sword swing began (`step` is its place in the combo, 0..2; `facing` is +1 right, -1 left).
+signal swung(step: int, facing: float)
+## The sword hit something (the combat effects listen).
+signal hit_landed(target: Node, damage: int)
 ## A strike was deflected; `perfect` when it came in the first instant of the window.
 signal parried(perfect: bool)
 ## The flask's charges changed (drunk, refilled, or the maximum moved).
@@ -332,7 +336,8 @@ func take_hit(damage: int, source_x: float) -> void:
 		_hit_direction = signf(global_position.x - source_x)
 
 
-func _on_hit_landed(_target: Node, _damage: int) -> void:
+func _on_hit_landed(target: Node, damage: int) -> void:
+	hit_landed.emit(target, damage)
 	if _riposte_left > 0.0:
 		_clear_riposte()  # the counter has landed
 	_mana.gain(MANA_PER_HIT * _build.mana_gain_multiplier())
@@ -450,6 +455,7 @@ func _enter_state(next: State) -> void:
 			_weapon.set_facing(_facing)
 			_attack_scale = FINISHER_DURATION_SCALE if _combo_step == COMBO_STEPS - 1 else 1.0
 			_weapon.start_attack(_attack_scale)
+			swung.emit(_combo_step, _facing)
 		State.STORM:
 			InputRouter.consume_skill(1)
 			_mana.spend(STORM_COST)

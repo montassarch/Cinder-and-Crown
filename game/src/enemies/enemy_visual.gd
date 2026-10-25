@@ -6,6 +6,9 @@ extends AnimatedSprite2D
 
 const ART_DIR := "res://art/enemies"
 const BASE_FPS: float = 12.0
+## A hit turns the sprite white for this long.
+const FLASH_SECONDS: float = 0.09
+const FLASH_SHADER := preload("res://src/enemies/hit_flash.gdshader")
 ## Where the feet sit across the frame (40%) and how far above the bottom edge (2 px), set by the art tool.
 const FEET_X_FRACTION: float = 0.40
 const FEET_MARGIN: float = 2.0
@@ -17,6 +20,8 @@ static var _cache: Dictionary = {}
 
 var art_id: String = ""
 var _feet_y: float = 0.0
+var _flash_until_msec: int = 0
+var _flash_material: ShaderMaterial
 
 
 static func has_art(id: String) -> bool:
@@ -61,6 +66,10 @@ func setup(id: String, feet_y: float) -> void:
 	_feet_y = feet_y
 	sprite_frames = frames_for(id)
 	centered = false
+	_flash_material = ShaderMaterial.new()
+	_flash_material.shader = FLASH_SHADER
+	_flash_material.set_shader_parameter(&"amount", 0.0)
+	material = _flash_material
 	play(&"Idle")
 	_place(false)
 
@@ -90,6 +99,18 @@ func show_state(state: Enemy.State, facing: float, moving: bool, kind: EnemyMove
 	flip_h = facing < 0.0
 	_place(flip_h)
 	modulate = tint
+
+
+## Turns the sprite white for a moment (an enemy has just been hit).
+func flash() -> void:
+	_flash_until_msec = Time.get_ticks_msec() + int(FLASH_SECONDS * 1000.0)
+	_flash_material.set_shader_parameter(&"amount", 1.0)
+
+
+func _process(_delta: float) -> void:
+	if _flash_until_msec > 0 and Time.get_ticks_msec() >= _flash_until_msec:
+		_flash_until_msec = 0
+		_flash_material.set_shader_parameter(&"amount", 0.0)
 
 
 ## The enemy is gone but its body is not: play the death, then the enemy frees itself.

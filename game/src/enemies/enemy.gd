@@ -259,6 +259,8 @@ func take_hit(damage: int, source_x: float, knockback_tiles: float = 0.0) -> voi
 	if is_guard_broken():
 		damage = ceili(damage * BREAK_DAMAGE_MULTIPLIER)
 	_health.take_damage(damage)
+	if _art != null:
+		_art.flash()
 	if _state == State.DEAD:
 		return
 	if knockback_tiles > 0.0:
