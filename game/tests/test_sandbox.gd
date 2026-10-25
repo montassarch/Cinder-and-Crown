@@ -157,3 +157,9 @@ func test_pressing_the_scene_switch_asks_for_that_scene() -> void:
 	menu.scene_requested.connect(func(path: String) -> void: asked.append(path))
 	menu.press_scene_switch()
 	assert_array(asked).is_equal(["res://levels/somewhere.tscn"])
+
+func test_the_sandbox_camera_also_runs_past_both_ends() -> void:
+	var camera: Camera2D = _sandbox.get_node("Camera")
+	var margin := GameConfig.tiles(Sandbox.CAMERA_MARGIN_TILES)
+	assert_int(camera.limit_left).is_equal(int(-margin))
+	assert_int(camera.limit_right).is_equal(int(GameConfig.tiles(_sandbox.arena_width_tiles()) + margin))

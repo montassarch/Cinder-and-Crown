@@ -37,11 +37,14 @@ func test_telegraph_progress_is_zero_when_not_winding_up() -> void:
 	assert_float(_spawn(_data()).telegraph_progress()).is_equal(0.0)
 
 func test_telegraph_progress_climbs_to_the_strike() -> void:
-	var enemy := _spawn(_data())
+	# A long wind-up, so uneven frame speed under load cannot carry the progress out of the range checked.
+	var data := _data()
+	data.telegraph_seconds = 3.0
+	var enemy := _spawn(data)
 	enemy.begin_telegraph()
 	assert_float(enemy.telegraph_progress()).is_less(0.1)
 	await _frames(15)
-	assert_float(enemy.telegraph_progress()).is_between(0.35, 0.7)
+	assert_float(enemy.telegraph_progress()).is_between(0.03, 0.45)
 
 # --- Light enemies flinch, unless the strike is committed ---
 

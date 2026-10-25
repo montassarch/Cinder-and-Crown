@@ -38,6 +38,10 @@ const SHOT_MUZZLE_TILES: float = 0.8
 const SLAM_TELL_RADIUS_TILES: float = 2.0
 ## A dive ends when it is this close to the spot it was aimed at.
 const DIVE_ARRIVE_TILES: float = 0.3
+## Physics layer of the level's solid ground and ledges.
+const WORLD_MASK: int = 1
+## A flyer with a ledge in its way slides along it this long before trying the other side.
+const FLYER_DETOUR_SECONDS: float = 4.0
 ## Shots, shockwaves and blast flashes join this group so a restarted level can sweep them up.
 const ATTACK_GROUP := &"enemy_attacks"
 const SHIELD_FLASH_COLOR := Color(0.85, 0.9, 1.0)
@@ -75,6 +79,9 @@ var _move_index: int = 0
 ## A dive latches the hero's position when its wind-up commits, then flies there.
 var _dive_target: Vector2 = Vector2.ZERO
 var _dive_velocity: Vector2 = Vector2.ZERO
+## A blocked flyer slides this way (+1 right, -1 left) along the ledge until it has a clear line to the hero.
+var _detour_dir: float = 0.0
+var _detour_left: float = 0.0
 ## Seconds before the enemy may begin another attack (the rest after a whole string).
 var _rest_left: float = 0.0
 ## Picks the move of a RANDOM pattern; tests seed it.
@@ -366,7 +373,7 @@ func _tick_poise(delta: float) -> void:
 
 
 ## Returns horizontal velocity; FLYER also sets velocity.y directly.
-func _think_move(foe: Node2D, _delta: float) -> float:
+func _think_move(foe: Node2D, delta: float) -> float:
 	if foe == null:
 		return 0.0
 	var offset := foe.global_position - global_position
@@ -375,6 +382,9 @@ func _think_move(foe: Node2D, _delta: float) -> float:
 
 	match data.behaviour:
 		EnemyData.Behaviour.FLYER:
+			if not has_clear_path_to(foe):
+				return _slide_round_the_ledge(offset, speed, delta)
+			_detour_dir = 0.0
 			var hover := foe.global_position + Vector2(0.0, -GameConfig.tiles(FLYER_HOVER_ABOVE_TILES))
 			hover.y += sin(_age * TAU * FLYER_BOB_HZ) * GameConfig.tiles(FLYER_BOB_AMPLITUDE_TILES)
 			var heading := hover - global_position
@@ -396,6 +406,26 @@ func _think_move(foe: Node2D, _delta: float) -> float:
 				begin_telegraph()
 				return 0.0
 			return signf(offset.x) * speed
+
+
+## True when no solid ground or ledge lies on the straight line from this enemy to `other`.
+func has_clear_path_to(other: Node2D) -> bool:
+	var query := PhysicsRayQueryParameters2D.create(global_position, other.global_position, WORLD_MASK)
+	return get_world_2d().direct_space_state.intersect_ray(query).is_empty()
+
+
+## A flyer over a ledge cannot dive through it and the hero cannot reach it, so it never winds up there: it slides
+## sideways (toward the hero's side, switching sides now and then or at a wall) until the way is clear.
+func _slide_round_the_ledge(offset: Vector2, speed: float, delta: float) -> float:
+	_detour_left -= delta
+	if _detour_dir == 0.0:
+		_detour_dir = signf(offset.x) if absf(offset.x) > 1.0 else _facing
+		_detour_left = FLYER_DETOUR_SECONDS
+	elif _detour_left <= 0.0 or is_on_wall():
+		_detour_dir = -_detour_dir
+		_detour_left = FLYER_DETOUR_SECONDS
+	velocity.y = 0.0
+	return _detour_dir * speed
 
 
 ## Ranged enemies stand at their preferred range: back off when the hero is closer than

@@ -17,6 +17,11 @@ const STICK_ZONE_RIGHT_EDGE_TILES: float = 10.0
 const STICK_ZONE_TOP_TILES: float = 4.5
 const STICK_EDGE_MARGIN_TILES: float = 0.4
 const STICK_DEADZONE: float = 0.25
+## The ring is mostly see-through (only its rim is solid) so the hero is never hidden behind it.
+const STICK_FILL_ALPHA_HELD: float = 0.2
+const STICK_FILL_ALPHA_IDLE: float = 0.1
+const STICK_KNOB_ALPHA_HELD: float = 0.6
+const STICK_KNOB_ALPHA_IDLE: float = 0.35
 
 ## The attack button sits in the corner; the others are fanned round it on two arcs of this radius (tiles).
 const ATTACK_CENTER_TILES := Vector2(21.3, 10.5)
@@ -217,8 +222,7 @@ func _draw_stick() -> void:
 	var origin := stick_origin()
 	var radius := GameConfig.tiles(STICK_RADIUS_TILES)
 	var fade := 0.9 if held else 0.45
-	_overlay.draw_circle(origin + Vector2(0.0, 1.5), radius, Color(0.0, 0.0, 0.0, 0.25 * fade))
-	_overlay.draw_circle(origin, radius, Color(BODY, 0.5 * fade))
+	_overlay.draw_circle(origin, radius, Color(BODY, STICK_FILL_ALPHA_HELD if held else STICK_FILL_ALPHA_IDLE))
 	_overlay.draw_arc(origin, radius - 1.0, 0.0, TAU, 56, Color(GOLD, 0.85 * fade), 1.6, true)
 	_overlay.draw_arc(origin, radius * 0.62, 0.0, TAU, 40, Color(GOLD, 0.25 * fade), 1.0, true)
 	for side in [-1.0, 1.0]:                      # direction chevrons on the ring
@@ -230,8 +234,7 @@ func _draw_stick() -> void:
 		offset = (_stick_pos - _stick_origin).limit_length(radius)
 	var knob := origin + offset
 	var knob_radius := radius * 0.42
-	_overlay.draw_circle(knob + Vector2(0.0, 1.5), knob_radius, Color(0.0, 0.0, 0.0, 0.3))
-	_overlay.draw_circle(knob, knob_radius, Color(0.12, 0.11, 0.16, 0.95 if held else 0.6))
+	_overlay.draw_circle(knob, knob_radius, Color(0.12, 0.11, 0.16, STICK_KNOB_ALPHA_HELD if held else STICK_KNOB_ALPHA_IDLE))
 	_overlay.draw_arc(knob, knob_radius - 0.8, 0.0, TAU, 32, Color(GOLD, 1.0 if held else 0.6), 1.6, true)
 	_overlay.draw_circle(knob, knob_radius * 0.35, Color(GOLD, 0.35 if held else 0.18))
 

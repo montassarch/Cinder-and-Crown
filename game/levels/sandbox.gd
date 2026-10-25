@@ -13,6 +13,9 @@ const GROUND_THICKNESS_TILES: float = 3.0
 const WALL_HEIGHT_TILES: float = 30.0
 const PLATFORM_STEP_TILES: float = Player.JUMP_HEIGHT * 0.8
 const PLATFORM_THICKNESS_TILES: float = 0.5
+## The camera runs this far past each end of the level (half a screen), and the end walls are this thick, so the
+## hero can stand mid-screen at the ends instead of hiding under the stick or the thumb cluster.
+const CAMERA_MARGIN_TILES: float = 12.0
 const SPAWN_DISTANCE_TILES: float = 8.0
 const GROUND_SPAWN_HEIGHT_TILES: float = 2.0
 const AIR_SPAWN_HEIGHT_TILES: float = 5.0
@@ -144,9 +147,9 @@ func _on_player_died() -> void:
 
 
 func _apply_camera_limits() -> void:
-	_camera.limit_left = 0
+	_camera.limit_left = int(-GameConfig.tiles(CAMERA_MARGIN_TILES))
 	_camera.limit_top = 0
-	_camera.limit_right = int(GameConfig.tiles(arena_width_tiles()))
+	_camera.limit_right = int(GameConfig.tiles(arena_width_tiles() + CAMERA_MARGIN_TILES))
 	_camera.limit_bottom = int(GameConfig.tiles(arena_height_tiles()))
 
 
@@ -165,8 +168,8 @@ func _build_arena() -> void:
 	_add_block(Rect2(0.0, GROUND_TOP_TILES, ARENA_WIDTH_TILES, GROUND_THICKNESS_TILES), GROUND_COLOR, false)
 	var wall_top := GROUND_TOP_TILES - WALL_HEIGHT_TILES
 	var wall_height := WALL_HEIGHT_TILES + GROUND_THICKNESS_TILES
-	_add_block(Rect2(-1.0, wall_top, 1.0, wall_height), GROUND_COLOR, false)
-	_add_block(Rect2(ARENA_WIDTH_TILES, wall_top, 1.0, wall_height), GROUND_COLOR, false)
+	_add_block(Rect2(-CAMERA_MARGIN_TILES, wall_top, CAMERA_MARGIN_TILES, wall_height), GROUND_COLOR, false)
+	_add_block(Rect2(ARENA_WIDTH_TILES, wall_top, CAMERA_MARGIN_TILES, wall_height), GROUND_COLOR, false)
 	for rect in platform_rects_tiles():
 		_add_block(rect, PLATFORM_COLOR, true)
 

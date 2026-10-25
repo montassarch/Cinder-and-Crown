@@ -237,3 +237,8 @@ func test_the_overlay_redraws_only_when_something_changed() -> void:
 	var before: int = _controls.redraw_count
 	await _frames(10)
 	assert_int(_controls.redraw_count).is_equal(before)
+
+func test_the_stick_ring_is_see_through_so_the_hero_shows_through_it() -> void:
+	assert_float(TouchControls.STICK_FILL_ALPHA_HELD).is_less_equal(0.25)
+	assert_float(TouchControls.STICK_FILL_ALPHA_IDLE).is_less(TouchControls.STICK_FILL_ALPHA_HELD)
+	assert_float(TouchControls.STICK_KNOB_ALPHA_HELD).is_less_equal(0.65)

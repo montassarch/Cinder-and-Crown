@@ -211,8 +211,8 @@ func _build_arena() -> void:
 
 	var wall_top := GROUND_TOP_TILES - WALL_HEIGHT_TILES
 	var wall_height := WALL_HEIGHT_TILES + GROUND_THICKNESS_TILES
-	_add_block(Rect2(-1.0, wall_top, 1.0, wall_height), GROUND_COLOR, false, _walls)
-	_add_block(Rect2(_width_tiles, wall_top, 1.0, wall_height), GROUND_COLOR, false, _walls)
+	_add_block(Rect2(-CAMERA_MARGIN_TILES, wall_top, CAMERA_MARGIN_TILES, wall_height), GROUND_COLOR, false, _walls)
+	_add_block(Rect2(_width_tiles, wall_top, CAMERA_MARGIN_TILES, wall_height), GROUND_COLOR, false, _walls)
 
 
 ## True when the hero's body really overlaps an exit zone. The physics engine can report

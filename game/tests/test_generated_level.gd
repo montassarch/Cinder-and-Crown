@@ -157,3 +157,39 @@ func test_an_exit_report_from_a_hero_who_is_not_on_the_exit_is_ignored() -> void
 	_level._on_exit_entered(_level.player)  # the hero is at the spawn, far from the exit
 	assert_bool(picker.is_open()).is_false()
 	assert_int(_level.level_seed).is_equal(before)
+
+# --- The camera runs past the level ends so the hero never stands under the on-screen controls ---
+
+func test_the_camera_runs_past_both_ends_by_half_a_screen() -> void:
+	var camera: Camera2D = _level.get_node("Camera")
+	var margin := GameConfig.tiles(Sandbox.CAMERA_MARGIN_TILES)
+	assert_int(camera.limit_left).is_equal(int(-margin))
+	assert_int(camera.limit_right).is_equal(int(GameConfig.tiles(_level.arena_width_tiles()) + margin))
+
+func test_the_end_walls_are_thick_enough_to_fill_the_view_beyond_the_level() -> void:
+	var margin := GameConfig.tiles(Sandbox.CAMERA_MARGIN_TILES)
+	var lowest := INF
+	var highest := -INF
+	for body: StaticBody2D in _level.get_node("Walls").get_children():
+		var half := ((body.get_child(0) as CollisionShape2D).shape as RectangleShape2D).size.x / 2.0
+		lowest = minf(lowest, body.position.x - half)
+		highest = maxf(highest, body.position.x + half)
+	assert_float(lowest).is_less_equal(-margin)
+	assert_float(highest).is_greater_equal(GameConfig.tiles(_level.arena_width_tiles()) + margin)
+
+## Where on a base-size screen the hero is drawn when he stands at world x.
+func _screen_x(world_x: float) -> float:
+	var camera: Camera2D = _level.get_node("Camera")
+	var view := float(GameConfig.BASE_WIDTH)
+	var left := clampf(world_x - view / 2.0, float(camera.limit_left), float(camera.limit_right) - view)
+	return world_x - left
+
+func test_at_the_exit_the_hero_stands_left_of_the_thumb_cluster() -> void:
+	var leftmost := INF
+	for action in TouchControls.BUTTON_CENTERS_TILES:
+		leftmost = minf(leftmost, GameConfig.tiles(TouchControls.BUTTON_CENTERS_TILES[action].x - TouchControls.BUTTON_RADII_TILES[action]))
+	assert_float(_screen_x(_exit_zone_center().x)).is_less(leftmost)
+
+func test_at_the_spawn_the_hero_stands_right_of_the_stick() -> void:
+	var stick_right := GameConfig.tiles(TouchControls.STICK_CENTER_TILES.x + TouchControls.STICK_RADIUS_TILES)
+	assert_float(_screen_x(_level.spawn_point().x)).is_greater(stick_right)
