@@ -11,6 +11,14 @@ Written 2026-10-22. The roadmap (`Roadmap.md`) has the big phases; this is the f
 - [ ] The Windows build exports but was never launched.
 - [ ] Licence note: the repo holds derived Quaternius frames (QAL: fine in a game, not redistributable as assets) and the Hero Knight source (keep the repo private or remove `tools/art/source/` before making it public).
 
+## The full game (2026-10-30, plan: `Design/Plans/2026-10-30-full-game.md`)
+- [x] Stage 1: four worlds, each with painted backdrops, tiles, weather, lights and two new enemies; four new rooms.
+- [ ] Stage 2: a boss at the end of each world.
+- [ ] Stage 3: double jump, air dash, weapon art on the hero, weapon drops.
+- [ ] Stage 4: the hand-painted magic effects in combat.
+- [ ] Stage 5: title, victory and death screens, balance, full-run playtest.
+- [ ] Note: with 9 enemies on screen one physics frame took 23 ms in the bot run (once); watch performance on the phone.
+
 ## Weapons (2026-10-25)
 - [x] Five weapons with 4-5 moves each (see `Design/Plans/2026-10-25-weapons.md`): sword, spear, gauntlet, bow, wand.
 - [ ] Play each in the sandbox (Menu, Slot A / Slot B) and tell me what feels wrong: reach, speed, damage, the lunges.
