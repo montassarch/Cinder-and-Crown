@@ -72,8 +72,9 @@ func _ready() -> void:
 	_refresh()
 
 
-## A wide bar along the bottom of the screen's top band, with the boss's name over it.
-const BOSS_BAR_SIZE_TILES := Vector2(14.0, 0.45)
+## A wide bar across the top of the screen with the boss's name under it.
+const BOSS_BAR_LEFT_TILES: float = 9.5
+const BOSS_BAR_SIZE_TILES := Vector2(10.0, 0.45)   # fits between the HUD bars (left) and the menu button (right)
 const BOSS_FILL_COLOR := Color(0.85, 0.15, 0.25)
 
 
@@ -96,7 +97,7 @@ func _make_boss_bar(theme: Theme) -> void:
 	_boss_label.add_theme_color_override("font_color", Color(1.0, 0.88, 0.7))
 	_boss_label.add_theme_color_override("font_outline_color", Color(0.05, 0.02, 0.04))
 	_boss_label.add_theme_constant_override("outline_size", 4)
-	_boss_label.position = Vector2(0, -GameConfig.tiles(1.0))
+	_boss_label.position = Vector2(0, GameConfig.tiles(BOSS_BAR_SIZE_TILES.y) + 2.0)
 	_boss_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	for c in [back, _boss_fill, _boss_label]:
 		_boss_box.add_child(c)
@@ -107,8 +108,8 @@ func _make_boss_bar(theme: Theme) -> void:
 func show_boss(boss: Enemy) -> void:
 	_boss = boss
 	_boss_label.text = boss.data.display_name
-	var view := get_viewport().get_visible_rect().size
-	_boss_box.position = Vector2((view.x - GameConfig.tiles(BOSS_BAR_SIZE_TILES.x)) / 2.0, view.y - GameConfig.tiles(1.2))
+	# along the top, right of the HUD text and left of the menu button (clear of the touch buttons below)
+	_boss_box.position = Vector2(GameConfig.tiles(BOSS_BAR_LEFT_TILES), GameConfig.tiles(0.6))
 	_boss_box.visible = true
 	_refresh_boss()
 

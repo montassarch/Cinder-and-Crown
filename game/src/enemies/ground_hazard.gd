@@ -6,6 +6,8 @@ extends Node2D
 
 const WARN_COLOR := Color(1.0, 0.3, 0.12)
 const FPS: float = 14.0
+## The painted effects are drawn a little larger than life so they read on a phone.
+const ART_SCALE: float = 1.5
 
 var damage: int = 0
 var _art: StringName
@@ -66,6 +68,7 @@ func _physics_process(delta: float) -> void:
 func _erupt() -> void:
 	queue_redraw()
 	_sprite = PaintedFx.sprite(_art, FPS)
+	_sprite.scale *= ART_SCALE
 	add_child(_sprite)
 	_sprite.animation_finished.connect(func() -> void:
 		_done_playing = true
