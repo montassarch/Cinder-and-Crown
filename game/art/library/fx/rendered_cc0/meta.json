@@ -1,0 +1,385 @@
+{
+ "pack": "rendered_cc0",
+ "author": "several (see each effect)",
+ "licence": "CC0 1.0",
+ "credit": "para, Sinestesia, Mikodrak, Beast, rubberduck, Limphands, Luke.RUSTLTD (all optional)",
+ "url": "see effects",
+ "notes": "Blender-rendered / painted effects, shrunk so they stay light; draw_scale 0.5 means draw at half size for a sharp phone image.",
+ "effects": {
+  "para_fire_ring": {
+   "frames": 16,
+   "size": [
+    86,
+    96
+   ],
+   "fps": 24,
+   "pivot": [
+    49.2,
+    46.8
+   ],
+   "blend": "add",
+   "draw_scale": 0.5,
+   "use": "fire ring shockwave (para, https://opengameart.org/content/animated-particle-effects-1)"
+  },
+  "para_smoke_burst": {
+   "frames": 16,
+   "size": [
+    96,
+    96
+   ],
+   "fps": 24,
+   "pivot": [
+    48.0,
+    48.0
+   ],
+   "blend": "mix",
+   "draw_scale": 0.5,
+   "use": "dust/smoke burst (para, https://opengameart.org/content/animated-particle-effects-1)"
+  },
+  "para_fire_ring_ground": {
+   "frames": 16,
+   "size": [
+    89,
+    96
+   ],
+   "fps": 24,
+   "pivot": [
+    44.8,
+    44.8
+   ],
+   "blend": "add",
+   "draw_scale": 0.5,
+   "use": "fire ring on the ground (para, https://opengameart.org/content/animated-particle-effects-1)"
+  },
+  "para_spirit_ring": {
+   "frames": 16,
+   "size": [
+    96,
+    96
+   ],
+   "fps": 24,
+   "pivot": [
+    48.0,
+    48.0
+   ],
+   "blend": "add",
+   "draw_scale": 0.5,
+   "use": "blue spirit ring (para, https://opengameart.org/content/animated-particle-effects-1)"
+  },
+  "para_fire": {
+   "frames": 16,
+   "size": [
+    96,
+    96
+   ],
+   "fps": 24,
+   "pivot": [
+    48.0,
+    48.0
+   ],
+   "blend": "add",
+   "draw_scale": 0.5,
+   "use": "looping fire (para, https://opengameart.org/content/animated-particle-effects-2)"
+  },
+  "para_blood_hit_1": {
+   "frames": 15,
+   "size": [
+    92,
+    96
+   ],
+   "fps": 24,
+   "pivot": [
+    44.2,
+    47.2
+   ],
+   "blend": "mix",
+   "draw_scale": 0.5,
+   "use": "blood hit spray (para, https://opengameart.org/content/animated-particle-effects-2)"
+  },
+  "para_blood_hit_2": {
+   "frames": 14,
+   "size": [
+    67,
+    96
+   ],
+   "fps": 24,
+   "pivot": [
+    31.7,
+    43.9
+   ],
+   "blend": "mix",
+   "draw_scale": 0.5,
+   "use": "blood hit spray (para, https://opengameart.org/content/animated-particle-effects-2)"
+  },
+  "sinestesia_hit": {
+   "frames": 16,
+   "size": [
+    128,
+    120
+   ],
+   "fps": 24,
+   "pivot": [
+    62.7,
+    68.3
+   ],
+   "blend": "mix",
+   "draw_scale": 0.5,
+   "use": "painted hit flash / blood splash (Sinestesia, https://opengameart.org/content/animations-blood-hit-and-both-d)"
+  },
+  "sinestesia_blood": {
+   "frames": 16,
+   "size": [
+    128,
+    125
+   ],
+   "fps": 24,
+   "pivot": [
+    59.6,
+    79.9
+   ],
+   "blend": "mix",
+   "draw_scale": 0.5,
+   "use": "painted hit flash / blood splash (Sinestesia, https://opengameart.org/content/animations-blood-hit-and-both-d)"
+  },
+  "sinestesia_hit_blood": {
+   "frames": 16,
+   "size": [
+    127,
+    128
+   ],
+   "fps": 24,
+   "pivot": [
+    67.2,
+    72.5
+   ],
+   "blend": "mix",
+   "draw_scale": 0.5,
+   "use": "painted hit flash / blood splash (Sinestesia, https://opengameart.org/content/animations-blood-hit-and-both-d)"
+  },
+  "mikodrak_black_explosion": {
+   "frames": 16,
+   "size": [
+    50,
+    47
+   ],
+   "fps": 18,
+   "pivot": [
+    25.0,
+    23.5
+   ],
+   "blend": "mix",
+   "draw_scale": 0.5,
+   "use": "black smoke burst (Mikodrak, https://opengameart.org/content/2d-spell-effects)"
+  },
+  "mikodrak_sword_fire": {
+   "frames": 16,
+   "size": [
+    128,
+    57
+   ],
+   "fps": 18,
+   "pivot": [
+    64.7,
+    28.9
+   ],
+   "blend": "add",
+   "draw_scale": 0.5,
+   "use": "flaming sword trail (Mikodrak, https://opengameart.org/content/2d-spell-effects)"
+  },
+  "mikodrak_sign_of_fire": {
+   "frames": 16,
+   "size": [
+    128,
+    114
+   ],
+   "fps": 18,
+   "pivot": [
+    64.7,
+    57.1
+   ],
+   "blend": "add",
+   "draw_scale": 0.5,
+   "use": "fire sigil (Mikodrak, https://opengameart.org/content/2d-spell-effects)"
+  },
+  "mikodrak_fire_scissors": {
+   "frames": 13,
+   "size": [
+    101,
+    128
+   ],
+   "fps": 18,
+   "pivot": [
+    50.4,
+    64.0
+   ],
+   "blend": "add",
+   "draw_scale": 0.5,
+   "use": "crossed fire slash (Mikodrak, https://opengameart.org/content/2d-spell-effects)"
+  },
+  "mikodrak_eater_fire": {
+   "frames": 16,
+   "size": [
+    128,
+    113
+   ],
+   "fps": 18,
+   "pivot": [
+    63.6,
+    56.7
+   ],
+   "blend": "add",
+   "draw_scale": 0.5,
+   "use": "devouring fire (Mikodrak, https://opengameart.org/content/2d-spell-effects)"
+  },
+  "mikodrak_lightning_ball": {
+   "frames": 16,
+   "size": [
+    56,
+    65
+   ],
+   "fps": 18,
+   "pivot": [
+    28.0,
+    32.5
+   ],
+   "blend": "add",
+   "draw_scale": 0.5,
+   "use": "ball lightning (Mikodrak, https://opengameart.org/content/2d-spell-effects)"
+  },
+  "mikodrak_blue_pillar": {
+   "frames": 16,
+   "size": [
+    61,
+    128
+   ],
+   "fps": 18,
+   "pivot": [
+    30.4,
+    64.3
+   ],
+   "blend": "add",
+   "draw_scale": 0.5,
+   "use": "blue light pillar (Mikodrak, https://opengameart.org/content/2d-spell-effects)"
+  },
+  "beast_smoke_aura": {
+   "frames": 24,
+   "size": [
+    96,
+    96
+   ],
+   "fps": 20,
+   "pivot": [
+    48.0,
+    48.0
+   ],
+   "blend": "mix",
+   "draw_scale": 0.5,
+   "use": "looping swirl of smoke: dark aura around a boss when tinted black (Beast, https://opengameart.org/content/smoke-aura)"
+  },
+  "rubberduck_explosion": {
+   "frames": 16,
+   "size": [
+    57,
+    96
+   ],
+   "fps": 24,
+   "pivot": [
+    26.1,
+    46.8
+   ],
+   "blend": "mix",
+   "draw_scale": 0.5,
+   "use": "explosion, volumetric render (rubberduck, https://opengameart.org/content/25-special-effects-rendered-with-blender)"
+  },
+  "rubberduck_flame": {
+   "frames": 16,
+   "size": [
+    51,
+    96
+   ],
+   "fps": 24,
+   "pivot": [
+    22.2,
+    43.5
+   ],
+   "blend": "add",
+   "draw_scale": 0.5,
+   "use": "flame, volumetric render (rubberduck, https://opengameart.org/content/25-special-effects-rendered-with-blender)"
+  },
+  "rubberduck_soul_flame": {
+   "frames": 16,
+   "size": [
+    50,
+    96
+   ],
+   "fps": 24,
+   "pivot": [
+    21.5,
+    43.0
+   ],
+   "blend": "add",
+   "draw_scale": 0.5,
+   "use": "flame, volumetric render (rubberduck, https://opengameart.org/content/25-special-effects-rendered-with-blender)"
+  },
+  "rubberduck_ground_burst": {
+   "frames": 16,
+   "size": [
+    96,
+    47
+   ],
+   "fps": 24,
+   "pivot": [
+    44.9,
+    20.6
+   ],
+   "blend": "mix",
+   "draw_scale": 0.5,
+   "use": "flat_effect, volumetric render (rubberduck, https://opengameart.org/content/25-special-effects-rendered-with-blender)"
+  },
+  "rubberduck_fire_ring": {
+   "frames": 16,
+   "size": [
+    96,
+    78
+   ],
+   "fps": 24,
+   "pivot": [
+    46.7,
+    38.2
+   ],
+   "blend": "add",
+   "draw_scale": 0.5,
+   "use": "ring, volumetric render (rubberduck, https://opengameart.org/content/25-special-effects-rendered-with-blender)"
+  },
+  "rubberduck_shockwave": {
+   "frames": 16,
+   "size": [
+    96,
+    63
+   ],
+   "fps": 24,
+   "pivot": [
+    47.6,
+    34.8
+   ],
+   "blend": "mix",
+   "draw_scale": 0.5,
+   "use": "shockwave, volumetric render (rubberduck, https://opengameart.org/content/25-special-effects-rendered-with-blender)"
+  },
+  "limphands_ps1_fire": {
+   "frames": 24,
+   "size": [
+    36,
+    64
+   ],
+   "fps": 24,
+   "pivot": [
+    14.6,
+    32.1
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "looping camp/brazier fire, PS1 look (Limphands, https://limphands.itch.io/ps1-fire)"
+  }
+ }
+}

@@ -1,0 +1,220 @@
+{
+ "pack": "pixel_misc_cc0",
+ "author": "several (see each effect)",
+ "licence": "CC0 1.0",
+ "credit": "tbbk, 13rice, Luis Zuno (ansimuz), Reactorcore (all optional)",
+ "url": "see effects",
+ "notes": "Small CC0 pixel effects gathered from OpenGameArt.",
+ "effects": {
+  "tbbk_slash": {
+   "frames": 9,
+   "size": [
+    57,
+    37
+   ],
+   "fps": 18,
+   "pivot": [
+    29.0,
+    22.5
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "pixel sword slash (tbbk, https://opengameart.org/content/pixel-art-sword-slash-effect)"
+  },
+  "13rice_radial_spark_pixel": {
+   "frames": 8,
+   "size": [
+    62,
+    64
+   ],
+   "fps": 16,
+   "pivot": [
+    30.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "radial lightning hit (13rice, https://opengameart.org/content/radial-lightning-effect)"
+  },
+  "13rice_radial_spark_hd": {
+   "frames": 8,
+   "size": [
+    96,
+    95
+   ],
+   "fps": 16,
+   "pivot": [
+    48.0,
+    47.6
+   ],
+   "blend": "add",
+   "draw_scale": 0.5,
+   "use": "radial spark, smooth (13rice); white - tint it"
+  },
+  "gv_darkbolt": {
+   "frames": 12,
+   "size": [
+    63,
+    83
+   ],
+   "fps": 14,
+   "pivot": [
+    31.0,
+    43.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "falling dark bolt (Gothicvania Magic Pack 9, ansimuz, https://opengameart.org/content/gothicvania-magic-pack-9)"
+  },
+  "gv_firebomb": {
+   "frames": 15,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 14,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "fire bomb burst (Gothicvania Magic Pack 9, ansimuz, https://opengameart.org/content/gothicvania-magic-pack-9)"
+  },
+  "gv_lightning": {
+   "frames": 11,
+   "size": [
+    56,
+    126
+   ],
+   "fps": 14,
+   "pivot": [
+    28.0,
+    62.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "lightning strike from above (Gothicvania Magic Pack 9, ansimuz, https://opengameart.org/content/gothicvania-magic-pack-9)"
+  },
+  "gv_spark": {
+   "frames": 8,
+   "size": [
+    30,
+    30
+   ],
+   "fps": 14,
+   "pivot": [
+    15.0,
+    15.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "small spark (Gothicvania Magic Pack 9, ansimuz, https://opengameart.org/content/gothicvania-magic-pack-9)"
+  },
+  "gv_enemy_death": {
+   "frames": 9,
+   "size": [
+    75,
+    66
+   ],
+   "fps": 12,
+   "pivot": [
+    38.5,
+    33.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "Gothicvania Church (ansimuz) enemy death"
+  },
+  "gv_fireball": {
+   "frames": 3,
+   "size": [
+    23,
+    23
+   ],
+   "fps": 12,
+   "pivot": [
+    11.0,
+    12.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "Gothicvania Church (ansimuz) fireball"
+  },
+  "gv_explosion": {
+   "frames": 6,
+   "size": [
+    39,
+    49
+   ],
+   "fps": 12,
+   "pivot": [
+    19.5,
+    24.5
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "enemy death pop (Gothicvania Swamp, ansimuz)"
+  },
+  "rc_blood_splat": {
+   "frames": 8,
+   "size": [
+    10,
+    10
+   ],
+   "fps": 14,
+   "pivot": [
+    5.0,
+    5.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "pixel blood (Reactorcore, https://opengameart.org/content/gore-blood-gibs-meat-chunks)"
+  },
+  "rc_blood_burst": {
+   "frames": 9,
+   "size": [
+    20,
+    20
+   ],
+   "fps": 14,
+   "pivot": [
+    10.0,
+    10.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "pixel blood (Reactorcore, https://opengameart.org/content/gore-blood-gibs-meat-chunks)"
+  },
+  "rc_blood_blast": {
+   "frames": 13,
+   "size": [
+    34,
+    34
+   ],
+   "fps": 14,
+   "pivot": [
+    17.0,
+    17.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "pixel blood (Reactorcore, https://opengameart.org/content/gore-blood-gibs-meat-chunks)"
+  },
+  "rc_gibs": {
+   "frames": 21,
+   "size": [
+    10,
+    12
+   ],
+   "fps": 1,
+   "pivot": [
+    5.0,
+    6.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "single gib particles (one per frame) for a GPUParticles2D burst"
+  }
+ }
+}

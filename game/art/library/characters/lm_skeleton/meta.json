@@ -1,0 +1,27 @@
+{
+ "name": "lm_skeleton",
+ "canvas": [
+  104,
+  64
+ ],
+ "feet": [
+  31,
+  61
+ ],
+ "anims": {
+  "Idle": 4,
+  "Death": 4,
+  "Walk": 4,
+  "Shield": 4,
+  "Attack": 8,
+  "Hit": 4
+ },
+ "fps": 10,
+ "author": "LuizMelo",
+ "licence": "CC0 1.0",
+ "credit": "LuizMelo (credit optional)",
+ "url": "https://luizmelo.itch.io/monsters-creatures-fantasy",
+ "graded": true,
+ "notes": "",
+ "use": "sword-and-shield skeleton with a block pose: a basic undead enemy"
+}

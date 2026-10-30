@@ -1,0 +1,29 @@
+{
+ "name": "gv_gothic_hero",
+ "canvas": [
+  88,
+  80
+ ],
+ "feet": [
+  36,
+  79
+ ],
+ "anims": {
+  "Idle": 4,
+  "Run": 12,
+  "Attack": 6,
+  "Jump": 5,
+  "Hurt": 3,
+  "Crouch": 3,
+  "CrouchSlash": 4,
+  "JumpAttack": 6
+ },
+ "fps": 10,
+ "author": "Luis Zuno (ansimuz)",
+ "licence": "CC0 1.0 (public domain)",
+ "credit": "Luis Zuno (@ansimuz) (credit optional)",
+ "url": "https://opengameart.org/content/gothicvania-patreons-collection",
+ "graded": false,
+ "notes": "",
+ "use": "red-caped swordsman with a full move set: rival hunter NPC or alternative hero"
+}

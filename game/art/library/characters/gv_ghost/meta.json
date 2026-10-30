@@ -1,0 +1,23 @@
+{
+ "name": "gv_ghost",
+ "canvas": [
+  40,
+  64
+ ],
+ "feet": [
+  13,
+  61
+ ],
+ "anims": {
+  "Float": 4,
+  "FloatHalo": 4
+ },
+ "fps": 10,
+ "author": "Luis Zuno (ansimuz)",
+ "licence": "CC0 1.0 (public domain)",
+ "credit": "Luis Zuno (@ansimuz) (credit optional)",
+ "url": "https://opengameart.org/content/gothicvania-cemetery-pack",
+ "graded": false,
+ "notes": "",
+ "use": "small drifting ghost"
+}

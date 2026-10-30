@@ -1,0 +1,23 @@
+{
+ "name": "gv_burning_ghoul",
+ "canvas": [
+  56,
+  56
+ ],
+ "feet": [
+  38,
+  55
+ ],
+ "anims": {
+  "Walk": 8,
+  "WalkAlt": 8
+ },
+ "fps": 10,
+ "author": "Luis Zuno (ansimuz)",
+ "licence": "CC0 1.0 (public domain)",
+ "credit": "Luis Zuno (@ansimuz) (credit optional)",
+ "url": "https://opengameart.org/content/gothicvania-church-pack",
+ "graded": false,
+ "notes": "",
+ "use": "shambling ghoul with a burning head: a Molten Forge Shambler"
+}

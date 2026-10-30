@@ -1,0 +1,1210 @@
+{
+ "pack": "kenney_particles",
+ "author": "Kenney (www.kenney.nl)",
+ "licence": "CC0 1.0",
+ "credit": "Kenney (credit optional)",
+ "url": "https://opengameart.org/content/particle-pack-80-sprites",
+ "notes": "Particle textures for GPUParticles2D / CPUParticles2D, shrunk to 64 px.",
+ "effects": {
+  "circle_01": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "circle_02": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "circle_03": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "circle_04": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "circle_05": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "dirt_01": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "dirt_02": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "dirt_03": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "fire_01": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "fire_02": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "flame_01": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "flame_02": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "flame_03": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "flame_04": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "flame_05": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "flame_06": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "flare_01": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "light_01": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "light_02": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "light_03": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "magic_01": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "magic_02": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "magic_03": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "magic_04": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "magic_05": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "muzzle_01": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "muzzle_02": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "muzzle_03": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "muzzle_04": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "muzzle_05": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "scorch_01": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "scorch_02": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "scorch_03": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "scratch_01": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "slash_01": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "slash_02": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "slash_03": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "slash_04": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "smoke_01": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "smoke_02": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "smoke_03": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "smoke_04": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "smoke_05": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "smoke_06": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "smoke_07": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "smoke_08": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "smoke_09": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "smoke_10": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "spark_01": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "spark_02": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "spark_03": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "spark_04": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "spark_05": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "spark_06": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "spark_07": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "star_01": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "star_02": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "star_03": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "star_04": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "star_05": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "star_06": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "star_07": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "star_08": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "star_09": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "symbol_01": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "symbol_02": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "trace_01": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "trace_02": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "trace_03": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "trace_04": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "trace_05": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "trace_06": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "trace_07": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "twirl_01": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "twirl_02": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "twirl_03": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "window_01": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "window_02": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "window_03": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  },
+  "window_04": {
+   "frames": 1,
+   "size": [
+    64,
+    64
+   ],
+   "fps": 1,
+   "pivot": [
+    32.0,
+    32.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "particle texture"
+  }
+ }
+}

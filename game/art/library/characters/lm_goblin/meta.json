@@ -1,0 +1,26 @@
+{
+ "name": "lm_goblin",
+ "canvas": [
+  96,
+  48
+ ],
+ "feet": [
+  45,
+  47
+ ],
+ "anims": {
+  "Idle": 4,
+  "Death": 4,
+  "Run": 8,
+  "Attack": 8,
+  "Hit": 4
+ },
+ "fps": 10,
+ "author": "LuizMelo",
+ "licence": "CC0 1.0",
+ "credit": "LuizMelo (credit optional)",
+ "url": "https://luizmelo.itch.io/monsters-creatures-fantasy",
+ "graded": true,
+ "notes": "",
+ "use": "small knife goblin: fast weak enemy"
+}

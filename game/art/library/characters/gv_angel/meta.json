@@ -1,0 +1,23 @@
+{
+ "name": "gv_angel",
+ "canvas": [
+  104,
+  120
+ ],
+ "feet": [
+  51,
+  113
+ ],
+ "anims": {
+  "Idle": 8,
+  "Attack": 3
+ },
+ "fps": 10,
+ "author": "Luis Zuno (ansimuz)",
+ "licence": "CC0 1.0 (public domain)",
+ "credit": "Luis Zuno (@ansimuz) (credit optional)",
+ "url": "https://opengameart.org/content/gothicvania-church-pack",
+ "graded": false,
+ "notes": "",
+ "use": "winged fallen angel: cathedral boss or statue that wakes"
+}

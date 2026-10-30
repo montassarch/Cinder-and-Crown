@@ -1,0 +1,23 @@
+{
+ "name": "gv_church_wizard",
+ "canvas": [
+  72,
+  56
+ ],
+ "feet": [
+  42,
+  55
+ ],
+ "anims": {
+  "Idle": 5,
+  "Cast": 10
+ },
+ "fps": 10,
+ "author": "Luis Zuno (ansimuz)",
+ "licence": "CC0 1.0 (public domain)",
+ "credit": "Luis Zuno (@ansimuz) (credit optional)",
+ "url": "https://opengameart.org/content/gothicvania-church-pack",
+ "graded": false,
+ "notes": "",
+ "use": "hooded fire caster: a cathedral cultist"
+}

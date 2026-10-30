@@ -1,0 +1,29 @@
+{
+ "name": "lm_fallen_king",
+ "canvas": [
+  160,
+  112
+ ],
+ "feet": [
+  66,
+  111
+ ],
+ "anims": {
+  "Idle": 6,
+  "Run": 8,
+  "Attack1": 6,
+  "Attack2": 6,
+  "Hit": 4,
+  "Jump": 2,
+  "Fall": 2,
+  "Death": 11
+ },
+ "fps": 10,
+ "author": "LuizMelo",
+ "licence": "CC0 1.0",
+ "credit": "LuizMelo (credit optional)",
+ "url": "https://luizmelo.itch.io/medieval-king-pack",
+ "graded": true,
+ "notes": "",
+ "use": "crowned swordsman: a mini-boss or the Crown Guard captain (ashen-graded)"
+}

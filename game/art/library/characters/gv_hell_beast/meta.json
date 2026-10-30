@@ -1,0 +1,23 @@
+{
+ "name": "gv_hell_beast",
+ "canvas": [
+  56,
+  64
+ ],
+ "feet": [
+  27,
+  63
+ ],
+ "anims": {
+  "Idle": 6,
+  "Breath": 4
+ },
+ "fps": 10,
+ "author": "Luis Zuno (ansimuz)",
+ "licence": "CC0 1.0 (public domain)",
+ "credit": "Luis Zuno (@ansimuz) (credit optional)",
+ "url": "https://opengameart.org/content/gothicvania-patreons-collection",
+ "graded": false,
+ "notes": "",
+ "use": "horned brute that breathes fire: Forge Brute alternative"
+}

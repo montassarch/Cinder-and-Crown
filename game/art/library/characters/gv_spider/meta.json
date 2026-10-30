@@ -1,0 +1,22 @@
+{
+ "name": "gv_spider",
+ "canvas": [
+  32,
+  24
+ ],
+ "feet": [
+  16,
+  23
+ ],
+ "anims": {
+  "Walk": 4
+ },
+ "fps": 10,
+ "author": "Luis Zuno (ansimuz)",
+ "licence": "CC0 1.0 (public domain)",
+ "credit": "Luis Zuno (@ansimuz) (credit optional)",
+ "url": "https://opengameart.org/content/gotthicvania-swamp",
+ "graded": false,
+ "notes": "",
+ "use": "crypt spider (crawler enemy)"
+}

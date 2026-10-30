@@ -1,0 +1,310 @@
+{
+ "pack": "cethiel_slashes",
+ "author": "Cethiel",
+ "licence": "CC0 1.0",
+ "credit": "Cethiel (credit optional)",
+ "url": "https://opengameart.org/content/weapon-slash-effect",
+ "notes": "5 slash shapes x 4 colours, 6 frames each, shrunk to half size (draw at 1.0 for a ~60 px arc, these are already game scale).",
+ "effects": {
+  "gold_1": {
+   "frames": 6,
+   "size": [
+    47,
+    46
+   ],
+   "fps": 20,
+   "pivot": [
+    24.5,
+    29.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "slash arc behind the swing (shape 1)"
+  },
+  "gold_2": {
+   "frames": 6,
+   "size": [
+    44,
+    43
+   ],
+   "fps": 20,
+   "pivot": [
+    23.5,
+    19.5
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "slash arc behind the swing (shape 2)"
+  },
+  "gold_3": {
+   "frames": 6,
+   "size": [
+    62,
+    60
+   ],
+   "fps": 20,
+   "pivot": [
+    31.5,
+    26.5
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "slash arc behind the swing (shape 3)"
+  },
+  "gold_4": {
+   "frames": 6,
+   "size": [
+    44,
+    50
+   ],
+   "fps": 20,
+   "pivot": [
+    18.5,
+    25.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "slash arc behind the swing (shape 4)"
+  },
+  "gold_5": {
+   "frames": 6,
+   "size": [
+    55,
+    54
+   ],
+   "fps": 20,
+   "pivot": [
+    27.5,
+    23.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "slash arc behind the swing (shape 5)"
+  },
+  "violet_1": {
+   "frames": 6,
+   "size": [
+    47,
+    47
+   ],
+   "fps": 20,
+   "pivot": [
+    24.5,
+    29.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "slash arc behind the swing (shape 1)"
+  },
+  "violet_2": {
+   "frames": 6,
+   "size": [
+    45,
+    44
+   ],
+   "fps": 20,
+   "pivot": [
+    24.0,
+    20.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "slash arc behind the swing (shape 2)"
+  },
+  "violet_3": {
+   "frames": 6,
+   "size": [
+    62,
+    60
+   ],
+   "fps": 20,
+   "pivot": [
+    31.5,
+    26.5
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "slash arc behind the swing (shape 3)"
+  },
+  "violet_4": {
+   "frames": 6,
+   "size": [
+    44,
+    50
+   ],
+   "fps": 20,
+   "pivot": [
+    18.5,
+    25.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "slash arc behind the swing (shape 4)"
+  },
+  "violet_5": {
+   "frames": 6,
+   "size": [
+    56,
+    54
+   ],
+   "fps": 20,
+   "pivot": [
+    27.5,
+    23.5
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "slash arc behind the swing (shape 5)"
+  },
+  "blue_1": {
+   "frames": 6,
+   "size": [
+    47,
+    46
+   ],
+   "fps": 20,
+   "pivot": [
+    24.5,
+    29.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "slash arc behind the swing (shape 1)"
+  },
+  "blue_2": {
+   "frames": 6,
+   "size": [
+    43,
+    42
+   ],
+   "fps": 20,
+   "pivot": [
+    23.0,
+    18.5
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "slash arc behind the swing (shape 2)"
+  },
+  "blue_3": {
+   "frames": 6,
+   "size": [
+    62,
+    60
+   ],
+   "fps": 20,
+   "pivot": [
+    31.5,
+    26.5
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "slash arc behind the swing (shape 3)"
+  },
+  "blue_4": {
+   "frames": 6,
+   "size": [
+    42,
+    50
+   ],
+   "fps": 20,
+   "pivot": [
+    17.5,
+    25.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "slash arc behind the swing (shape 4)"
+  },
+  "blue_5": {
+   "frames": 6,
+   "size": [
+    54,
+    52
+   ],
+   "fps": 20,
+   "pivot": [
+    26.5,
+    22.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "slash arc behind the swing (shape 5)"
+  },
+  "fire_1": {
+   "frames": 6,
+   "size": [
+    50,
+    50
+   ],
+   "fps": 20,
+   "pivot": [
+    26.0,
+    30.5
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "slash arc behind the swing (shape 1)"
+  },
+  "fire_2": {
+   "frames": 6,
+   "size": [
+    48,
+    48
+   ],
+   "fps": 20,
+   "pivot": [
+    25.5,
+    22.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "slash arc behind the swing (shape 2)"
+  },
+  "fire_3": {
+   "frames": 6,
+   "size": [
+    62,
+    61
+   ],
+   "fps": 20,
+   "pivot": [
+    31.5,
+    28.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "slash arc behind the swing (shape 3)"
+  },
+  "fire_4": {
+   "frames": 6,
+   "size": [
+    46,
+    50
+   ],
+   "fps": 20,
+   "pivot": [
+    20.5,
+    25.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "slash arc behind the swing (shape 4)"
+  },
+  "fire_5": {
+   "frames": 6,
+   "size": [
+    58,
+    58
+   ],
+   "fps": 20,
+   "pivot": [
+    29.0,
+    25.5
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "slash arc behind the swing (shape 5)"
+  }
+ }
+}
