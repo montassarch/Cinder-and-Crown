@@ -29,6 +29,9 @@ var last_depth := -1
 var max_enemies_seen := 0
 var shop_opened := 0
 var worlds_seen := {}
+## Boss instance id -> [name, time it appeared]; finished fights are printed with their length.
+var boss_fights := {}
+var boss_results: Array[String] = []
 
 
 var booted := 0
@@ -139,12 +142,17 @@ func _physics_process(delta: float) -> bool:
 		seen_types[id] = true
 		if not tracked.has(e.get_instance_id()):
 			tracked[e.get_instance_id()] = id
+			if e.data.boss:
+				boss_fights[e.get_instance_id()] = [id, t]
 		if e.global_position.y > 2000.0 or is_nan(e.global_position.x):
 			issues.append("enemy %s out of the world at %s" % [id, e.global_position])
 	for k in tracked.keys():
 		if not is_instance_valid(instance_from_id(k)) or instance_from_id(k).is_dead():
 			var kid: String = tracked[k]
 			kills_by_type[kid] = int(kills_by_type.get(kid, 0)) + 1
+			if boss_fights.has(k):
+				boss_results.append("%s beaten in %.0fs" % [boss_fights[k][0], t - boss_fights[k][1]])
+				boss_fights.erase(k)
 			stats['kills'] += 1
 			last_kill_t = t
 			tracked.erase(k)
@@ -275,5 +283,7 @@ func _report(why: String) -> void:
 	print("PLAYTEST kills ", JSON.stringify(kills_by_type), " wanders ", wanders)
 	print("PLAYTEST world ", level.biome().id, " worlds visited ", worlds_seen.keys())
 	print("PLAYTEST depth ", level.depth(), " hp ", _hp(), "/", _max_hp(), " cells ", level.cells_this_run(), " enemy types seen ", seen_types.keys(), " max enemies at once ", max_enemies_seen, " shop opens ", shop_opened)
+	for r in boss_results:
+		print("PLAYTEST boss ", r)
 	for i in issues:
 		print("PLAYTEST ISSUE ", i)

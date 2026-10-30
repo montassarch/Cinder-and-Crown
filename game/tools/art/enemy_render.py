@@ -255,7 +255,7 @@ if base.startswith(('outfit:', 'creature:', 'base:')):
     rig.animation_data_create()
 
 def setup_scene():
-    sc.render.engine = 'CYCLES'; sc.cycles.samples = 36; sc.cycles.device = 'CPU'; sc.cycles.use_denoising = False
+    sc.render.engine = 'CYCLES'; sc.cycles.samples = int(os.environ.get('SAMPLES', '36')); sc.cycles.device = 'CPU'; sc.cycles.use_denoising = False
     sc.render.film_transparent = True
     if base.startswith('proc:'): sc.view_settings.view_transform = 'Standard'
     sc.render.resolution_x, sc.render.resolution_y = CW * SHRINK, CH * SHRINK
