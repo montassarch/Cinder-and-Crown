@@ -14,6 +14,7 @@ signal scene_requested(path: String)
 signal world_requested(biome: BiomeData)
 
 const ENEMY_DIR := "res://data/enemies"
+const BOSS_DIR := "res://data/bosses"
 const WEAPON_DIR := "res://data/weapons"
 const PANEL_MARGIN_TILES: float = 0.25
 const TOGGLE_SIZE_TILES := Vector2(2.75, 1.1)
@@ -35,7 +36,7 @@ var _world_picker: OptionButton
 func _ready() -> void:
 	layer = 20
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	for path in DataScanner.list(ENEMY_DIR):
+	for path in DataScanner.list(ENEMY_DIR) + DataScanner.list(BOSS_DIR):
 		var enemy := load(path) as EnemyData
 		if enemy != null:
 			_enemies.append(enemy)

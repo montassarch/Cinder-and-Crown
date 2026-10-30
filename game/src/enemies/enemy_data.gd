@@ -43,6 +43,15 @@ enum Pattern { SEQUENCE, RANDOM }
 @export var tint: Color = Color(0.6, 0.6, 0.6)
 
 
+## A boss: a health bar across the screen, no knockback, and (optionally) a second phase.
+@export var boss: bool = false
+## Below `phase_two_at` of its health it plays these moves instead (empty: no second phase), moving
+## `phase_two_speed` times faster.
+@export var phase_two_moves: Array[EnemyMove] = []
+@export var phase_two_at: float = 0.5
+@export var phase_two_speed: float = 1.3
+
+
 ## The moves to play: the listed ones, or one built from the older attack fields.
 func effective_moves() -> Array[EnemyMove]:
 	if not moves.is_empty():

@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EnemyMove" format=3]
+
+[ext_resource type="Script" path="res://src/enemies/enemy_move.gd" id="1_move"]
+
+[resource]
+script = ExtResource("1_move")
+id = "king_lightning_wide"
+kind = 6
+telegraph_seconds = 0.8
+active_seconds = 0.3
+recovery_seconds = 0.5
+damage = 20
+reach_tiles = 0.8
+parryable = false
+count = 5
+spacing_tiles = 3.0
+hazard_art = &"lightning_strike"
+hazard_height_tiles = 6.0

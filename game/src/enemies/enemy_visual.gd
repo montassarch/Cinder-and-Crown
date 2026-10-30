@@ -89,9 +89,13 @@ func show_state(state: Enemy.State, facing: float, moving: bool, kind: EnemyMove
 	var anim := animation_for(state, moving, kind)
 	if anim == &"Dash" and not sprite_frames.has_animation(&"Dash"):
 		anim = &"Strike"
+	# a caster (a boss) raises its hands for floor hazards and summons instead of swinging
+	if kind in [EnemyMove.Kind.HAZARD, EnemyMove.Kind.SUMMON] and anim in FITTED and sprite_frames.has_animation(&"Cast" + anim):
+		anim = &"Cast" + anim
 	if anim != animation:
-		var seconds := {&"Windup": windup, &"Strike": strike, &"Recover": recovery}.get(anim, 0.0) as float
-		if anim in FITTED and seconds > 0.0:
+		var phase := StringName(str(anim).trim_prefix("Cast"))
+		var seconds := {&"Windup": windup, &"Strike": strike, &"Recover": recovery}.get(phase, 0.0) as float
+		if phase in FITTED and seconds > 0.0:
 			speed_scale = float(sprite_frames.get_frame_count(anim)) / seconds / BASE_FPS
 		else:
 			speed_scale = 1.0

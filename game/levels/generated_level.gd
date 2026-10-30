@@ -5,6 +5,8 @@ extends Sandbox
 ## comes from Sandbox.
 
 signal level_completed
+## The last world's boss fell.
+signal run_won
 
 const ROOM_DIR := "res://data/rooms"
 const BOON_DIR := "res://data/boons"
@@ -18,6 +20,8 @@ const WAVE_FIRST_SLOT_TILES: float = 9.0
 const WAVE_END_MARGIN_TILES: float = 2.0
 const GATE_SHUT_COLOR := Color(0.9, 0.2, 0.2, 0.45)
 const OFFER_COUNT: int = 3
+## The boss appears once the hero is this far into its arena.
+const BOSS_TRIGGER_TILES: float = 4.0
 
 @export var level_seed: int = 1
 @export var room_count: int = 6
@@ -36,6 +40,12 @@ var _gate_color := Color.WHITE
 var _depth: int = 0
 var _meta_upgrades: Array[MetaUpgradeData] = []
 var _cells_run: int = 0
+## The boss arena's left edge in tiles (-1 on an ordinary level), and the boss once it has appeared.
+var _arena_start: float = -1.0
+var _boss: Enemy
+var _boss_spawn: Vector2
+var _boss_beaten: bool = false
+var _boss_spawned: bool = false
 
 @onready var _rooms: Node2D = $Rooms
 @onready var _walls: Node2D = $Walls
@@ -90,11 +100,46 @@ func exit_gate_color() -> Color:
 func _process(delta: float) -> void:
 	super(delta)
 	_trigger_encounters()
+	_trigger_boss()
 	_update_exit_gate()
 
 
 func _exit_open() -> bool:
+	if is_boss_level() and encounters_enabled and not _boss_beaten:
+		return false
 	return not encounters_enabled or enemy_count() == 0
+
+
+## True on a world's last level: spawn room, the boss's arena, exit.
+func is_boss_level() -> bool:
+	return biome() != null and biome().boss != null and _depth == biome().boss_depth()
+
+
+func _trigger_boss() -> void:
+	if _arena_start < 0.0 or _boss_spawned or player == null or not encounters_enabled:
+		return
+	if player.global_position.x >= GameConfig.tiles(_arena_start + BOSS_TRIGGER_TILES):
+		_boss_spawned = true
+		_boss = spawn_enemy_at(biome().boss, _boss_spawn)
+		_boss.died.connect(_on_boss_died.bind(biome().boss))
+		_hud.show_boss(_boss)
+
+
+## A boss pays its cells and refills the flask; the last world's boss wins the run.
+func _on_boss_died(data: EnemyData) -> void:
+	_boss_beaten = true
+	# whatever it summoned crumbles with it
+	for child in get_children():
+		if child is Enemy and not child.is_dead() and not child.data.boss:
+			child.take_hit(1000000, child.global_position.x)
+	_on_enemy_died(data.cell_reward)
+	player.set_flask_charges(player.flask_max())
+	_hud.hide_boss()
+	if _depth >= BiomeData.load_all().back().boss_depth():
+		_hud.show_banner("VICTORY", "%s has fallen. The crown is yours." % data.display_name.trim_prefix("The "))
+		run_won.emit()
+	else:
+		_hud.show_banner("%s falls" % data.display_name, "The way on is open")
 
 
 func _trigger_encounters() -> void:
@@ -201,7 +246,15 @@ func _build_arena() -> void:
 		var room := load(path) as RoomData
 		if room != null:
 			pool.append(room)
-	_layout = LevelGenerator.generate(pool, room_count, level_seed)
+	_arena_start = -1.0
+	_boss = null
+	_boss_beaten = false
+	_boss_spawned = false
+	_hud.hide_boss()
+	if is_boss_level():
+		_layout = _boss_layout(pool)
+	else:
+		_layout = LevelGenerator.generate(pool, room_count, level_seed)
 	if _layout.is_empty():
 		push_error("GeneratedLevel: no valid level from %d rooms in %s (seed %d)" % [pool.size(), ROOM_DIR, level_seed])
 		_width_tiles = ARENA_WIDTH_TILES
@@ -216,6 +269,9 @@ func _build_arena() -> void:
 		instance.position = GameConfig.tiles_v(cursor, 0.0)
 		_skin_room(instance)
 		_rooms.add_child(instance)
+		if room.kind == RoomData.Kind.BOSS:
+			_arena_start = cursor
+			_boss_spawn = (instance.get_node("BossSpawn") as Marker2D).global_position
 		if room.kind == RoomData.Kind.SPAWN:
 			_spawn = (instance.get_node("PlayerSpawn") as Marker2D).global_position
 		elif room.kind == RoomData.Kind.EXIT:
@@ -231,6 +287,19 @@ func _build_arena() -> void:
 	var wall_height := WALL_HEIGHT_TILES + GROUND_THICKNESS_TILES
 	_add_block(Rect2(-CAMERA_MARGIN_TILES, wall_top, CAMERA_MARGIN_TILES, wall_height), GROUND_COLOR, false, _walls)
 	_add_block(Rect2(_width_tiles, wall_top, CAMERA_MARGIN_TILES, wall_height), GROUND_COLOR, false, _walls)
+
+
+## A boss level: a spawn room, the arena, an exit (picked by the level's seed when there are several).
+func _boss_layout(pool: Array[RoomData]) -> Array[RoomData]:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = level_seed
+	var layout: Array[RoomData] = []
+	for kind in [RoomData.Kind.SPAWN, RoomData.Kind.BOSS, RoomData.Kind.EXIT]:
+		var options := pool.filter(func(r: RoomData) -> bool: return r.kind == kind)
+		if options.is_empty():
+			return []
+		layout.append(options[rng.randi_range(0, options.size() - 1)])
+	return layout
 
 
 ## Rooms are authored with flat colour blocks; they wear the world's floor and ledge tiles instead.

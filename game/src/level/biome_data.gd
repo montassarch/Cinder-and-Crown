@@ -23,10 +23,18 @@ const DIR := "res://data/biomes"
 @export var light_fps: float = 9.0
 ## The enemies its waves are drawn from.
 @export var enemies: Array[EnemyData] = []
+## Levels in this world; the last one is the boss's arena.
+@export var levels: int = 3
+@export var boss: EnemyData
 
 
 func art_path(name: String) -> String:
 	return "%s/%s.png" % [art_dir, name]
+
+
+## The depth of this world's boss level (its last).
+func boss_depth() -> int:
+	return first_depth + levels - 1
 
 
 ## Every world, in the order a run reaches them.

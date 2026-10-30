@@ -32,6 +32,10 @@ var _banner: VBoxContainer
 var _banner_title: Label
 var _banner_sub: Label
 var _banner_left: float = 0.0
+var _boss: Enemy
+var _boss_box: Control
+var _boss_fill: ColorRect
+var _boss_label: Label
 
 
 func _ready() -> void:
@@ -64,7 +68,78 @@ func _ready() -> void:
 	_cells_label.position = _flask_label.position + Vector2(0.0, GameConfig.tiles(0.8))
 	_cells_label.add_theme_color_override("font_color", Color(0.55, 0.95, 1.0))
 	_make_banner(theme)
+	_make_boss_bar(theme)
 	_refresh()
+
+
+## A wide bar along the bottom of the screen's top band, with the boss's name over it.
+const BOSS_BAR_SIZE_TILES := Vector2(14.0, 0.45)
+const BOSS_FILL_COLOR := Color(0.85, 0.15, 0.25)
+
+
+func _make_boss_bar(theme: Theme) -> void:
+	_boss_box = Control.new()
+	_boss_box.name = "BossBar"
+	_boss_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var size := GameConfig.tiles_v(BOSS_BAR_SIZE_TILES.x, BOSS_BAR_SIZE_TILES.y)
+	var back := ColorRect.new()
+	back.color = Color(0.08, 0.03, 0.05, 0.85)
+	back.size = size + Vector2(4, 4)
+	back.position = Vector2(-2, -2)
+	back.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_boss_fill = ColorRect.new()
+	_boss_fill.color = BOSS_FILL_COLOR
+	_boss_fill.size = size
+	_boss_fill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_boss_label = Label.new()
+	_boss_label.theme = theme
+	_boss_label.add_theme_color_override("font_color", Color(1.0, 0.88, 0.7))
+	_boss_label.add_theme_color_override("font_outline_color", Color(0.05, 0.02, 0.04))
+	_boss_label.add_theme_constant_override("outline_size", 4)
+	_boss_label.position = Vector2(0, -GameConfig.tiles(1.0))
+	_boss_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	for c in [back, _boss_fill, _boss_label]:
+		_boss_box.add_child(c)
+	add_child(_boss_box)
+	_boss_box.visible = false
+
+
+func show_boss(boss: Enemy) -> void:
+	_boss = boss
+	_boss_label.text = boss.data.display_name
+	var view := get_viewport().get_visible_rect().size
+	_boss_box.position = Vector2((view.x - GameConfig.tiles(BOSS_BAR_SIZE_TILES.x)) / 2.0, view.y - GameConfig.tiles(1.2))
+	_boss_box.visible = true
+	_refresh_boss()
+
+
+func hide_boss() -> void:
+	_boss = null
+	if _boss_box != null:
+		_boss_box.visible = false
+
+
+func boss_visible() -> bool:
+	return _boss_box.visible
+
+
+func boss_name() -> String:
+	return _boss_label.text
+
+
+func boss_fraction() -> float:
+	if not is_instance_valid(_boss):
+		return 0.0
+	return float(_boss.health().current) / float(maxi(_boss.health().max_health, 1))
+
+
+func _refresh_boss() -> void:
+	if not _boss_box.visible:
+		return
+	if not is_instance_valid(_boss):
+		hide_boss()
+		return
+	_boss_fill.size.x = GameConfig.tiles(BOSS_BAR_SIZE_TILES.x) * boss_fraction()
 
 
 func _make_banner(theme: Theme) -> void:
@@ -181,6 +256,8 @@ func _process(delta: float) -> void:
 
 
 func _refresh() -> void:
+	if _boss_box != null:
+		_refresh_boss()
 	_weapons.text = weapon_text()
 	_enemies.text = enemy_text()
 	_flask_label.text = flask_text()

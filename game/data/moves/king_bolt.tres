@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EnemyMove" format=3]
+
+[ext_resource type="Script" path="res://src/enemies/enemy_move.gd" id="1_move"]
+
+[resource]
+script = ExtResource("1_move")
+id = "king_bolt"
+kind = 1
+telegraph_seconds = 0.5
+active_seconds = 0.15
+recovery_seconds = 0.5
+damage = 14
+speed_tiles = 13.0
+range_tiles = 18.0
+parryable = true
+tint = Color(0.65, 0.75, 1, 1)

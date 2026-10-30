@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EnemyMove" format=3]
+
+[ext_resource type="Script" path="res://src/enemies/enemy_move.gd" id="1_move"]
+
+[resource]
+script = ExtResource("1_move")
+id = "tyrant_crash"
+kind = 6
+telegraph_seconds = 0.9
+active_seconds = 0.35
+recovery_seconds = 0.9
+damage = 22
+reach_tiles = 2.2
+parryable = false
+count = 1
+spacing_tiles = 0.0
+hazard_art = &"ember_crash"
+hazard_height_tiles = 3.0

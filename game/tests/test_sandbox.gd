@@ -110,9 +110,9 @@ func test_hud_shows_the_flask_charges() -> void:
 	_sandbox.player.set_flask_charges(1)
 	assert_str(hud.flask_text()).contains("1/%d" % Player.FLASK_BASE_CHARGES)
 
-func test_menu_lists_every_shipped_enemy_and_both_weapon_slots() -> void:
+func test_menu_lists_every_shipped_enemy_and_boss_and_both_weapon_slots() -> void:
 	var menu: SandboxMenu = _sandbox.get_node("Menu")
-	assert_int(menu.spawn_button_count()).is_equal(DataScanner.list("res://data/enemies").size())
+	assert_int(menu.spawn_button_count()).is_equal(DataScanner.list("res://data/enemies").size() + DataScanner.list("res://data/bosses").size())
 	assert_int(menu.weapon_choice_count()).is_equal(DataScanner.list("res://data/weapons").size())
 
 func test_menu_buttons_drive_the_sandbox() -> void:

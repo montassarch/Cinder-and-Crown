@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EnemyMove" format=3]
+
+[ext_resource type="Script" path="res://src/enemies/enemy_move.gd" id="1_move"]
+[ext_resource type="Resource" path="res://data/enemies/shambler.tres" id="2_s"]
+
+[resource]
+script = ExtResource("1_move")
+id = "bishop_call"
+kind = 7
+telegraph_seconds = 0.9
+active_seconds = 0.1
+recovery_seconds = 0.8
+damage = 0
+parryable = false
+count = 2
+summon = ExtResource("2_s")

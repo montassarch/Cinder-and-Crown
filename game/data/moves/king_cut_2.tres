@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EnemyMove" format=3]
+
+[ext_resource type="Script" path="res://src/enemies/enemy_move.gd" id="1_move"]
+
+[resource]
+script = ExtResource("1_move")
+id = "king_cut_2"
+kind = 0
+telegraph_seconds = 0.3
+active_seconds = 0.12
+recovery_seconds = 0.6
+damage = 16
+reach_tiles = 2.4
+parryable = true

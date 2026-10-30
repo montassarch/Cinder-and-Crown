@@ -8,6 +8,8 @@
 [ext_resource type="Resource" path="res://data/enemies/penitent.tres" id="e3"]
 [ext_resource type="Resource" path="res://data/enemies/cinder_bat.tres" id="e4"]
 
+[ext_resource type="Resource" path="res://data/bosses/rime_colossus.tres" id="boss"]
+
 [resource]
 script = ExtResource("1_b")
 id = "frost_ossuary"
@@ -23,3 +25,5 @@ light_x = Array[float]([70.0, 300.0])
 light_y = 150.0
 light_fps = 6.0
 enemies = Array[ExtResource("2_e")]([ExtResource("e0"), ExtResource("e1"), ExtResource("e2"), ExtResource("e3"), ExtResource("e4")])
+levels = 3
+boss = ExtResource("boss")

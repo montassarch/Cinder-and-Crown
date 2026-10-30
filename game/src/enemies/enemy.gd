@@ -10,6 +10,8 @@ signal guard_broken
 ## The enemy blew itself up. It is gone without being killed, so `died` is not emitted
 ## (a self-destruct pays no cells).
 signal exploded
+## A boss fell below its phase threshold and plays its second set of moves from now on.
+signal phase_changed(phase: int)
 
 enum State { MOVE, TELEGRAPH, STRIKE, RECOVER, DEAD, STUNNED }
 
@@ -68,6 +70,10 @@ const POISE_PIP_GAP: float = 2.0
 const PARRY_STAGGER: float = 0.8
 const PERFECT_PARRY_STAGGER: float = 1.3
 const PARRY_KNOCKBACK_TILES: float = 1.5
+## A summon adds no one while this many enemies are already up.
+const SUMMON_CAP: int = 5
+## Summoned enemies appear this far either side of the caster.
+const SUMMON_SPREAD_TILES: float = 2.5
 
 ## Who this enemy hunts. Falls back to the first node in group "player".
 var target: Node2D
@@ -99,6 +105,7 @@ var _poise_idle: float = 0.0
 var _vulnerable_left: float = 0.0
 ## The sprite, when this enemy has art (the coloured box is then hidden but keeps carrying the state colour).
 var _art: EnemyVisual
+var _phase: int = 1
 
 @onready var _health: Health = $Health
 @onready var _body: ColorRect = $Body
@@ -151,6 +158,18 @@ func facing() -> float:
 ## The attack being played (winding up, striking or recovering); null between attacks.
 func current_move() -> EnemyMove:
 	return _move
+
+
+## 1, or 2 once a boss has passed its phase threshold.
+func phase() -> int:
+	return _phase
+
+
+## The moves it plays now: its second phase's once that has begun.
+func moves() -> Array[EnemyMove]:
+	if _phase == 2 and not data.phase_two_moves.is_empty():
+		return data.phase_two_moves
+	return data.effective_moves()
 
 
 func move_index() -> int:
@@ -226,11 +245,35 @@ func on_parried(perfect: bool, from_x: float) -> void:
 func begin_telegraph() -> void:
 	if data == null or _state != State.MOVE or _rest_left > 0.0:
 		return
-	var moves := data.effective_moves()
+	var moves := moves()
 	var index := 0
-	if data.pattern == EnemyData.Pattern.RANDOM and moves.size() > 1:
+	if data.boss:
+		# a boss only picks what can reach the hero from where it stands; with nothing, it keeps walking
+		var usable: Array[int] = []
+		for i in moves.size():
+			if _reaches_from_here(moves[i]):
+				usable.append(i)
+		if usable.is_empty():
+			return
+		index = usable[rng.randi_range(0, usable.size() - 1)] if data.pattern == EnemyData.Pattern.RANDOM else usable[0]
+	elif data.pattern == EnemyData.Pattern.RANDOM and moves.size() > 1:
 		index = rng.randi_range(0, moves.size() - 1)
 	_start_move(index)
+
+
+## A swing needs the hero in reach; a rush or a dive needs him within a few strides; casts, shots and slams reach
+## anywhere in the room.
+func _reaches_from_here(move: EnemyMove) -> bool:
+	var foe := _current_target()
+	if foe == null:
+		return false
+	var distance := absf(foe.global_position.x - global_position.x)
+	match move.kind:
+		EnemyMove.Kind.MELEE, EnemyMove.Kind.EXPLODE:
+			return distance <= GameConfig.tiles(move.reach_tiles * STRIKE_REACH_FACTOR)
+		EnemyMove.Kind.DASH:
+			return distance <= GameConfig.tiles(move.speed_tiles * move.active_seconds)
+	return true
 
 
 func _start_move(index: int) -> void:
@@ -238,15 +281,17 @@ func _start_move(index: int) -> void:
 	if foe != null:
 		_facing = signf(foe.global_position.x - global_position.x) if foe.global_position.x != global_position.x else _facing
 	_move_index = index
-	_move = data.effective_moves()[index]
+	_move = moves()[index]
 	_state = State.TELEGRAPH
 	_body.color = TELEGRAPH_FLASH
 	_telegraph_timer.start(maxf(_move.telegraph_seconds, 0.001))
+	if _move.kind == EnemyMove.Kind.HAZARD and foe != null:
+		_place_hazards(_move, foe)
 
 
 ## A SEQUENCE string goes on to its next move; a RANDOM attack is one move.
 func _has_next_move() -> bool:
-	return data.pattern == EnemyData.Pattern.SEQUENCE and _move_index + 1 < data.effective_moves().size()
+	return data.pattern == EnemyData.Pattern.SEQUENCE and _move_index + 1 < moves().size()
 
 
 ## Contract used by Weapon: damage lands, health drops, the body is knocked back.
@@ -263,10 +308,20 @@ func take_hit(damage: int, source_x: float, knockback_tiles: float = 0.0) -> voi
 		_art.flash()
 	if _state == State.DEAD:
 		return
-	if knockback_tiles > 0.0:
+	_check_phase()
+	if knockback_tiles > 0.0 and not data.boss:
 		var direction := signf(global_position.x - source_x)
 		_knockback_x = direction * GameConfig.tiles(sqrt(2.0 * KNOCKBACK_DECAY * knockback_tiles))
 	_react_to_hit()
+
+
+func _check_phase() -> void:
+	if _phase != 1 or data.phase_two_moves.is_empty():
+		return
+	if _health.current <= _health.max_health * data.phase_two_at:
+		_phase = 2
+		_move_index = 0
+		phase_changed.emit(2)
 
 
 ## True when a hit came from the side the enemy faces (its shield side).
@@ -362,7 +417,7 @@ func _physics_process(delta: float) -> void:
 func _update_art() -> void:
 	if _art == null:
 		return
-	var move: EnemyMove = _move if _move != null else data.effective_moves()[0]
+	var move: EnemyMove = _move if _move != null else moves()[0]
 	var colour := _body.color
 	var tint := Color.WHITE if colour == data.tint or colour == TELEGRAPH_FLASH else colour.lerp(Color.WHITE, 0.2)
 	_art.show_state(_state, _facing, absf(velocity.x) > 1.0, move.kind, move.telegraph_seconds, move.active_seconds, move.recovery_seconds, tint)
@@ -381,7 +436,7 @@ func _think_move(foe: Node2D, delta: float) -> float:
 	if foe == null:
 		return 0.0
 	var offset := foe.global_position - global_position
-	var speed := GameConfig.tiles(data.move_speed_tiles)
+	var speed := GameConfig.tiles(data.move_speed_tiles) * (data.phase_two_speed if _phase == 2 else 1.0)
 	var reach := GameConfig.tiles(data.attack_range_tiles)
 
 	match data.behaviour:
@@ -408,6 +463,8 @@ func _think_move(foe: Node2D, delta: float) -> float:
 		_:
 			if absf(offset.x) <= reach * 0.9 and absf(offset.y) <= GameConfig.tiles(2.0):
 				begin_telegraph()
+				if data.boss and _state == State.MOVE and absf(offset.x) > GameConfig.tiles(1.0):
+					return signf(offset.x) * speed  # nothing it has reaches yet: close in
 				return 0.0
 			return signf(offset.x) * speed
 
@@ -506,6 +563,8 @@ func _on_telegraph_timeout() -> void:
 			_fire_projectile(move)
 		EnemyMove.Kind.SLAM:
 			_launch_waves(move)
+		EnemyMove.Kind.SUMMON:
+			_summon(move)
 		EnemyMove.Kind.EXPLODE:
 			var target_foe := _current_target()
 			if target_foe != null and global_position.distance_to(target_foe.global_position) <= GameConfig.tiles(move.reach_tiles):
@@ -537,6 +596,42 @@ func _fire_projectile(move: EnemyMove) -> void:
 	if move.tint.a > 0.0:
 		shot.color = move.tint
 	shot.launch(_facing, GameConfig.tiles(move.speed_tiles), GameConfig.tiles(move.range_tiles), move.damage, self)
+
+
+## Marks the floor round the hero: `count` spots `spacing_tiles` apart, centred on him. Each erupts as the wind-up ends.
+func _place_hazards(move: EnemyMove, foe: Node2D) -> void:
+	var floor_y := _floor_below(foe)
+	for i in move.count:
+		var offset := (float(i) - float(move.count - 1) / 2.0) * GameConfig.tiles(move.spacing_tiles)
+		GroundHazard.spawn(get_parent(), move.hazard_art, Vector2(foe.global_position.x + offset, floor_y),
+				GameConfig.tiles(move.reach_tiles), GameConfig.tiles(move.hazard_height_tiles), move.telegraph_seconds,
+				move.active_seconds, move.damage, global_position.x, foe)
+
+
+## The floor under `who` (straight down); if there is none in reach, where his feet are.
+func _floor_below(who: Node2D) -> float:
+	var from := who.global_position
+	var query := PhysicsRayQueryParameters2D.create(from, from + Vector2(0.0, GameConfig.tiles(20.0)), WORLD_MASK)
+	var hit := get_world_2d().direct_space_state.intersect_ray(query)
+	if not hit.is_empty():
+		return (hit["position"] as Vector2).y
+	return from.y + GameConfig.tiles(Player.BODY_SIZE_TILES.y) / 2.0
+
+
+## Calls `count` of `summon` beside the caster through the level (anything with spawn_enemy_at), unless the room is
+## already crowded.
+func _summon(move: EnemyMove) -> void:
+	var level := get_parent()
+	if level == null or not level.has_method("spawn_enemy_at"):
+		return
+	var crowd := get_tree().get_nodes_in_group("enemy").filter(func(e: Node) -> bool: return not e.is_dead() and not e.is_queued_for_deletion())
+	var room := maxi(SUMMON_CAP - crowd.size() + 1, 0)
+	for i in mini(move.count, room):
+		var side := -1.0 if i % 2 == 0 else 1.0
+		var at := global_position + Vector2(side * GameConfig.tiles(SUMMON_SPREAD_TILES * (1 + i / 2)), 0.0)
+		var minion: Enemy = level.spawn_enemy_at(move.summon, at)
+		if minion != null:
+			minion.target = _current_target()
 
 
 ## A slam sends a shockwave along the floor each way.

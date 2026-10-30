@@ -1,5 +1,5 @@
 # Hand-painted (cel-shaded) combat effects, drawn in code: hard colour bands, ragged flame edges, a soft glow.
-#   python3 toon_fx.py <out_dir>
+#   python3 toon_fx.py <out_dir>        (the game's copy: game/art/fx_painted)
 # Output: <out_dir>/<effect>/<n>.png  (RGBA, 150 px per metre like art/fx) and <out_dir>/sheet.png (all frames on grey).
 # Effects: frost_blade (ice sword falls, crystals burst), tidal_slash (water crescent), arcane_ward (shield dome),
 #          ember_blade (flame twists into a sword), ember_crash (floor breaks, fire bursts), fire_pillar.
@@ -346,9 +346,44 @@ def ember_crash():
     return frames
 
 
+# ---------------------------------------------------------------- lightning strike (falls on a spot from the sky)
+def lightning_strike():
+    W, H = 200, 480
+    floor = H - 20
+    CORE, MID, EDGE = (250, 252, 255, 255), (150, 190, 255, 255), (50, 70, 200, 255)
+    frames = []
+    plan = [(0.4, 0.0, 0), (1.0, 0.6, 1), (1.0, 1.0, 2), (0.8, 0.8, 3), (0.45, 0.4, 4), (0.0, 0.15, 5)]
+    for i, (bolt, impact, seed) in enumerate(plan):
+        img = canvas(W, H); d = ImageDraw.Draw(img)
+        rng = np.random.default_rng(700 + seed)
+        if bolt:
+            pts = [(W / 2 + rng.uniform(-20, 20), 0)]
+            for k in range(1, 13):
+                pts.append((W / 2 + rng.uniform(-26, 26) * (1 - k / 14), floor * k / 12))
+            pts[-1] = (W / 2, floor)
+            for width, col in ((16, EDGE), (9, MID), (4, CORE)):
+                d.line([(x * SS, y * SS) for x, y in pts], fill=col[:3] + (int(255 * min(1, bolt + 0.2)),), width=int(width * bolt) * SS + SS, joint='curve')
+            for _ in range(3):                                   # forks
+                k = int(rng.integers(2, 9)); x, y = pts[k]; sgn = rng.choice((-1, 1))
+                fork = [(x, y), (x + sgn * 22, y + 30), (x + sgn * 34, y + 62)]
+                d.line([(fx * SS, fy * SS) for fx, fy in fork], fill=MID, width=4 * SS, joint='curve')
+                d.line([(fx * SS, fy * SS) for fx, fy in fork], fill=CORE, width=2 * SS)
+        if impact:
+            r = 60 * impact
+            d.ellipse(((W / 2 - r) * SS, (floor - r * 0.35) * SS, (W / 2 + r) * SS, (floor + r * 0.2) * SS), fill=(160, 200, 255, 200))
+            d.ellipse(((W / 2 - r * 0.6) * SS, (floor - r * 0.22) * SS, (W / 2 + r * 0.6) * SS, (floor + r * 0.12) * SS), fill=CORE)
+            for _ in range(int(10 * impact)):                    # sparks thrown off the floor
+                a = rng.uniform(math.pi * 1.05, math.pi * 1.95); L = rng.uniform(20, 60) * impact
+                x0, y0 = W / 2, floor - 4
+                d.line([(x0 * SS, y0 * SS), ((x0 + math.cos(a) * L) * SS, (y0 + math.sin(a) * L) * SS)], fill=MID, width=2 * SS)
+        frames.append(glow(down(img), 10, (80, 120, 255), 1.0))
+    return frames
+
+
 EFFECTS = {
     'frost_blade': frost_blade, 'tidal_slash': tidal_slash, 'arcane_ward': arcane_ward,
     'ember_blade': ember_blade, 'ember_crash': ember_crash, 'fire_pillar': fire_pillar,
+    'lightning_strike': lightning_strike,
 }
 
 if __name__ == '__main__':

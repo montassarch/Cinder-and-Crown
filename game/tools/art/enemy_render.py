@@ -12,6 +12,7 @@ ONLY = set(argv[3:])
 UAL = os.path.join(PACKS, 'Universal_Animation_Library/Universal Animation Library[Standard]/Unreal-Godot/UAL1_Standard.glb')
 OUTFITS = os.path.join(PACKS, 'Modular_Character_Outfits_-_Fantasy/Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Outfits')
 BEST = os.path.join(PACKS, 'bestiary/Bestiary - Dungeon Monsters Kit[Standard]/Exports/GLB (Godot-Unreal)')
+BASES = os.path.join(PACKS, 'Universal_Base_Characters/Universal Base Characters[Standard]/Base Characters/Godot - UE')
 SHRINK = 8
 
 # animation -> (library action, t0, t1, frame count, loops).  windup/strike/recover split one attack swing.
@@ -21,6 +22,10 @@ HUMAN_ANIMS = {
     'Recover': ('Sword_Attack', 0.78, 1.0, 3, False), 'Stun': ('Hit_Chest', 0.0, 1.0, 3, False),
     'Death': ('Death01', 0.0, 1.0, 6, False), 'Dash': ('Sprint_Loop', 0, 1, 6, True),
 }
+
+# bosses also cast: summons and floor hazards play these instead of the weapon swing
+BOSS_ANIMS = dict(HUMAN_ANIMS, CastWindup=('Spell_Simple_Enter', 0.0, 1.0, 4, False), CastStrike=('Spell_Simple_Shoot', 0.2, 0.7, 3, False),
+                  CastRecover=('Spell_Simple_Exit', 0.0, 1.0, 3, False))
 
 SPECS = {
     # canvas px, px per metre, eye colour, base model
@@ -37,6 +42,11 @@ SPECS = {
     'forge_brute': dict(base='creature:Imp', canvas=(120, 80), pxm=30, eye=(255, 170, 40), mul=(0.75, 0.32, 0.25), sat=0.9, val=0.7, props=['horns', 'hammer'], anims=HUMAN_ANIMS),
     'magma_bat': dict(base='proc:bat', canvas=(64, 48), pxm=60, eye=(255, 240, 150), anims={}, yaw=55, light=0.35, body=(60, 20, 14), wing=(220, 90, 20), wing_glow=3.0),
     'storm_knight': dict(base='outfit:Male_Ranger', canvas=(96, 64), pxm=24, eye=(150, 210, 255), mul=(0.38, 0.42, 0.72), sat=0.5, val=0.8, props=['storm_helm', 'breastplate', 'pauldrons', 'storm_sword'], anims=HUMAN_ANIMS),
+    # bosses (rendered big: more pixels per metre on a bigger canvas)
+    'hollow_bishop': dict(base='outfit:Male_Ranger', canvas=(176, 112), pxm=44, eye=(255, 215, 100), mul=(0.62, 0.32, 0.85), sat=0.9, val=0.85, props=['mitre', 'crozier'], anims=BOSS_ANIMS),
+    'rime_colossus': dict(base='creature:Imp', canvas=(240, 160), pxm=66, eye=(150, 235, 255), mul=(0.5, 0.68, 1.0), sat=0.5, val=0.95, props=['ice_mantle'], anims=BOSS_ANIMS),
+    'forge_tyrant': dict(base='creature:Imp', canvas=(240, 160), pxm=64, eye=(255, 190, 50), mul=(0.85, 0.32, 0.2), sat=0.9, val=0.6, props=['horns', 'molten_plate'], anims=BOSS_ANIMS),
+    'storm_king': dict(base='outfit:Male_Ranger', canvas=(176, 112), pxm=42, eye=(170, 225, 255), mul=(0.25, 0.3, 0.55), sat=0.7, val=0.7, props=['king_crown', 'breastplate', 'pauldrons', 'storm_sword'], anims=BOSS_ANIMS),
     'storm_wisp': dict(base='proc:wisp', canvas=(48, 48), pxm=50, eye=(255, 250, 200), anims={}, light=0.0, core=(170, 190, 255), glow=(50, 80, 255)),
 }
 SPEC = SPECS[ENEMY]
@@ -175,6 +185,41 @@ def build_props(rig, props):
             for part in (add('cube', (hx, hy, hz), (0.03, 0.17, 0.03), DARK), add('cube', (hx, hy - 0.19, hz), (0.02, 0.03, 0.19), GOLD),
                          add('cube', (hx, hy - 0.62, hz), (0.05, 0.80, 0.05), STEEL), add('cube', (hx, hy - 0.62, hz + 0.03), (0.055, 0.78, 0.01), STORM)):
                 attach(part, rig, 'hand_r')
+        elif p == 'mitre':
+            attach(add('cone', (0, 0.0, 1.95), (0.11, 0.08, 0.26), CLOTH), rig, 'Head')
+            attach(add('cube', (0, -0.075, 1.93), (0.03, 0.01, 0.2), GOLD), rig, 'Head')
+            attach(add('cube', (0, -0.075, 1.95), (0.12, 0.01, 0.03), GOLD), rig, 'Head')
+            attach(add('sphere', (0, -0.02, 1.70), (0.10, 0.10, 0.11), BONE), rig, 'Head')               # a skull under the hood
+            attach(add('sphere', (0, -0.095, 1.705), (0.07, 0.03, 0.03), DARK), rig, 'Head')
+        elif p == 'crozier':
+            hx, hy, hz = -0.76, 0.07, 1.44
+            attach(add('cyl', (hx, hy, hz - 0.2), (0.025, 0.025, 1.9), GOLD), rig, 'hand_r')            # an upright staff
+            attach(add('torus', (hx, hy - 0.1, hz + 0.85), (0.12, 0.12, 0.12), GOLD, rot=(math.radians(90), 0, 0), minor=0.25), rig, 'hand_r')
+            attach(add('sphere', (hx, hy - 0.1, hz + 0.85), (0.05, 0.05, 0.05), FUSE), rig, 'hand_r')
+        elif p == 'ice_mantle':
+            sb = 'spine_02' if 'spine_02' in rig.data.bones else 'spine_03'
+            h = rig.data.bones[sb].head_local
+            hb = rig.data.bones['Head'].tail_local
+            for k in range(7):                                                                   # a ridge of ice down the back
+                a = (k - 3) * 0.32
+                attach(add('cone', (h[0] + math.sin(a) * 0.14, h[1] + 0.16, h[2] + 0.1 + math.cos(a) * 0.12), (0.05, 0.05, 0.22 + 0.06 * (3 - abs(k - 3))), ICE, rot=(math.radians(-50), math.radians(a * 40), 0)), rig, sb)
+            for k, dx in enumerate((-0.07, 0.0, 0.07)):
+                attach(add('cone', (hb[0] + dx, hb[1], hb[2] + 0.08 + (0.04 if k == 1 else 0)), (0.035, 0.035, 0.14 + (0.06 if k == 1 else 0)), ICE), rig, 'Head')
+        elif p == 'molten_plate':
+            sb = 'spine_02' if 'spine_02' in rig.data.bones else 'spine_03'
+            h = rig.data.bones[sb].head_local
+            attach(add('cube', (h[0], h[1] - 0.14, h[2] + 0.08), (0.28, 0.06, 0.26), IRON), rig, sb)
+            attach(add('cube', (h[0], h[1] - 0.18, h[2] + 0.08), (0.16, 0.02, 0.14), EMBER_GLOW), rig, sb)
+        elif p == 'king_crown':
+            hb = rig.data.bones['Head'].tail_local
+            cz = hb[2] + 0.02
+            attach(add('torus', (hb[0], hb[1], cz), (0.11, 0.11, 0.2), GOLD, minor=0.03), rig, 'Head')
+            for k in range(7):
+                a = k * math.tau / 7
+                attach(add('cone', (hb[0] + math.cos(a) * 0.11, hb[1] + math.sin(a) * 0.11, cz + 0.1), (0.03, 0.03, 0.14), GOLD), rig, 'Head')
+            attach(add('sphere', (hb[0], hb[1] - 0.11, cz + 0.02), (0.025, 0.025, 0.025), STORM), rig, 'Head')
+        elif p == 'cape':
+            attach(add('cube', (0, 0.14, 1.1), (0.42, 0.03, 0.85), CLOTH), rig, 'spine_03')
         elif p == 'crown':
             hb = rig.data.bones['Head'].tail_local
             cz = hb[2] + 0.16
@@ -189,13 +234,13 @@ sc = bpy.context.scene
 base = SPEC['base']
 rig = None
 eye_obj = None
-if base.startswith(('outfit:', 'creature:')):
+if base.startswith(('outfit:', 'creature:', 'base:')):
     bpy.ops.import_scene.gltf(filepath=UAL)
     old = list(bpy.data.objects)
     for o in [o for o in old if o.type == 'MESH']: bpy.data.objects.remove(o, do_unlink=True)
     actions = {a.name: a for a in bpy.data.actions}
     kind, name = base.split(':')
-    path = os.path.join(OUTFITS, name + '.gltf') if kind == 'outfit' else os.path.join(BEST, name + '.glb')
+    path = {'outfit': os.path.join(OUTFITS, name + '.gltf'), 'creature': os.path.join(BEST, name + '.glb'), 'base': os.path.join(BASES, name + '.gltf')}[kind]
     before = set(bpy.data.objects)
     bpy.ops.import_scene.gltf(filepath=path)
     rig = [o for o in bpy.data.objects if o not in before and o.type == 'ARMATURE'][0]

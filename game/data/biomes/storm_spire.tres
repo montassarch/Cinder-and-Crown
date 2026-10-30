@@ -9,6 +9,8 @@
 [ext_resource type="Resource" path="res://data/enemies/frost_ghoul.tres" id="e4"]
 [ext_resource type="Resource" path="res://data/enemies/forge_brute.tres" id="e5"]
 
+[ext_resource type="Resource" path="res://data/bosses/storm_king.tres" id="boss"]
+
 [resource]
 script = ExtResource("1_b")
 id = "storm_spire"
@@ -24,3 +26,5 @@ light_x = Array[float]([80.0, 260.0])
 light_y = 140.0
 light_fps = 8.0
 enemies = Array[ExtResource("2_e")]([ExtResource("e0"), ExtResource("e1"), ExtResource("e2"), ExtResource("e3"), ExtResource("e4"), ExtResource("e5")])
+levels = 3
+boss = ExtResource("boss")

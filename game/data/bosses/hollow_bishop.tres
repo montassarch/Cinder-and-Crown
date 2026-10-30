@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/enemies/enemy_data.gd" id="1_data"]
+[ext_resource type="Script" path="res://src/enemies/enemy_move.gd" id="2_move"]
+[ext_resource type="Resource" path="res://data/moves/bishop_sweep.tres" id="m0"]
+[ext_resource type="Resource" path="res://data/moves/bishop_pillars.tres" id="m1"]
+[ext_resource type="Resource" path="res://data/moves/bishop_call.tres" id="m2"]
+[ext_resource type="Resource" path="res://data/moves/bishop_pillars_wide.tres" id="m3"]
+[ext_resource type="Resource" path="res://data/moves/bishop_slam.tres" id="m4"]
+
+[resource]
+script = ExtResource("1_data")
+display_name = "The Hollow Bishop"
+art = "hollow_bishop"
+max_health = 520
+move_speed_tiles = 1.6
+attack_damage = 14
+attack_range_tiles = 8.0
+telegraph_seconds = 0.6
+recovery_seconds = 0.8
+behaviour = 0
+moves = Array[ExtResource("2_move")]([ExtResource("m0"), ExtResource("m1"), ExtResource("m2")])
+pattern = 1
+chain_gap_seconds = 0.2
+cooldown_seconds = 0.9
+poise = 8
+threat = 0
+unlock_depth = 99
+max_per_wave = 1
+cell_reward = 40
+body_size_tiles = Vector2(1.4, 3.2)
+tint = Color(0.6, 0.35, 0.8, 1)
+boss = true
+phase_two_moves = Array[ExtResource("2_move")]([ExtResource("m0"), ExtResource("m3"), ExtResource("m4"), ExtResource("m2")])
+phase_two_at = 0.5
+phase_two_speed = 1.3

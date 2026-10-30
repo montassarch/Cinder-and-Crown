@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="RoomData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/level/room_data.gd" id="1_data"]
+[ext_resource type="PackedScene" path="res://data/rooms/room_arena.tscn" id="2_scene"]
+
+[resource]
+script = ExtResource("1_data")
+scene = ExtResource("2_scene")
+kind = 3
+size_tiles = Vector2i(30, 14)

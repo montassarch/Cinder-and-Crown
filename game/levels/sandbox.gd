@@ -152,7 +152,7 @@ func spawn_enemy(data: EnemyData) -> Enemy:
 	var toward_center := 1.0 if player.global_position.x < GameConfig.tiles(arena_width_tiles() / 2.0) else -1.0
 	var x := player.global_position.x + toward_center * GameConfig.tiles(SPAWN_DISTANCE_TILES)
 	x = clampf(x, GameConfig.tiles(2.0), GameConfig.tiles(arena_width_tiles() - 2.0))
-	var height := AIR_SPAWN_HEIGHT_TILES if data.behaviour == EnemyData.Behaviour.FLYER else GROUND_SPAWN_HEIGHT_TILES
+	var height := AIR_SPAWN_HEIGHT_TILES if data.behaviour == EnemyData.Behaviour.FLYER else maxf(GROUND_SPAWN_HEIGHT_TILES, data.body_size_tiles.y / 2.0 + 0.5)
 	return spawn_enemy_at(data, Vector2(x, GameConfig.tiles(GROUND_TOP_TILES - height)))
 
 

@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EnemyMove" format=3]
+
+[ext_resource type="Script" path="res://src/enemies/enemy_move.gd" id="1_move"]
+
+[resource]
+script = ExtResource("1_move")
+id = "frost_fall"
+kind = 6
+telegraph_seconds = 1.1
+active_seconds = 0.4
+recovery_seconds = 0.8
+damage = 18
+reach_tiles = 1.0
+parryable = false
+count = 3
+spacing_tiles = 4.0
+hazard_art = &"frost_blade"
+hazard_height_tiles = 5.0
