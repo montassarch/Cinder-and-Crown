@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="BiomeData" format=3]
+
+[ext_resource type="Script" path="res://src/level/biome_data.gd" id="1_b"]
+[ext_resource type="Script" path="res://src/enemies/enemy_data.gd" id="2_e"]
+[ext_resource type="Resource" path="res://data/enemies/frost_ghoul.tres" id="e0"]
+[ext_resource type="Resource" path="res://data/enemies/rime_wisp.tres" id="e1"]
+[ext_resource type="Resource" path="res://data/enemies/crown_guard.tres" id="e2"]
+[ext_resource type="Resource" path="res://data/enemies/penitent.tres" id="e3"]
+[ext_resource type="Resource" path="res://data/enemies/cinder_bat.tres" id="e4"]
+
+[resource]
+script = ExtResource("1_b")
+id = "frost_ossuary"
+display_name = "The Frostbound Ossuary"
+subtitle = "Bones sleep under the ice"
+first_depth = 3
+art_dir = "res://art/biomes/frost_ossuary"
+clear_color = Color(0.05, 0.08, 0.13, 1)
+weather = 1
+weather_color = Color(0.85, 0.93, 1.0, 0.85)
+light_prefix = "light"
+light_x = Array[float]([70.0, 300.0])
+light_y = 150.0
+light_fps = 6.0
+enemies = Array[ExtResource("2_e")]([ExtResource("e0"), ExtResource("e1"), ExtResource("e2"), ExtResource("e3"), ExtResource("e4")])

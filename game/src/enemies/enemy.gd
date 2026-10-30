@@ -534,6 +534,8 @@ func _fire_projectile(move: EnemyMove) -> void:
 	var shot := EnemyProjectile.new()
 	get_parent().add_child(shot)
 	shot.global_position = global_position + Vector2(_facing * GameConfig.tiles(SHOT_MUZZLE_TILES), 0.0)
+	if move.tint.a > 0.0:
+		shot.color = move.tint
 	shot.launch(_facing, GameConfig.tiles(move.speed_tiles), GameConfig.tiles(move.range_tiles), move.damage, self)
 
 

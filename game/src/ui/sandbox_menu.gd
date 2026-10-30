@@ -11,6 +11,7 @@ signal reset_requested
 signal debug_toggled(enabled: bool)
 signal opened(is_open: bool)
 signal scene_requested(path: String)
+signal world_requested(biome: BiomeData)
 
 const ENEMY_DIR := "res://data/enemies"
 const WEAPON_DIR := "res://data/weapons"
@@ -27,6 +28,8 @@ var _clear_button: Button
 var _switch_button: Button
 var _switch_path: String = ""
 var _pickers: Array[OptionButton] = []
+var _worlds: Array[BiomeData] = []
+var _world_picker: OptionButton
 
 
 func _ready() -> void:
@@ -40,6 +43,7 @@ func _ready() -> void:
 		var weapon := load(path) as WeaponData
 		if weapon != null:
 			_weapons.append(weapon)
+	_worlds = BiomeData.load_all()
 	_build_ui()
 
 
@@ -66,6 +70,15 @@ func spawn_button_count() -> int:
 
 func weapon_choice_count() -> int:
 	return _weapons.size()
+
+
+func world_choice_count() -> int:
+	return _worlds.size()
+
+
+func choose_world(index: int) -> void:
+	_world_picker.select(index)
+	world_requested.emit(_worlds[index])
 
 
 func press_spawn(index: int) -> void:
@@ -148,6 +161,16 @@ func _build_ui() -> void:
 		row.add_child(picker)
 		column.add_child(row)
 		_pickers.append(picker)
+
+	var world_row := HBoxContainer.new()
+	world_row.add_child(_make_label("World:"))
+	_world_picker = OptionButton.new()
+	_world_picker.focus_mode = Control.FOCUS_NONE
+	for world in _worlds:
+		_world_picker.add_item(world.display_name)
+	_world_picker.item_selected.connect(func(index: int) -> void: world_requested.emit(_worlds[index]))
+	world_row.add_child(_world_picker)
+	column.add_child(world_row)
 
 	var actions := HFlowContainer.new()
 	_clear_button = _make_button("Clear enemies")

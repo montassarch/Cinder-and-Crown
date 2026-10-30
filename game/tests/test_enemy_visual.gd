@@ -155,4 +155,4 @@ func test_every_enemy_looks_the_way_it_faces() -> void:
 							near_n += 1
 				assert_int(near_n).is_greater(0)
 				# facing right: the eye is right of its neighbours; facing left: left of them
-				assert_float((eye_x - near_sum / near_n) * facing).is_greater(0.0)
+				assert_float((eye_x - near_sum / near_n) * facing).override_failure_message("%s %s facing %d" % [id, anim, facing]).is_greater(0.0)

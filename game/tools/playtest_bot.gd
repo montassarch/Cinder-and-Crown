@@ -28,6 +28,7 @@ var tracked := {}
 var last_depth := -1
 var max_enemies_seen := 0
 var shop_opened := 0
+var worlds_seen := {}
 
 
 var booted := 0
@@ -122,6 +123,7 @@ func _physics_process(delta: float) -> bool:
 		stats["levels"] += 1
 		level_time = 0.0
 		return false
+	worlds_seen[level.biome().id] = true
 	if level.depth() != last_depth:
 		last_depth = level.depth()
 
@@ -271,6 +273,7 @@ func _report(why: String) -> void:
 	print("PLAYTEST seed=%d ended: %s after %.0fs" % [seed_value, why, t])
 	print("PLAYTEST stats ", JSON.stringify(stats))
 	print("PLAYTEST kills ", JSON.stringify(kills_by_type), " wanders ", wanders)
+	print("PLAYTEST world ", level.biome().id, " worlds visited ", worlds_seen.keys())
 	print("PLAYTEST depth ", level.depth(), " hp ", _hp(), "/", _max_hp(), " cells ", level.cells_this_run(), " enemy types seen ", seen_types.keys(), " max enemies at once ", max_enemies_seen, " shop opens ", shop_opened)
 	for i in issues:
 		print("PLAYTEST ISSUE ", i)

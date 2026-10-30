@@ -31,6 +31,13 @@ SPECS = {
     'crown_brute': dict(base='creature:Imp', canvas=(120, 80), pxm=34, eye=(255, 230, 120), mul=(0.6, 0.42, 0.45), sat=0.8, val=0.75, props=['crown'], anims=HUMAN_ANIMS),
     'ember_wisp': dict(base='proc:wisp', canvas=(48, 48), pxm=50, eye=(40, 20, 10), anims={}, light=0.0),
     'cinder_bat': dict(base='proc:bat', canvas=(64, 48), pxm=70, eye=(255, 230, 120), anims={}, yaw=55, light=0.35),
+    # later worlds
+    'frost_ghoul': dict(base='outfit:Male_Peasant', canvas=(96, 64), pxm=23, eye=(140, 230, 255), mul=(0.42, 0.58, 0.85), sat=0.4, val=0.85, props=['frost_head', 'ice_spikes'], anims=dict(HUMAN_ANIMS, Windup=('Punch_Cross', 0.0, 0.4, 4, False), Strike=('Punch_Cross', 0.42, 0.66, 3, False), Recover=('Punch_Cross', 0.7, 1.0, 3, False))),
+    'rime_wisp': dict(base='proc:wisp', canvas=(48, 48), pxm=50, eye=(20, 30, 60), anims={}, light=0.0, core=(225, 245, 255), glow=(90, 190, 255)),
+    'forge_brute': dict(base='creature:Imp', canvas=(120, 80), pxm=30, eye=(255, 170, 40), mul=(0.75, 0.32, 0.25), sat=0.9, val=0.7, props=['horns', 'hammer'], anims=HUMAN_ANIMS),
+    'magma_bat': dict(base='proc:bat', canvas=(64, 48), pxm=60, eye=(255, 240, 150), anims={}, yaw=55, light=0.35, body=(60, 20, 14), wing=(220, 90, 20), wing_glow=3.0),
+    'storm_knight': dict(base='outfit:Male_Ranger', canvas=(96, 64), pxm=24, eye=(150, 210, 255), mul=(0.38, 0.42, 0.72), sat=0.5, val=0.8, props=['storm_helm', 'breastplate', 'pauldrons', 'storm_sword'], anims=HUMAN_ANIMS),
+    'storm_wisp': dict(base='proc:wisp', canvas=(48, 48), pxm=50, eye=(255, 250, 200), anims={}, light=0.0, core=(170, 190, 255), glow=(50, 80, 255)),
 }
 SPEC = SPECS[ENEMY]
 CW, CH = SPEC['canvas']
@@ -91,6 +98,11 @@ BONE = mat('P_bone', (225, 220, 205), 0.7); DARK = mat('P_dark', (12, 8, 16), 0.
 CLOTH = mat('P_cloth', (120, 30, 40), 0.8)
 SKIN = mat('P_skin', (120, 160, 100), 0.8)
 FUSE = mat('P_fuse', (255, 150, 40), 0.4, 0, (255, 120, 20), 20.0)
+ICE = mat('P_ice', (170, 220, 255), 0.15, 0, (120, 200, 255), 1.5)
+FROST_SKIN = mat('P_fskin', (150, 175, 210), 0.7)
+HORN = mat('P_horn', (60, 40, 30), 0.6)
+EMBER_GLOW = mat('P_eglow', (255, 120, 30), 0.4, 0, (255, 110, 20), 6.0)
+STORM = mat('P_storm', (120, 170, 255), 0.3, 0, (110, 160, 255), 5.0)
 
 def build_props(rig, props):
     for p in props:
@@ -130,6 +142,39 @@ def build_props(rig, props):
             for dz in (-0.08, 0.08):
                 attach(add('torus', (cx, cy, cz + dz), (0.135, 0.135, 0.2), IRON, minor=0.015), rig, sb)
             attach(add('sphere', (cx, cy, cz + 0.17), (0.03, 0.03, 0.03), FUSE), rig, sb)
+        elif p == 'frost_head':
+            attach(add('sphere', (0, -0.02, 1.70), (0.10, 0.105, 0.12), FROST_SKIN), rig, 'Head')
+            attach(add('cube', (0, -0.085, 1.63), (0.07, 0.05, 0.06), FROST_SKIN), rig, 'Head')
+            attach(add('sphere', (0, -0.095, 1.705), (0.075, 0.03, 0.03), DARK), rig, 'Head')
+            for k, dx in enumerate((-0.06, 0.0, 0.06)):                                         # a crown of ice shards
+                attach(add('cone', (dx, -0.01, 1.84 + (0.03 if k == 1 else 0)), (0.03, 0.03, 0.12 + (0.05 if k == 1 else 0)), ICE), rig, 'Head')
+        elif p == 'ice_spikes':
+            for sx in (-1, 1):
+                for k in range(3):
+                    attach(add('cone', (0.16 * sx, 0.06 + k * 0.03, 1.48 + k * 0.04), (0.035, 0.035, 0.16), ICE, rot=(math.radians(-25), math.radians(30 * sx), 0)), rig, 'spine_03')
+            for k in range(4):
+                attach(add('cone', (0.0, 0.14, 1.2 + k * 0.1), (0.03, 0.03, 0.13), ICE, rot=(math.radians(-60), 0, 0)), rig, 'spine_03')
+        elif p == 'horns':
+            hb = rig.data.bones['Head'].tail_local
+            for sx in (-1, 1):
+                attach(add('cone', (hb[0] + 0.09 * sx, hb[1], hb[2] + 0.08), (0.045, 0.045, 0.2), HORN, rot=(0, math.radians(-35 * sx), 0)), rig, 'Head')
+        elif p == 'hammer':
+            hand = rig.data.bones['hand_r'].head_local
+            hx, hy, hz = hand[0], hand[1], hand[2]
+            # held by the end of the haft with the head trailing behind the fist, so it never hides the face
+            attach(add('cyl', (hx, hy + 0.25, hz), (0.03, 0.03, 0.75), WOOD, rot=(math.radians(90), 0, 0)), rig, 'hand_r')
+            attach(add('cube', (hx, hy + 0.62, hz), (0.22, 0.16, 0.30), IRON), rig, 'hand_r')
+            attach(add('cube', (hx, hy + 0.62, hz + 0.155), (0.23, 0.17, 0.02), EMBER_GLOW), rig, 'hand_r')
+        elif p == 'storm_helm':
+            attach(add('sphere', (0, -0.02, 1.70), (0.125, 0.13, 0.13), STEEL), rig, 'Head')
+            attach(add('cube', (0, -0.14, 1.69), (0.10, 0.02, 0.025), STORM), rig, 'Head')
+            for sx in (-1, 1):
+                attach(add('cone', (0.11 * sx, 0.0, 1.80), (0.03, 0.03, 0.14), GOLD, rot=(0, math.radians(-40 * sx), 0)), rig, 'Head')
+        elif p == 'storm_sword':
+            hx, hy, hz = -0.76, 0.07, 1.44
+            for part in (add('cube', (hx, hy, hz), (0.03, 0.17, 0.03), DARK), add('cube', (hx, hy - 0.19, hz), (0.02, 0.03, 0.19), GOLD),
+                         add('cube', (hx, hy - 0.62, hz), (0.05, 0.80, 0.05), STEEL), add('cube', (hx, hy - 0.62, hz + 0.03), (0.055, 0.78, 0.01), STORM)):
+                attach(part, rig, 'hand_r')
         elif p == 'crown':
             hb = rig.data.bones['Head'].tail_local
             cz = hb[2] + 0.16
@@ -212,9 +257,10 @@ def render_to(anim, i):
 # ---------------------------------------------------------- procedural creatures
 
 def build_wisp():
-    core = mat('P_wcore', (255, 240, 170), 0.5, 0, (255, 235, 170), 1.0)
-    glow = mat('P_wglow', (255, 120, 30), 0.5, 0, (255, 90, 15), 10.0)
-    ember = mat('P_wemb', (255, 60, 20), 0.5, 0, (255, 80, 20), 1.0)
+    c = SPEC.get('core', (255, 240, 170)); g = SPEC.get('glow', (255, 120, 30))
+    core = mat('P_wcore', c, 0.5, 0, c, 1.0)
+    glow = mat('P_wglow', g, 0.5, 0, g, 10.0)
+    ember = mat('P_wemb', g, 0.5, 0, g, 1.0)
     return core, glow, ember
 
 def pose_wisp(anim, t, objs):
@@ -237,7 +283,9 @@ def pose_wisp(anim, t, objs):
     eyeo.location = (0, -0.13 * s - lean, base_z + 0.03)
 
 def build_bat():
-    body = mat('P_bbody', (50, 30, 45), 0.6); wing = mat('P_bwing', (90, 30, 40), 0.7)
+    body = mat('P_bbody', SPEC.get('body', (50, 30, 45)), 0.6)
+    wc = SPEC.get('wing', (90, 30, 40))
+    wing = mat('P_bwing', wc, 0.7, 0, wc if SPEC.get('wing_glow') else None, SPEC.get('wing_glow', 0.0))
     eyem = mat('P_beye', (255, 200, 80), 0.4, 0, (255, 190, 60), 1.0)
     return body, wing, eyem
 
@@ -249,7 +297,7 @@ def sample_t(count, loops, i):
 if base == 'proc:wisp':
     cm, gm, em = build_wisp()
     core = add('sphere', (0, 0, 0.55), (1, 1, 1), cm); glow = add('sphere', (0, 0, 0.55), (1, 1, 1), gm)
-    glow.data.materials[0] = mat('P_wglow2', (255, 100, 20), 0.5, 0, (255, 120, 30), 1.0)
+    glow.data.materials[0] = mat('P_wglow2', SPEC.get('glow', (255, 100, 20)), 0.5, 0, SPEC.get('glow', (255, 120, 30)), 1.0)
     tails = [add('sphere', (0, 0.1, 0.5), (0.05, 0.05, 0.05), em) for _ in range(3)]
     eyeo = bpy.data.objects.new('eye', None); sc.collection.objects.link(eyeo)
     objs = (core, glow, tails[0], tails[1], tails[2], eyeo)

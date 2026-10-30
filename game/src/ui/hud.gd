@@ -9,6 +9,10 @@ const MANA_GAP_TILES: float = 0.1
 const MANA_COLOR := Color(0.25, 0.55, 1.0)
 const MANA_DENIED_COLOR := Color(1.0, 0.95, 0.95)
 const MANA_FLASH_SECONDS: float = 0.35
+## A world's name shows across the screen this long when the hero arrives in it (the last half fades out).
+const BANNER_SECONDS: float = 3.2
+const BANNER_TITLE_SIZE: int = 22
+const BANNER_COLOR := Color(1.0, 0.86, 0.6)
 
 var _player: Player
 var _enemy_counter: Callable
@@ -24,6 +28,10 @@ var _mana_flash: float = 0.0
 @onready var _enemies: Label = $EnemyLabel
 var _flask_label: Label
 var _cells_label: Label
+var _banner: VBoxContainer
+var _banner_title: Label
+var _banner_sub: Label
+var _banner_left: float = 0.0
 
 
 func _ready() -> void:
@@ -55,7 +63,57 @@ func _ready() -> void:
 	_flask_label.position = _enemies.position + Vector2(0.0, GameConfig.tiles(0.8))
 	_cells_label.position = _flask_label.position + Vector2(0.0, GameConfig.tiles(0.8))
 	_cells_label.add_theme_color_override("font_color", Color(0.55, 0.95, 1.0))
+	_make_banner(theme)
 	_refresh()
+
+
+func _make_banner(theme: Theme) -> void:
+	_banner = VBoxContainer.new()
+	_banner.name = "Banner"
+	_banner.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_banner.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
+	_banner.position.y = GameConfig.tiles(5.0)   # below the HUD text on the left
+	_banner.alignment = BoxContainer.ALIGNMENT_CENTER
+	_banner_title = Label.new()
+	_banner_title.add_theme_font_size_override("font_size", BANNER_TITLE_SIZE)
+	_banner_title.add_theme_color_override("font_color", BANNER_COLOR)
+	_banner_title.add_theme_color_override("font_outline_color", Color(0.05, 0.02, 0.04))
+	_banner_title.add_theme_constant_override("outline_size", 6)
+	_banner_sub = Label.new()
+	_banner_sub.theme = theme
+	_banner_sub.add_theme_color_override("font_color", Color(0.85, 0.85, 0.92))
+	_banner_sub.add_theme_color_override("font_outline_color", Color(0.05, 0.02, 0.04))
+	_banner_sub.add_theme_constant_override("outline_size", 4)
+	for label: Label in [_banner_title, _banner_sub]:
+		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_banner.add_child(label)
+	add_child(_banner)
+	_banner.visible = false
+
+
+## Shows a world's name (and a line under it) across the top of the screen for a few seconds.
+func show_banner(title: String, subtitle: String = "") -> void:
+	_banner_title.text = title
+	_banner_sub.text = subtitle
+	_banner_left = BANNER_SECONDS
+	_banner.modulate.a = 1.0
+	_banner.visible = true
+	_banner.reset_size()
+	_banner.position.x = (get_viewport().get_visible_rect().size.x - _banner.size.x) / 2.0
+
+
+func hide_banner() -> void:
+	_banner_left = 0.0
+	_banner.visible = false
+
+
+func banner_visible() -> bool:
+	return _banner.visible
+
+
+func banner_text() -> String:
+	return "%s\n%s" % [_banner_title.text, _banner_sub.text]
 
 
 func bind(player: Player, enemy_counter: Callable) -> void:
@@ -111,6 +169,10 @@ func enemy_text() -> String:
 
 
 func _process(delta: float) -> void:
+	if _banner_left > 0.0:
+		_banner_left = maxf(0.0, _banner_left - delta)
+		_banner.modulate.a = minf(1.0, _banner_left / (BANNER_SECONDS * 0.5))
+		_banner.visible = _banner_left > 0.0
 	if _mana_flash > 0.0:
 		_mana_flash = maxf(0.0, _mana_flash - delta)
 		_mana_fill.color = MANA_COLOR.lerp(MANA_DENIED_COLOR, _mana_flash / MANA_FLASH_SECONDS)

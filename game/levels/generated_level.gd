@@ -8,7 +8,6 @@ signal level_completed
 
 const ROOM_DIR := "res://data/rooms"
 const BOON_DIR := "res://data/boons"
-const ENEMY_DIR := "res://data/enemies"
 const META_DIR := "res://data/meta"
 ## Flask charges handed back for clearing a level.
 const FLASK_PER_LEVEL: int = 1
@@ -30,7 +29,7 @@ var _width_tiles: float = 0.0
 var _spawn: Vector2 = Vector2.ZERO
 var _boon_pool: Array[BoonData] = []
 var _exit_zones: Array[Area2D] = []
-var _enemy_pool: Array[EnemyData] = []
+var _biomes: Array[BiomeData] = []
 var _encounters: Array[Dictionary] = []
 var _gate_open_color := Color.WHITE
 var _gate_color := Color.WHITE
@@ -50,10 +49,6 @@ func _ready() -> void:
 		var boon := load(path) as BoonData
 		if boon != null:
 			_boon_pool.append(boon)
-	for path in DataScanner.list(ENEMY_DIR):
-		var enemy := load(path) as EnemyData
-		if enemy != null:
-			_enemy_pool.append(enemy)
 	for path in DataScanner.list(META_DIR):
 		var upgrade := load(path) as MetaUpgradeData
 		if upgrade != null:
@@ -62,6 +57,7 @@ func _ready() -> void:
 	_shop.start_requested.connect(reset_player)
 	player.set_run_bonuses(MetaSave.bonus_boons(_meta_upgrades))
 	player.start_new_run()
+	_hud.show_banner(biome().display_name, biome().subtitle)
 
 
 func layout() -> Array[RoomData]:
@@ -113,7 +109,7 @@ func _trigger_encounters() -> void:
 func _spawn_wave(encounter: Dictionary) -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = level_seed * 7919 + int(encounter.index) * 104729 + _depth * 31
-	var wave := WaveGenerator.roll(_enemy_pool, _depth, rng)
+	var wave := WaveGenerator.roll(enemy_pool(), _depth, rng)
 	for i in wave.size():
 		var along := (i + 0.5) / wave.size()
 		var x_tiles := lerpf(encounter.start + WAVE_FIRST_SLOT_TILES, encounter.end - WAVE_END_MARGIN_TILES, along)
@@ -156,9 +152,30 @@ func arena_height_tiles() -> float:
 	return float(tallest) if tallest > 0 else super.arena_height_tiles()
 
 
-## Builds the next level and puts the player back at its spawn.
+## The enemies this level's waves are drawn from: its world's.
+func enemy_pool() -> Array[EnemyData]:
+	return biome().enemies
+
+
+## In a run the menu's world picker jumps to that world's first level (handy for trying a world out).
+func show_world(next: BiomeData) -> void:
+	set_depth(next.first_depth)
+	regenerate(level_seed, true)
+
+
+func _current_biome() -> BiomeData:
+	if _biomes.is_empty():
+		_biomes = BiomeData.load_all()
+	return BiomeData.for_depth(_biomes, _depth)
+
+
+## Builds the next level and puts the player back at its spawn. A level in a new world announces it.
 func regenerate(new_seed: int, keep_health: bool = false) -> void:
 	level_seed = new_seed
+	var next := _current_biome()
+	if next != biome():
+		_set_biome(next)
+		_hud.show_banner(next.display_name, next.subtitle)
 	for container in [_rooms, _walls]:
 		for child in container.get_children():
 			container.remove_child(child)
@@ -197,6 +214,7 @@ func _build_arena() -> void:
 			_encounters.append({"index": _encounters.size(), "start": cursor, "end": cursor + room.size_tiles.x, "spawned": false})
 		var instance: Node2D = room.scene.instantiate()
 		instance.position = GameConfig.tiles_v(cursor, 0.0)
+		_skin_room(instance)
 		_rooms.add_child(instance)
 		if room.kind == RoomData.Kind.SPAWN:
 			_spawn = (instance.get_node("PlayerSpawn") as Marker2D).global_position
@@ -213,6 +231,25 @@ func _build_arena() -> void:
 	var wall_height := WALL_HEIGHT_TILES + GROUND_THICKNESS_TILES
 	_add_block(Rect2(-CAMERA_MARGIN_TILES, wall_top, CAMERA_MARGIN_TILES, wall_height), GROUND_COLOR, false, _walls)
 	_add_block(Rect2(_width_tiles, wall_top, CAMERA_MARGIN_TILES, wall_height), GROUND_COLOR, false, _walls)
+
+
+## Rooms are authored with flat colour blocks; they wear the world's floor and ledge tiles instead.
+func _skin_room(room: Node) -> void:
+	for body in room.get_children():
+		if not (body is StaticBody2D) or not body.has_node("Visual"):
+			continue
+		var old := body.get_node("Visual") as Control
+		var shape := body.get_node_or_null("Shape") as CollisionShape2D
+		var tiles := TextureRect.new()
+		tiles.texture = _ledge_texture if shape != null and shape.one_way_collision else _ground_texture
+		tiles.stretch_mode = TextureRect.STRETCH_TILE
+		tiles.position = old.position
+		tiles.size = old.size
+		tiles.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		body.remove_child(old)
+		old.free()
+		tiles.name = "Visual"
+		body.add_child(tiles)
 
 
 ## True when the hero's body really overlaps an exit zone. The physics engine can report
@@ -266,3 +303,4 @@ func reset_player() -> void:
 	player.set_run_bonuses(MetaSave.bonus_boons(_meta_upgrades))
 	player.start_new_run()
 	regenerate(level_seed)
+	_hud.show_banner(biome().display_name, biome().subtitle)

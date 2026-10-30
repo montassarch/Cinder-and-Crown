@@ -138,3 +138,24 @@ func test_a_reflected_shot_that_kills_the_last_enemy_pays_cells_and_opens_the_ga
 	assert_bool(last.is_dead()).is_true()
 	assert_int(level.enemy_count()).is_equal(0)
 	assert_int(MetaSave.cells()).is_greater(before)
+
+func test_a_move_can_colour_its_shot() -> void:
+	var data := EnemyData.new()
+	var move := EnemyMove.new()
+	move.id = "blue"
+	move.kind = EnemyMove.Kind.PROJECTILE
+	move.speed_tiles = 5.0
+	move.range_tiles = 5.0
+	move.tint = Color(0.4, 0.7, 1.0)
+	data.moves = [move]
+	var enemy: Enemy = auto_free(load("res://src/enemies/enemy.tscn").instantiate())
+	add_child(enemy)
+	enemy.configure(data)
+	enemy._fire_projectile(move)
+	var shots := get_children().filter(func(n: Node) -> bool: return n is EnemyProjectile)
+	assert_int(shots.size()).is_equal(1)
+	assert_object(shots[0].color).is_equal(Color(0.4, 0.7, 1.0))
+
+func test_a_shot_without_a_colour_is_an_ember() -> void:
+	var p := _shot()
+	assert_object(p.color).is_equal(EnemyProjectile.COLOR)

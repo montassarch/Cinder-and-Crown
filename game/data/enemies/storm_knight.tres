@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/enemies/enemy_data.gd" id="1_data"]
+[ext_resource type="Script" path="res://src/enemies/enemy_move.gd" id="2_move"]
+[ext_resource type="Resource" path="res://data/moves/storm_cut.tres" id="m0"]
+[ext_resource type="Resource" path="res://data/moves/storm_cut_2.tres" id="m1"]
+[ext_resource type="Resource" path="res://data/moves/storm_lunge.tres" id="m2"]
+
+[resource]
+script = ExtResource("1_data")
+display_name = "Storm Knight"
+art = "storm_knight"
+max_health = 75
+move_speed_tiles = 2.5
+attack_damage = 10
+attack_range_tiles = 1.9
+telegraph_seconds = 0.3
+recovery_seconds = 0.1
+behaviour = 0
+moves = Array[ExtResource("2_move")]([ExtResource("m0"), ExtResource("m1"), ExtResource("m2")])
+pattern = 0
+chain_gap_seconds = 0.1
+cooldown_seconds = 1.0
+preferred_range_tiles = 0.0
+poise = 3
+shielded = false
+threat = 5
+unlock_depth = 9
+max_per_wave = 2
+cell_reward = 3
+body_size_tiles = Vector2(1.0, 2.0)
+tint = Color(0.4, 0.5, 0.9, 1)

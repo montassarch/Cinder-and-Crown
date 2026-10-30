@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/enemies/enemy_data.gd" id="1_data"]
+[ext_resource type="Script" path="res://src/enemies/enemy_move.gd" id="2_move"]
+[ext_resource type="Resource" path="res://data/moves/magma_dive.tres" id="m0"]
+
+[resource]
+script = ExtResource("1_data")
+display_name = "Magma Bat"
+art = "magma_bat"
+max_health = 16
+move_speed_tiles = 6.0
+attack_damage = 10
+attack_range_tiles = 5.0
+telegraph_seconds = 0.3
+recovery_seconds = 0.6
+behaviour = 1
+moves = Array[ExtResource("2_move")]([ExtResource("m0")])
+pattern = 0
+chain_gap_seconds = 0.1
+cooldown_seconds = 0.9
+preferred_range_tiles = 0.0
+poise = 0
+shielded = false
+threat = 3
+unlock_depth = 6
+max_per_wave = 3
+cell_reward = 1
+body_size_tiles = Vector2(0.8, 0.6)
+tint = Color(1.0, 0.5, 0.15, 1)

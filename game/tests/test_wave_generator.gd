@@ -108,8 +108,8 @@ func test_every_shipped_enemy_unlocks_in_the_spec_order() -> void:
 
 func test_no_wave_at_any_depth_exceeds_its_budget_with_the_full_roster() -> void:
 	var pool := _roster()
-	assert_int(pool.size()).is_equal(7)
-	for depth in 9:
+	assert_int(pool.size()).is_equal(DataScanner.list("res://data/enemies").size())
+	for depth in 13:
 		for seed_value in 40:
 			var wave := WaveGenerator.roll(pool, depth, _rng(seed_value))
 			assert_int(wave.size()).is_between(1, WaveGenerator.MAX_WAVE_SIZE)

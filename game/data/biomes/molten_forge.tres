@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="BiomeData" format=3]
+
+[ext_resource type="Script" path="res://src/level/biome_data.gd" id="1_b"]
+[ext_resource type="Script" path="res://src/enemies/enemy_data.gd" id="2_e"]
+[ext_resource type="Resource" path="res://data/enemies/forge_brute.tres" id="e0"]
+[ext_resource type="Resource" path="res://data/enemies/magma_bat.tres" id="e1"]
+[ext_resource type="Resource" path="res://data/enemies/powder_pilgrim.tres" id="e2"]
+[ext_resource type="Resource" path="res://data/enemies/crown_guard.tres" id="e3"]
+[ext_resource type="Resource" path="res://data/enemies/shambler.tres" id="e4"]
+
+[resource]
+script = ExtResource("1_b")
+id = "molten_forge"
+display_name = "The Molten Forge"
+subtitle = "The furnaces never cooled"
+first_depth = 6
+art_dir = "res://art/biomes/molten_forge"
+clear_color = Color(0.12, 0.04, 0.03, 1)
+weather = 2
+weather_color = Color(1.0, 0.5, 0.15, 0.95)
+light_prefix = "light"
+light_x = Array[float]([110.0, 290.0])
+light_y = 150.0
+light_fps = 10.0
+enemies = Array[ExtResource("2_e")]([ExtResource("e0"), ExtResource("e1"), ExtResource("e2"), ExtResource("e3"), ExtResource("e4")])

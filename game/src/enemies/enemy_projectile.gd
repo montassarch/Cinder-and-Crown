@@ -16,6 +16,7 @@ const REFLECTED_COLOR := Color(0.6, 0.95, 1.0)
 const KNOCKBACK_TILES: float = 1.0
 
 var damage: int = 0
+var color: Color = COLOR
 
 var _direction: float = 1.0
 var _speed: float = 0.0
@@ -100,6 +101,6 @@ func _source_x() -> float:
 
 
 func _draw() -> void:
-	var color := REFLECTED_COLOR if _reflected else COLOR
-	draw_circle(Vector2.ZERO, RADIUS, color)
+	var shown := REFLECTED_COLOR if _reflected else color
+	draw_circle(Vector2.ZERO, RADIUS, shown)
 	draw_circle(Vector2.ZERO, RADIUS * 0.5, Color.WHITE)

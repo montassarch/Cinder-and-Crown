@@ -18,9 +18,15 @@ func test_lists_every_shipped_enemy_and_weapon() -> void:
 		"res://data/enemies/crown_brute.tres",
 		"res://data/enemies/crown_guard.tres",
 		"res://data/enemies/ember_wisp.tres",
+		"res://data/enemies/forge_brute.tres",
+		"res://data/enemies/frost_ghoul.tres",
+		"res://data/enemies/magma_bat.tres",
 		"res://data/enemies/penitent.tres",
 		"res://data/enemies/powder_pilgrim.tres",
+		"res://data/enemies/rime_wisp.tres",
 		"res://data/enemies/shambler.tres",
+		"res://data/enemies/storm_knight.tres",
+		"res://data/enemies/storm_wisp.tres",
 	])
 	assert_array(DataScanner.list("res://data/weapons")).contains_exactly([
 		"res://data/weapons/ash_wand.tres",

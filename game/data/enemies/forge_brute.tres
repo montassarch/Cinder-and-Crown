@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/enemies/enemy_data.gd" id="1_data"]
+[ext_resource type="Script" path="res://src/enemies/enemy_move.gd" id="2_move"]
+[ext_resource type="Resource" path="res://data/moves/forge_charge.tres" id="m0"]
+[ext_resource type="Resource" path="res://data/moves/forge_slam.tres" id="m1"]
+
+[resource]
+script = ExtResource("1_data")
+display_name = "Forge Brute"
+art = "forge_brute"
+max_health = 120
+move_speed_tiles = 1.9
+attack_damage = 22
+attack_range_tiles = 5.0
+telegraph_seconds = 0.8
+recovery_seconds = 1.0
+behaviour = 2
+moves = Array[ExtResource("2_move")]([ExtResource("m0"), ExtResource("m1")])
+pattern = 0
+chain_gap_seconds = 0.1
+cooldown_seconds = 1.4
+preferred_range_tiles = 0.0
+poise = 5
+shielded = false
+threat = 6
+unlock_depth = 6
+max_per_wave = 1
+cell_reward = 4
+body_size_tiles = Vector2(1.6, 2.4)
+tint = Color(0.8, 0.35, 0.2, 1)

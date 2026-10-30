@@ -23,6 +23,8 @@ enum Kind { MELEE, PROJECTILE, SLAM, DASH, DIVE, EXPLODE }
 @export var parryable: bool = true
 ## Afterwards the enemy is exposed for this long: it takes extra damage (a dive's landing).
 @export var exposed_seconds: float = 0.0
+## PROJECTILE: the shot's colour (fully transparent keeps the default ember orange).
+@export var tint: Color = Color(0, 0, 0, 0)
 
 
 ## False when a number this kind of move depends on is missing.

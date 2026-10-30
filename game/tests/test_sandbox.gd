@@ -163,3 +163,22 @@ func test_the_sandbox_camera_also_runs_past_both_ends() -> void:
 	var margin := GameConfig.tiles(Sandbox.CAMERA_MARGIN_TILES)
 	assert_int(camera.limit_left).is_equal(int(-margin))
 	assert_int(camera.limit_right).is_equal(int(GameConfig.tiles(_sandbox.arena_width_tiles()) + margin))
+
+func test_the_menu_lists_every_world() -> void:
+	var menu := _sandbox.get_node("Menu") as SandboxMenu
+	assert_int(menu.world_choice_count()).is_equal(BiomeData.load_all().size())
+
+func test_choosing_a_world_dresses_the_sandbox_in_it() -> void:
+	var menu := _sandbox.get_node("Menu") as SandboxMenu
+	menu.choose_world(2)
+	var forge := BiomeData.load_all()[2]
+	assert_str(_sandbox.biome().id).is_equal(forge.id)
+	assert_str((_sandbox.get_node("Backdrop") as Backdrop).biome().id).is_equal(forge.id)
+	var ground := load(forge.art_path("ground_tile"))
+	var floors := _sandbox.get_children().filter(func(n: Node) -> bool: return n is StaticBody2D)
+	assert_int(floors.size()).is_greater(0)
+	for body in floors:
+		var visual := body.get_node("Visual") as TextureRect
+		var one_way: bool = (body.get_child(0) as CollisionShape2D).one_way_collision
+		if not one_way:
+			assert_object(visual.texture).is_same(ground)

@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="BiomeData" format=3]
+
+[ext_resource type="Script" path="res://src/level/biome_data.gd" id="1_b"]
+[ext_resource type="Script" path="res://src/enemies/enemy_data.gd" id="2_e"]
+[ext_resource type="Resource" path="res://data/enemies/shambler.tres" id="e0"]
+[ext_resource type="Resource" path="res://data/enemies/crown_guard.tres" id="e1"]
+[ext_resource type="Resource" path="res://data/enemies/cinder_bat.tres" id="e2"]
+[ext_resource type="Resource" path="res://data/enemies/ember_wisp.tres" id="e3"]
+[ext_resource type="Resource" path="res://data/enemies/penitent.tres" id="e4"]
+[ext_resource type="Resource" path="res://data/enemies/powder_pilgrim.tres" id="e5"]
+[ext_resource type="Resource" path="res://data/enemies/crown_brute.tres" id="e6"]
+
+[resource]
+script = ExtResource("1_b")
+id = "cathedral"
+display_name = "The Cinder Cathedral"
+subtitle = "Where the crown fell"
+first_depth = 0
+art_dir = "res://art/cathedral"
+clear_color = Color(0.09, 0.08, 0.11, 1)
+weather = 0
+weather_color = Color(1.0, 0.62, 0.25, 0.9)
+light_prefix = "flame"
+light_x = Array[float]([96.0, 352.0])
+light_y = 158.0
+light_fps = 9.0
+enemies = Array[ExtResource("2_e")]([ExtResource("e0"), ExtResource("e1"), ExtResource("e2"), ExtResource("e3"), ExtResource("e4"), ExtResource("e5"), ExtResource("e6")])

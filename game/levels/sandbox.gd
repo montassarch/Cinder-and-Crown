@@ -26,11 +26,14 @@ const GENERATED_PATH := "res://levels/generated_level.tscn"
 const GROUND_COLOR := Color(0.22, 0.2, 0.26)
 const PLATFORM_COLOR := Color(0.35, 0.3, 0.4)
 const BACKGROUND_COLOR := Color(0.09, 0.08, 0.11)
-const GROUND_TEXTURE := preload("res://art/cathedral/ground_tile.png")
-const LEDGE_TEXTURE := preload("res://art/cathedral/ledge_tile.png")
+const DEFAULT_BIOME := "res://data/biomes/cathedral.tres"
 
 var player: Player
 var _fx: CombatFx
+var _biome: BiomeData
+var _backdrop: Backdrop
+var _ground_texture: Texture2D
+var _ledge_texture: Texture2D
 
 @onready var _camera: Camera2D = $Camera
 @onready var _hud: Hud = $Hud
@@ -40,11 +43,11 @@ var _fx: CombatFx
 
 
 func _ready() -> void:
-	RenderingServer.set_default_clear_color(BACKGROUND_COLOR)
-	var backdrop := Backdrop.new()
-	backdrop.name = "Backdrop"
-	add_child(backdrop)
-	move_child(backdrop, 0)
+	_backdrop = Backdrop.new()
+	_backdrop.name = "Backdrop"
+	add_child(_backdrop)
+	move_child(_backdrop, 0)
+	_set_biome(_current_biome())
 	_build_arena()
 
 	player = PLAYER_SCENE.instantiate()
@@ -70,6 +73,7 @@ func _ready() -> void:
 	_menu.debug_toggled.connect(func(on: bool) -> void: _overlay.enabled = on)
 	_menu.opened.connect(_on_menu_opened)
 	_menu.scene_requested.connect(_switch_scene)
+	_menu.world_requested.connect(show_world)
 	var switch := _scene_switch()
 	_menu.set_scene_switch(switch[0], switch[1])
 	_menu.sync_weapons(player)
@@ -77,6 +81,34 @@ func _ready() -> void:
 
 func _process(_delta: float) -> void:
 	_camera.global_position = player.global_position
+
+
+## The world this level is in: its backdrop, tiles and background colour follow it.
+func biome() -> BiomeData:
+	return _biome
+
+
+## Hook: which world to show (the sandbox is always the first one).
+func _current_biome() -> BiomeData:
+	return load(DEFAULT_BIOME)
+
+
+func _set_biome(next: BiomeData) -> void:
+	_biome = next
+	_ground_texture = load(next.art_path("ground_tile"))
+	_ledge_texture = load(next.art_path("ledge_tile"))
+	RenderingServer.set_default_clear_color(next.clear_color)
+	_backdrop.apply(next)
+
+
+## Dresses the test room as another world (its art, tiles and colour), to preview it.
+func show_world(next: BiomeData) -> void:
+	_set_biome(next)
+	for child in get_children():
+		if child is StaticBody2D:
+			var visual := child.get_node("Visual") as TextureRect
+			var one_way: bool = (child.get_child(0) as CollisionShape2D).one_way_collision
+			visual.texture = _ledge_texture if one_way else _ground_texture
 
 
 ## Hooks: a level that builds its own geometry overrides these.
@@ -191,7 +223,8 @@ func _add_block(rect_tiles: Rect2, color: Color, one_way: bool, parent: Node = s
 	shape.one_way_collision = one_way
 	body.add_child(shape)
 	var visual := TextureRect.new()
-	visual.texture = LEDGE_TEXTURE if one_way else GROUND_TEXTURE
+	visual.name = "Visual"
+	visual.texture = _ledge_texture if one_way else _ground_texture
 	visual.stretch_mode = TextureRect.STRETCH_TILE
 	visual.size = size
 	visual.position = -size / 2.0

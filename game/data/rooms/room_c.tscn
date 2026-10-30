@@ -1,0 +1,110 @@
+[gd_scene load_steps=7 format=3]
+
+[sub_resource type="RectangleShape2D" id="floor"]
+size = Vector2(512, 32)
+
+[sub_resource type="RectangleShape2D" id="p1"]
+size = Vector2(64, 8)
+
+[sub_resource type="RectangleShape2D" id="p2"]
+size = Vector2(64, 8)
+
+[sub_resource type="RectangleShape2D" id="p3"]
+size = Vector2(96, 8)
+
+[sub_resource type="RectangleShape2D" id="p4"]
+size = Vector2(64, 8)
+
+[sub_resource type="RectangleShape2D" id="p5"]
+size = Vector2(64, 8)
+
+[node name="RoomC" type="Node2D"]
+
+[node name="Floor" type="StaticBody2D" parent="."]
+position = Vector2(256.0, 208)
+
+[node name="Shape" type="CollisionShape2D" parent="Floor"]
+shape = SubResource("floor")
+
+[node name="Visual" type="ColorRect" parent="Floor"]
+offset_left = -256.0
+offset_top = -16
+offset_right = 256.0
+offset_bottom = 16
+mouse_filter = 2
+color = Color(0.22, 0.2, 0.26, 1)
+
+[node name="Platform1" type="StaticBody2D" parent="."]
+position = Vector2(72, 155.04)
+
+[node name="Shape" type="CollisionShape2D" parent="Platform1"]
+shape = SubResource("p1")
+one_way_collision = true
+
+[node name="Visual" type="ColorRect" parent="Platform1"]
+offset_left = -32.0
+offset_top = -4
+offset_right = 32.0
+offset_bottom = 4
+mouse_filter = 2
+color = Color(0.35, 0.3, 0.4, 1)
+
+[node name="Platform2" type="StaticBody2D" parent="."]
+position = Vector2(152, 155.04)
+
+[node name="Shape" type="CollisionShape2D" parent="Platform2"]
+shape = SubResource("p2")
+one_way_collision = true
+
+[node name="Visual" type="ColorRect" parent="Platform2"]
+offset_left = -32.0
+offset_top = -4
+offset_right = 32.0
+offset_bottom = 4
+mouse_filter = 2
+color = Color(0.35, 0.3, 0.4, 1)
+
+[node name="Platform3" type="StaticBody2D" parent="."]
+position = Vector2(256, 114.08)
+
+[node name="Shape" type="CollisionShape2D" parent="Platform3"]
+shape = SubResource("p3")
+one_way_collision = true
+
+[node name="Visual" type="ColorRect" parent="Platform3"]
+offset_left = -48.0
+offset_top = -4
+offset_right = 48.0
+offset_bottom = 4
+mouse_filter = 2
+color = Color(0.35, 0.3, 0.4, 1)
+
+[node name="Platform4" type="StaticBody2D" parent="."]
+position = Vector2(360, 155.04)
+
+[node name="Shape" type="CollisionShape2D" parent="Platform4"]
+shape = SubResource("p4")
+one_way_collision = true
+
+[node name="Visual" type="ColorRect" parent="Platform4"]
+offset_left = -32.0
+offset_top = -4
+offset_right = 32.0
+offset_bottom = 4
+mouse_filter = 2
+color = Color(0.35, 0.3, 0.4, 1)
+
+[node name="Platform5" type="StaticBody2D" parent="."]
+position = Vector2(440, 155.04)
+
+[node name="Shape" type="CollisionShape2D" parent="Platform5"]
+shape = SubResource("p5")
+one_way_collision = true
+
+[node name="Visual" type="ColorRect" parent="Platform5"]
+offset_left = -32.0
+offset_top = -4
+offset_right = 32.0
+offset_bottom = 4
+mouse_filter = 2
+color = Color(0.35, 0.3, 0.4, 1)

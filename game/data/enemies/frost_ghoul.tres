@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/enemies/enemy_data.gd" id="1_data"]
+[ext_resource type="Script" path="res://src/enemies/enemy_move.gd" id="2_move"]
+[ext_resource type="Resource" path="res://data/moves/ghoul_claw.tres" id="m0"]
+[ext_resource type="Resource" path="res://data/moves/ghoul_frenzy.tres" id="m1"]
+
+[resource]
+script = ExtResource("1_data")
+display_name = "Frost Ghoul"
+art = "frost_ghoul"
+max_health = 42
+move_speed_tiles = 2.6
+attack_damage = 9
+attack_range_tiles = 1.5
+telegraph_seconds = 0.45
+recovery_seconds = 0.6
+behaviour = 0
+moves = Array[ExtResource("2_move")]([ExtResource("m0"), ExtResource("m1")])
+pattern = 0
+chain_gap_seconds = 0.15
+cooldown_seconds = 1.1
+preferred_range_tiles = 0.0
+poise = 1
+shielded = false
+threat = 3
+unlock_depth = 3
+max_per_wave = 3
+cell_reward = 2
+body_size_tiles = Vector2(1.0, 1.8)
+tint = Color(0.5, 0.7, 0.95, 1)
