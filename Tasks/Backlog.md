@@ -13,7 +13,7 @@ Written 2026-10-22. The roadmap (`Roadmap.md`) has the big phases; this is the f
 
 ## The full game (2026-10-30, plan: `Design/Plans/2026-10-30-full-game.md`)
 - [x] Stage 1: four worlds, each with painted backdrops, tiles, weather, lights and two new enemies; four new rooms.
-- [ ] Stage 2: a boss at the end of each world.
+- [x] Stage 2: a boss at the end of each world (Hollow Bishop, Rime Colossus, Forge Tyrant, Storm King).
 - [ ] Stage 3: double jump, air dash, weapon art on the hero, weapon drops.
 - [ ] Stage 4: the hand-painted magic effects in combat.
 - [ ] Stage 5: title, victory and death screens, balance, full-run playtest.
