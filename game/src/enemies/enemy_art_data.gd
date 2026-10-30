@@ -13,6 +13,7 @@ const ENTRIES := {
 	"powder_pilgrim": {"canvas": Vector2i(80, 48), "eye": Color8(255, 230, 90), "anims": {"Dash": 6, "Death": 6, "Idle": 6, "Move": 8, "Recover": 3, "Strike": 3, "Stun": 3, "Windup": 4}},
 	"rime_wisp": {"canvas": Vector2i(48, 48), "eye": Color8(20, 30, 60), "anims": {"Death": 6, "Idle": 6, "Move": 6, "Recover": 3, "Strike": 3, "Stun": 3, "Windup": 4}},
 	"shambler": {"canvas": Vector2i(96, 64), "eye": Color8(255, 90, 40), "anims": {"Dash": 6, "Death": 6, "Idle": 6, "Move": 8, "Recover": 3, "Strike": 3, "Stun": 3, "Windup": 4}},
+	"storm_king": {"canvas": Vector2i(176, 112), "eye": Color8(170, 225, 255), "anims": {"CastRecover": 3, "CastStrike": 3, "CastWindup": 4, "Dash": 6, "Death": 6, "Idle": 6, "Move": 8, "Recover": 3, "Strike": 3, "Stun": 3, "Windup": 4}},
 	"storm_knight": {"canvas": Vector2i(96, 64), "eye": Color8(150, 210, 255), "anims": {"Dash": 6, "Death": 6, "Idle": 6, "Move": 8, "Recover": 3, "Strike": 3, "Stun": 3, "Windup": 4}},
 	"storm_wisp": {"canvas": Vector2i(48, 48), "eye": Color8(255, 250, 200), "anims": {"Death": 6, "Idle": 6, "Move": 6, "Recover": 3, "Strike": 3, "Stun": 3, "Windup": 4}},
 }
