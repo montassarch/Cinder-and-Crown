@@ -1,0 +1,415 @@
+{
+ "sfx/starninjas_swords": {
+  "author": "StarNinjas",
+  "licence": "CC0 1.0",
+  "credit": "StarNinjas (credit optional)",
+  "url": "https://opengameart.org/content/20-sword-sound-effects-attacks-and-clashes",
+  "use": "10 sword attacks (swing+hit) and 10 clashes: hits, parries, shield blocks",
+  "files": {
+   "sword_1.ogg": 0.88,
+   "sword_2.ogg": 1.08,
+   "sword_3.ogg": 0.62,
+   "sword_4.ogg": 0.54,
+   "sword_5.ogg": 0.87,
+   "sword_6.ogg": 0.5,
+   "sword_7.ogg": 0.75,
+   "sword_8.ogg": 0.96,
+   "sword_9.ogg": 1.35,
+   "sword_10.ogg": 1.14,
+   "sword_clash_1.ogg": 0.88,
+   "sword_clash_2.ogg": 0.59,
+   "sword_clash_3.ogg": 0.76,
+   "sword_clash_4.ogg": 0.66,
+   "sword_clash_5.ogg": 0.54,
+   "sword_clash_6.ogg": 1.28,
+   "sword_clash_7.ogg": 1.0,
+   "sword_clash_8.ogg": 0.75,
+   "sword_clash_9.ogg": 1.09,
+   "sword_clash_10.ogg": 0.85
+  }
+ },
+ "sfx/vehicle_weapons_apparel": {
+  "author": "Vehicle (Jan Schupke)",
+  "licence": "CC0 1.0",
+  "credit": "Vehicle / Jan Schupke (credit optional)",
+  "url": "https://opengameart.org/content/fantasy-weapons-and-apparel-sfx-library",
+  "use": "metal-on-metal clashes, weapon draw / sheathe (weapon swap), leather boot steps and jumps, arrow draw (bow), buckles (equip)",
+  "files": {
+   "sword_knife_clash_01.ogg": 0.75,
+   "sword_knife_clash_02.ogg": 0.8,
+   "sword_knife_clash_03.ogg": 0.63,
+   "sword_knife_clash_04.ogg": 1.59,
+   "sword_knife_clash_05.ogg": 1.19,
+   "sword_knife_clash_06.ogg": 2.03,
+   "sword_knife_clash_07.ogg": 1.48,
+   "sword_knife_clash_08.ogg": 1.59,
+   "sword_knife_clash_09.ogg": 2.28,
+   "knife_unsheathe_01.ogg": 2.45,
+   "knife_unsheathe_02.ogg": 0.37,
+   "knife_unsheathe_03.ogg": 0.56,
+   "knife_unsheathe_04.ogg": 0.46,
+   "seax_unsheathe_01.ogg": 0.45,
+   "seax_unsheathe_02.ogg": 0.3,
+   "seax_unsheathe_03.ogg": 0.25,
+   "knife_sheathe_01.ogg": 0.41,
+   "knife_sheathe_02.ogg": 0.32,
+   "knife_sheathe_03.ogg": 0.44,
+   "seax_sheathe_01.ogg": 0.42,
+   "seax_sheathe_02.ogg": 0.27,
+   "seax_sheathe_03.ogg": 0.76,
+   "boots_leather_jump_01.ogg": 0.34,
+   "boots_leather_jump_02.ogg": 0.53,
+   "boots_leather_jump_03.ogg": 0.22,
+   "boots_leather_step_01.ogg": 0.3,
+   "boots_leather_step_02.ogg": 0.33,
+   "boots_leather_step_03.ogg": 0.35,
+   "boots_leather_step_04.ogg": 0.35,
+   "arrow_grab_from_quiver_01.ogg": 0.55,
+   "arrow_grab_from_quiver_02.ogg": 1.2,
+   "arrow_grab_from_quiver_03.ogg": 0.68,
+   "belt_buckle_01.ogg": 0.12,
+   "belt_buckle_02.ogg": 0.59
+  }
+ },
+ "sfx/artisticdude_swishes": {
+  "author": "artisticdude",
+  "licence": "CC0 1.0",
+  "credit": "artisticdude (credit optional)",
+  "url": "https://opengameart.org/content/swishes-sound-pack",
+  "use": "13 whooshes (4 light, 9 heavy): swings that miss, dodge roll, spear thrust",
+  "files": {
+   "swish_1.ogg": 0.1,
+   "swish_2.ogg": 0.08,
+   "swish_3.ogg": 0.11,
+   "swish_4.ogg": 0.1,
+   "swish_5.ogg": 0.1,
+   "swish_6.ogg": 0.1,
+   "swish_7.ogg": 0.12,
+   "swish_8.ogg": 0.12,
+   "swish_9.ogg": 0.13,
+   "swish_10.ogg": 0.08,
+   "swish_11.ogg": 0.07,
+   "swish_12.ogg": 0.06,
+   "swish_13.ogg": 0.06
+  }
+ },
+ "sfx/remaxim_melee": {
+  "author": "remaxim",
+  "licence": "CC0 1.0",
+  "credit": "remaxim (credit optional)",
+  "url": "https://opengameart.org/content/3-melee-sounds",
+  "use": "sword / blunt / claw melee whooshes",
+  "files": {
+   "animal_melee_sound.ogg": 0.6,
+   "melee_sound.ogg": 0.61,
+   "sword_sound.ogg": 0.54
+  }
+ },
+ "sfx/rubberduck_rpg": {
+  "author": "rubberduck",
+  "licence": "CC0 1.0",
+  "credit": "rubberduck (credit optional)",
+  "url": "https://opengameart.org/content/80-cc0-rpg-sfx",
+  "use": "blades, metal, chains (gates, hanging cages), fire spells, creature hurt/die/roar, coins and gems (cells pickup), locks, books, stones, wood",
+  "files": {
+   "blade_01.ogg": 0.21,
+   "blade_02.ogg": 0.26,
+   "blade_03.ogg": 0.25,
+   "book_01.ogg": 0.58,
+   "book_02.ogg": 0.68,
+   "book_03.ogg": 1.02,
+   "book_04.ogg": 0.94,
+   "chain_01.ogg": 0.38,
+   "chain_02.ogg": 0.34,
+   "chain_03.ogg": 0.7,
+   "creature_die_01.ogg": 0.71,
+   "creature_hurt_01.ogg": 0.45,
+   "creature_hurt_02.ogg": 0.42,
+   "creature_monster_01.ogg": 0.12,
+   "creature_monster_02.ogg": 0.11,
+   "creature_monster_03.ogg": 0.79,
+   "creature_monster_04.ogg": 0.65,
+   "creature_roar_01.ogg": 0.55,
+   "creature_roar_02.ogg": 0.86,
+   "creature_roar_03.ogg": 0.85,
+   "item_coins_01.ogg": 0.32,
+   "item_coins_02.ogg": 0.54,
+   "item_coins_03.ogg": 0.44,
+   "item_coins_04.ogg": 1.52,
+   "item_gem_01.ogg": 0.2,
+   "item_gem_02.ogg": 0.08,
+   "item_gem_03.ogg": 0.15,
+   "item_gem_04.ogg": 0.5,
+   "lock_01.ogg": 0.29,
+   "lock_02.ogg": 0.13,
+   "lock_03.ogg": 0.25,
+   "metal_01.ogg": 0.42,
+   "metal_02.ogg": 0.5,
+   "metal_03.ogg": 0.32,
+   "spell_01.ogg": 0.51,
+   "spell_02.ogg": 0.42,
+   "spell_fire_01.ogg": 0.67,
+   "spell_fire_02.ogg": 0.58,
+   "spell_fire_03.ogg": 1.41,
+   "spell_fire_04.ogg": 1.01,
+   "spell_fire_05.ogg": 0.92,
+   "spell_fire_06.ogg": 0.76,
+   "spell_fire_07.ogg": 0.43,
+   "stones_01.ogg": 0.43,
+   "stones_02.ogg": 0.59,
+   "stones_03.ogg": 0.68,
+   "stones_04.ogg": 0.2,
+   "wood_01.ogg": 0.16,
+   "wood_02.ogg": 0.11,
+   "wood_03.ogg": 0.23,
+   "wood_04.ogg": 0.28,
+   "wood_05.ogg": 0.17
+  }
+ },
+ "sfx/rubberduck_creatures": {
+  "author": "rubberduck",
+  "licence": "CC0 1.0",
+  "credit": "rubberduck (credit optional)",
+  "url": "https://opengameart.org/content/80-cc0-creature-sfx",
+  "use": "monster growls, roars, troll grunts, hurt and scream sounds, a howl (hell hound), breath (ghost)",
+  "files": {
+   "breath.ogg": 0.37,
+   "grunt_01.ogg": 0.64,
+   "grunt_02.ogg": 0.51,
+   "grunt_03.ogg": 0.48,
+   "grunt_04.ogg": 0.46,
+   "grunt_05.ogg": 0.4,
+   "howl.ogg": 0.51,
+   "hurt_01.ogg": 0.36,
+   "hurt_02.ogg": 0.36,
+   "hurt_03.ogg": 0.36,
+   "hurt_04.ogg": 0.26,
+   "hurt_05.ogg": 0.3,
+   "monster_01.ogg": 0.73,
+   "monster_02.ogg": 0.42,
+   "monster_03.ogg": 0.38,
+   "monster_04.ogg": 1.03,
+   "monster_05.ogg": 0.41,
+   "monster_06.ogg": 0.61,
+   "monster_07.ogg": 0.78,
+   "roar_01.ogg": 0.31,
+   "roar_02.ogg": 0.72,
+   "roar_03.ogg": 0.4,
+   "scream_01.ogg": 0.83,
+   "scream_02.ogg": 0.85,
+   "troll_01.ogg": 0.55,
+   "troll_02.ogg": 0.47,
+   "troll_03.ogg": 0.35,
+   "weird_01.ogg": 0.37,
+   "weird_02.ogg": 0.25,
+   "weird_03.ogg": 0.25,
+   "weird_04.ogg": 0.2,
+   "weird_05.ogg": 0.6
+  }
+ },
+ "sfx/haeldb_footsteps": {
+  "author": "HaelDB",
+  "licence": "CC0 1.0 (dual-licensed CC0 / OGA-BY 3.0; used under CC0)",
+  "credit": "HaelDB (credit optional)",
+  "url": "https://opengameart.org/content/footsteps-leather-cloth-armor",
+  "use": "leather, cloth and metal-armour footsteps",
+  "files": {
+   "step_cloth1.ogg": 0.05,
+   "step_cloth2.ogg": 0.13,
+   "step_cloth3.ogg": 0.25,
+   "step_cloth4.ogg": 0.08,
+   "step_lth1.ogg": 0.16,
+   "step_lth2.ogg": 0.15,
+   "step_lth4.ogg": 0.25,
+   "step_lth33.ogg": 0.25,
+   "step_metal.ogg": 0.15,
+   "step_metal__2.ogg": 0.19,
+   "step_metal__3.ogg": 0.18,
+   "step_metal__4.ogg": 0.14
+  }
+ },
+ "sfx/jaggedstone_magic": {
+  "author": "JaggedStone",
+  "licence": "CC0 1.0",
+  "credit": "JaggedStone (credit optional)",
+  "url": "https://opengameart.org/content/magic-spell-sfx",
+  "use": "7 magic casts (wand, boons, shrine)",
+  "files": {
+   "magical_1_0.ogg": 1.59,
+   "magical_2.ogg": 1.38,
+   "magical_3.ogg": 1.8,
+   "magical_4.ogg": 1.61,
+   "magical_5.ogg": 1.41,
+   "magical_6_0.ogg": 1.11,
+   "magical_7_0.ogg": 1.33
+  }
+ },
+ "sfx/antumdeluge_fire": {
+  "author": "AntumDeluge",
+  "licence": "CC0 1.0",
+  "credit": "AntumDeluge (credit optional)",
+  "url": "https://opengameart.org/content/fire-crackling",
+  "use": "short fire crackle (torch lit, fire hit)",
+  "files": {
+   "fire_1_0.ogg": 3.54
+  }
+ },
+ "ambience/pagdev_fireplace": {
+  "author": "PagDev",
+  "licence": "CC0 1.0",
+  "credit": "PagDev (credit optional)",
+  "url": "https://opengameart.org/content/fireplace-sound-loop",
+  "use": "fireplace loop: bonfire / brazier / Molten Forge bed",
+  "files": {
+   "fire.ogg": 29.26
+  }
+ },
+ "ambience/yd_dungeon": {
+  "author": "yd",
+  "licence": "CC0 1.0",
+  "credit": "yd (credit optional)",
+  "url": "https://opengameart.org/content/dungeon-ambience",
+  "use": "dark dungeon exploration bed",
+  "files": {
+   "dungeon002_0.ogg": 206.0
+  }
+ },
+ "ambience/wortmann_dark_cavern": {
+  "author": "Paul Wortmann",
+  "licence": "CC0 1.0",
+  "credit": "Paul Wortmann (credit optional)",
+  "url": "https://opengameart.org/content/dark-cavern-ambient",
+  "use": "looping cavern drones: Frost Ossuary / crypt",
+  "files": {
+   "dark_cavern_ambient_001.ogg": 120.0,
+   "dark_cavern_ambient_002.ogg": 120.0
+  }
+ },
+ "ambience/jaggedstone_dungeon_loop": {
+  "author": "JaggedStone",
+  "licence": "CC0 1.0",
+  "credit": "JaggedStone (credit optional)",
+  "url": "https://opengameart.org/content/loopable-dungeon-ambience",
+  "use": "loopable dungeon ambience",
+  "files": {
+   "dungeon_ambient_1_0.ogg": 94.31
+  }
+ },
+ "ambience/ogrebane_dark": {
+  "author": "Ogrebane",
+  "licence": "CC0 1.0",
+  "credit": "Ogrebane (credit optional)",
+  "url": "https://opengameart.org/content/dark-ambiences",
+  "use": "5 dark ambiences: cathedral hall, boss arena tension",
+  "files": {
+   "ambience_1.ogg": 4.63,
+   "ambience_2.ogg": 1.81,
+   "ambience_3.ogg": 1.69,
+   "ambience_4.ogg": 1.4,
+   "ambience_5.ogg": 3.44
+  }
+ },
+ "ambience/kindland_forgotten_tomb": {
+  "author": "kindland",
+  "licence": "CC0 1.0",
+  "credit": "kindland (credit optional)",
+  "url": "https://opengameart.org/content/forgoten-tomb-ambience",
+  "use": "forgotten-tomb ambience: crypt rooms",
+  "files": {
+   "forgoten_tombs_1.ogg": 214.2
+  }
+ },
+ "music/isao_dark_solemn_choral_organ": {
+  "author": "ISAo",
+  "licence": "OGA-BY 3.0",
+  "credit": "\"Dark Solemn Choral with Organ\" (Beyond Redemption, demo) by ISAo - https://airyluvs.com/ - OGA-BY 3.0",
+  "url": "https://opengameart.org/content/dark-solemn-choral-with-organ",
+  "use": "THE dark choir + organ theme: title screen, cathedral, Hollow Bishop",
+  "files": {
+   "dark_solemn_choral_with_organ.ogg": 70.66
+  }
+ },
+ "music/cesisco_fantasy_choir": {
+  "author": "cesisco",
+  "licence": "CC0 1.0",
+  "credit": "cesisco (credit optional)",
+  "url": "https://opengameart.org/content/fantasy-choir-3-orchestral-pieces",
+  "use": "3 orchestral choir pieces: boss intros, victory, between-runs hub",
+  "files": {
+   "fantasy_choir_1.ogg": 53.1,
+   "fantasy_choir_2.ogg": 126.13,
+   "fantasy_choir_3.ogg": 91.24
+  }
+ },
+ "music/umplix_cathedral": {
+  "author": "Umplix",
+  "licence": "CC0 1.0",
+  "credit": "Umplix (credit optional)",
+  "url": "https://opengameart.org/content/cathedral-0",
+  "use": "\"Cathedral\": slow emotional theme for the Cathedral world / game over",
+  "files": {
+   "cathedral.ogg": 72.0
+  }
+ },
+ "music/yubatake_fugue_b_minor": {
+  "author": "Yubatake",
+  "licence": "CC-BY 4.0",
+  "credit": "\"Fugue in B Minor\" by Yubatake (OpenGameArt.org), CC-BY 4.0",
+  "url": "https://opengameart.org/content/fugue-in-b-minor",
+  "use": "pipe-organ fugue: cathedral exploration, organ boss",
+  "files": {
+   "fugue_in_b_minor.ogg": 277.26
+  }
+ },
+ "music/yubatake_elegy_dm": {
+  "author": "Yubatake",
+  "licence": "CC-BY 4.0",
+  "credit": "\"Elegy Dm\" by Yubatake (OpenGameArt.org), CC-BY 4.0",
+  "url": "https://opengameart.org/content/elegy-dm",
+  "use": "sacred strings adagio with choir: run end / credits",
+  "files": {
+   "elegy_dm.ogg": 382.03
+  }
+ },
+ "music/nene_boss_battle_2_metal": {
+  "author": "nene",
+  "licence": "CC0 1.0",
+  "credit": "nene (credit optional)",
+  "url": "https://opengameart.org/content/boss-battle-2-symphonic-metal",
+  "use": "symphonic metal boss fight (opening + loop; the pack swaps the names, see the page)",
+  "files": {
+   "boss_battle_2_opening.ogg": 39.72,
+   "boss_battle_2_loop.ogg": 26.48
+  }
+ },
+ "music/matthewpablo_dark_descent": {
+  "author": "Matthew Pablo",
+  "licence": "CC-BY 3.0",
+  "credit": "\"Dark Descent\" by Matthew Pablo (http://www.matthewpablo.com), CC-BY 3.0",
+  "url": "https://opengameart.org/content/dark-descent",
+  "use": "orchestral dread with choir: descending into a world",
+  "files": {
+   "dark_descent.ogg": 83.33
+  }
+ },
+ "music/matthewpablo_heroic_demise": {
+  "author": "Matthew Pablo",
+  "licence": "CC-BY 3.0",
+  "credit": "\"Heroic Demise\" by Matthew Pablo (http://www.matthewpablo.com), CC-BY 3.0",
+  "url": "https://opengameart.org/content/heroic-demise-updated-version",
+  "use": "epic battle / final boss",
+  "files": {
+   "heroic_demise.ogg": 301.98
+  }
+ },
+ "music/foxsynergy_chapel_of_hate": {
+  "author": "FoxSynergy",
+  "licence": "CC-BY 3.0",
+  "credit": "\"Chapel of Hate\" by FoxSynergy, CC-BY 3.0",
+  "url": "https://opengameart.org/content/chapel-of-hate",
+  "use": "dark chapel organ-rock: cathedral combat",
+  "files": {
+   "chapel_of_hate.ogg": 261.17
+  }
+ }
+}

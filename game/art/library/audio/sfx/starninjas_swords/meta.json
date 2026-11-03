@@ -1,0 +1,29 @@
+{
+ "author": "StarNinjas",
+ "licence": "CC0 1.0",
+ "credit": "StarNinjas (credit optional)",
+ "url": "https://opengameart.org/content/20-sword-sound-effects-attacks-and-clashes",
+ "use": "10 sword attacks (swing+hit) and 10 clashes: hits, parries, shield blocks",
+ "files": {
+  "sword_1.ogg": 0.88,
+  "sword_2.ogg": 1.08,
+  "sword_3.ogg": 0.62,
+  "sword_4.ogg": 0.54,
+  "sword_5.ogg": 0.87,
+  "sword_6.ogg": 0.5,
+  "sword_7.ogg": 0.75,
+  "sword_8.ogg": 0.96,
+  "sword_9.ogg": 1.35,
+  "sword_10.ogg": 1.14,
+  "sword_clash_1.ogg": 0.88,
+  "sword_clash_2.ogg": 0.59,
+  "sword_clash_3.ogg": 0.76,
+  "sword_clash_4.ogg": 0.66,
+  "sword_clash_5.ogg": 0.54,
+  "sword_clash_6.ogg": 1.28,
+  "sword_clash_7.ogg": 1.0,
+  "sword_clash_8.ogg": 0.75,
+  "sword_clash_9.ogg": 1.09,
+  "sword_clash_10.ogg": 0.85
+ }
+}
