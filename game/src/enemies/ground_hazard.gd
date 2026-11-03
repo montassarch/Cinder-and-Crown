@@ -69,6 +69,7 @@ func _physics_process(delta: float) -> void:
 
 func _erupt() -> void:
 	queue_redraw()
+	Sound.play(&"hazard")
 	_sprite = PaintedFx.sprite(_art, FPS)
 	_sprite.scale *= ART_SCALE
 	add_child(_sprite)

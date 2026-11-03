@@ -23,6 +23,10 @@ const DIR := "res://data/biomes"
 @export var light_fps: float = 9.0
 ## The enemies its waves are drawn from.
 @export var enemies: Array[EnemyData] = []
+## Tracks in audio/music and audio/ambience (see SoundBank).
+@export var music: StringName = &""
+@export var ambience: StringName = &""
+@export var boss_music: StringName = &"boss"
 ## Levels in this world; the last one is the boss's arena.
 @export var levels: int = 3
 @export var boss: EnemyData

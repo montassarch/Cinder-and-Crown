@@ -129,6 +129,8 @@ func _trigger_boss() -> void:
 	if player.global_position.x >= GameConfig.tiles(_arena_start + BOSS_TRIGGER_TILES):
 		_boss_spawned = true
 		_boss = spawn_enemy_at(biome().boss, _boss_spawn)
+		Sound.music(biome().boss_music)
+		Sound.play(&"roar")
 		_boss.died.connect(_on_boss_died.bind(biome().boss))
 		_hud.show_boss(_boss)
 
@@ -146,11 +148,13 @@ func _on_boss_died(data: EnemyData) -> void:
 	if _depth >= BiomeData.load_all().back().boss_depth():
 		_hud.show_banner("VICTORY", "%s has fallen. The crown is yours." % data.display_name.trim_prefix("The "))
 		MetaSave.add_win()
+		Sound.music(SoundBank.VICTORY_MUSIC)
 		run_won.emit()
 		_touch.release_all()
 		_victory.open(data.display_name, _cells_run, MetaSave.wins())
 	else:
 		_hud.show_banner("%s falls" % data.display_name, "The way on is open")
+		Sound.music(biome().music)
 
 
 func _trigger_encounters() -> void:
@@ -191,6 +195,8 @@ func _on_enemy_died(reward: int) -> void:
 func _update_exit_gate() -> void:
 	var open := _exit_open()
 	# a hero already standing in the exit when it opens is offered the boons too (he does not have to step out and back)
+	if open and not _gate_was_open and encounters_enabled and enemy_count() == 0 and _encounters.any(func(e: Dictionary) -> bool: return e.spawned):
+		Sound.play(&"gate")
 	if open and not _gate_was_open and player != null and _hero_on_exit(player):
 		_on_exit_entered.call_deferred(player)
 	_gate_was_open = open
@@ -374,6 +380,7 @@ func _on_exit_entered(body: Node) -> void:
 
 
 func _on_boon_chosen(boon: BoonData) -> void:
+	Sound.play(&"boon")
 	player.apply_boon(boon)
 	player.refill_flask(FLASK_PER_LEVEL)
 	# the last world's boss level is the end of a run: there is nothing deeper
@@ -383,6 +390,7 @@ func _on_boon_chosen(boon: BoonData) -> void:
 
 ## Dying opens the shop; the run restarts when it is closed.
 func _on_player_died() -> void:
+	Sound.music(SoundBank.FALLEN_MUSIC)
 	_touch.release_all()
 	_shop.open(_meta_upgrades, _cells_run)
 
@@ -395,4 +403,5 @@ func reset_player() -> void:
 	player.set_run_bonuses(MetaSave.bonus_boons(_meta_upgrades))
 	player.start_new_run()
 	regenerate(level_seed)
+	Sound.music(biome().music)
 	_hud.show_banner(biome().display_name, biome().subtitle)

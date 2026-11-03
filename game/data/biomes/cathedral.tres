@@ -29,3 +29,6 @@ light_fps = 9.0
 enemies = Array[ExtResource("2_e")]([ExtResource("e0"), ExtResource("e1"), ExtResource("e2"), ExtResource("e3"), ExtResource("e4"), ExtResource("e5"), ExtResource("e6")])
 levels = 3
 boss = ExtResource("boss")
+music = &"cathedral"
+ambience = &"cathedral"
+boss_music = &"boss"

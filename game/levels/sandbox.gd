@@ -102,6 +102,8 @@ func _set_biome(next: BiomeData) -> void:
 	_ledge_texture = load(next.art_path("ledge_tile"))
 	RenderingServer.set_default_clear_color(next.clear_color)
 	_backdrop.apply(next)
+	Sound.music(next.music)
+	Sound.ambience(next.ambience)
 
 
 ## Dresses the test room as another world (its art, tiles and colour), to preview it.

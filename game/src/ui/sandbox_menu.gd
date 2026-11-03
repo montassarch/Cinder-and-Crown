@@ -31,6 +31,7 @@ var _switch_path: String = ""
 var _pickers: Array[OptionButton] = []
 var _worlds: Array[BiomeData] = []
 var _world_picker: OptionButton
+var _sound_button: Button
 
 
 func _ready() -> void:
@@ -71,6 +72,10 @@ func spawn_button_count() -> int:
 
 func weapon_choice_count() -> int:
 	return _weapons.size()
+
+
+func press_sound_toggle() -> void:
+	_sound_button.pressed.emit()
 
 
 func world_choice_count() -> int:
@@ -184,6 +189,11 @@ func _build_ui() -> void:
 	_switch_button.visible = false
 	_switch_button.pressed.connect(func() -> void: scene_requested.emit(_switch_path))
 	actions.add_child(_switch_button)
+	_sound_button = _make_button("Sound: on")
+	_sound_button.pressed.connect(func() -> void:
+		Sound.set_muted(not Sound.is_muted())
+		_sound_button.text = "Sound: off" if Sound.is_muted() else "Sound: on")
+	actions.add_child(_sound_button)
 	var debug := CheckButton.new()
 	debug.text = "Debug boxes"
 	debug.focus_mode = Control.FOCUS_NONE

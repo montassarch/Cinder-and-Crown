@@ -27,3 +27,6 @@ light_fps = 10.0
 enemies = Array[ExtResource("2_e")]([ExtResource("e0"), ExtResource("e1"), ExtResource("e2"), ExtResource("e3"), ExtResource("e4")])
 levels = 3
 boss = ExtResource("boss")
+music = &"forge"
+ambience = &"forge"
+boss_music = &"boss"

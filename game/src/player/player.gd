@@ -19,6 +19,8 @@ signal parried(perfect: bool)
 signal flask_changed(charges: int, maximum: int)
 ## For the effects: a roll began, the hero landed from the air, drank the flask, cast an ability (&"storm" / &"rend").
 signal rolled
+signal jumped
+signal weapon_swapped
 signal landed
 signal drank
 signal ability_cast(ability: StringName)
@@ -339,6 +341,7 @@ func swap_weapons() -> void:
 		return
 	_active_slot = other
 	_weapon.equip(_weapons[_active_slot])
+	weapon_swapped.emit()
 
 
 func is_invincible() -> bool:
@@ -481,6 +484,7 @@ func _enter_state(next: State) -> void:
 			velocity.y = -GameConfig.tiles(sqrt(2.0 * GRAVITY * JUMP_HEIGHT))
 			_coyote = 0.0
 			InputRouter.consume_jump()
+			jumped.emit()
 		State.ROLL:
 			InputRouter.consume_roll()
 			rolled.emit()
