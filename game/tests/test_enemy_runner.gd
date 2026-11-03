@@ -217,7 +217,11 @@ func test_a_projectile_move_spawns_a_shot_that_flies_toward_the_hero() -> void:
 	var victim := _victim_beside(enemy)
 	victim.global_position = enemy.global_position + GameConfig.tiles_v(5.0, 0.0)
 	enemy.begin_telegraph()
-	await _frames(10)  # the 0.1 s wind-up is over: the shot is out
+	# the 0.1 s wind-up runs on a timer: wait for it (generously, a loaded machine can lag) rather than a frame count
+	for i in 60:
+		await _frames(1)
+		if not _shots_in(self).is_empty():
+			break
 	var shots := _shots_in(self)
 	assert_int(shots.size()).is_equal(1)
 	assert_int(shots[0].damage).is_equal(8)

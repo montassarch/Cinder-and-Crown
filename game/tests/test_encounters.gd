@@ -132,6 +132,9 @@ func test_the_exit_gate_looks_shut_or_open() -> void:
 	var shut: Color = _level.exit_gate_color()
 	_kill_all()
 	await _frames(2)
+	# the gate is repainted in _process, which can lag physics frames on a loaded machine
+	await get_tree().process_frame
+	await get_tree().process_frame
 	assert_object(_level.exit_gate_color()).is_not_equal(shut)
 
 # --- Depth ---
