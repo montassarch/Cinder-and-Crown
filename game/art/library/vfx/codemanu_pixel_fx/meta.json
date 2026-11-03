@@ -2,7 +2,7 @@
  "pack": "codemanu_pixel_fx",
  "author": "CodeManu",
  "licence": "CC-BY 4.0 (itch.io licence field; the page text says public domain - we credit to be safe)",
- "credit": "\"Free Pixel Effects Pack\" by CodeManu (https://codemanu.itch.io/pixelart-effect-pack), CC-BY 4.0",
+ "credit": "Free Pixel Effects Pack by CodeManu (CC-BY 4.0)",
  "url": "https://codemanu.itch.io/pixelart-effect-pack",
  "notes": "100x100 grid sheets, empty cells dropped, subsampled to 16 frames max.",
  "effects": {
@@ -34,7 +34,7 @@
    ],
    "blend": "add",
    "draw_scale": 1.0,
-   "use": "rune ring"
+   "use": "figure-eight rune trail"
   },
   "bluefire": {
    "frames": 16,
@@ -216,6 +216,21 @@
    "draw_scale": 1.0,
    "use": "ghost / soul burst"
   },
+  "loading": {
+   "frames": 16,
+   "size": [
+    62,
+    62
+   ],
+   "fps": 16,
+   "pivot": [
+    27.0,
+    29.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "spinner (loading / saving icon)"
+  },
   "sunburn": {
    "frames": 16,
    "size": [
@@ -275,6 +290,21 @@
    "blend": "add",
    "draw_scale": 1.0,
    "use": "ice burst"
+  },
+  "magicbubbles": {
+   "frames": 16,
+   "size": [
+    50,
+    53
+   ],
+   "fps": 16,
+   "pivot": [
+    24.0,
+    21.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "bubbles (poison / swamp)"
   }
  }
 }

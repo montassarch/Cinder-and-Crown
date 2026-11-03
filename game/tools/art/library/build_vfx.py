@@ -97,12 +97,13 @@ def pvfx():
 def codemanu():
     root = P('codemanu/x/Free_Pixel_Effects_Pack')
     pk = Pack('codemanu_pixel_fx', author='CodeManu', licence='CC-BY 4.0 (itch.io licence field; the page text says public domain - we credit to be safe)',
-              credit='"Free Pixel Effects Pack" by CodeManu (https://codemanu.itch.io/pixelart-effect-pack), CC-BY 4.0',
+              credit='Free Pixel Effects Pack by CodeManu (CC-BY 4.0)',
               url='https://codemanu.itch.io/pixelart-effect-pack', notes='100x100 grid sheets, empty cells dropped, subsampled to 16 frames max.')
     uses = {'weaponhit': 'weapon hit spark', 'fire': 'fire column', 'phantom': 'ghost / soul burst', 'felspell': 'curse cast', 'midnight': 'dark burst',
             'flamelash': 'fire whip slash', 'firespin': 'fire vortex', 'brightfire': 'holy fire', 'magickahit': 'magic impact', 'casting': 'cast glyph',
             'protectioncircle': 'ward circle', 'sunburn': 'sun flare', 'freezing': 'ice burst', 'vortex': 'void vortex', 'nebula': 'mist cloud',
-            'bluefire': 'soul fire', 'magicspell': 'spell burst', 'magic8': 'rune ring'}
+            'bluefire': 'soul fire', 'magicspell': 'spell burst', 'magic8': 'figure-eight rune trail',
+            'loading': 'spinner (loading / saving icon)', 'magicbubbles': 'bubbles (poison / swamp)'}
     for f in natsort(glob.glob(os.path.join(root, '*_spritesheet.png'))):
         key = re.sub(r'^\d+_|_spritesheet\.png$', '', os.path.basename(f))
         if key not in uses: continue
@@ -226,5 +227,45 @@ def textures():
     pk.done(zoom=1)
 
 
+# ------------------------------------------------------------------ MatheusGG28 "Pixel FX Pack - 11 Visual Effects" (free, commercial OK, no credit)
+def matheus():
+    root = P('matheus_fx/x/*/*')
+    pk = Pack('matheusgg28_pixel_fx', author='MatheusGG28', licence='itch.io free licence: "Free for personal and commercial use. No credits required."',
+              credit='Pixel FX Pack - 11 Visual Effects by MatheusGG28 (credit optional)', url='https://matheusgg99.itch.io/impact-and-explosion-effects-pack',
+              notes='32x32 pixel effects at native size. The page states no redistribution limit; it also grants no explicit redistribution right.')
+    for folder, eff, use in (('Explosion_Impacts/Small_Explosion', 'explosion_small', 'small blast / hit pop'),
+                             ('Explosion_Impacts/Median_Explosion', 'explosion_medium', 'medium blast'),
+                             ('Explosion_Impacts/Big_Explosion', 'explosion_big', 'big blast (powder keg)'),
+                             ('Projectile_Impacts/Projectile_Impact', 'impact_projectile', 'arrow / bolt impact'),
+                             ('Projectile_Impacts/Projectile_Impact_2', 'impact_projectile_2', 'magic bolt impact'),
+                             ('Punch_Impact', 'impact_punch', 'gauntlet punch / shield bash impact'),
+                             ('Dust_Effects/Dust_Effect', 'dust', 'run / land dust'), ('Dust_Effects/Dust_Effect_2', 'dust_2', 'dodge-roll dust'),
+                             ('Shock_Waves/Shock_Wave', 'shockwave', 'slam shockwave'), ('Shock_Waves/Shock_Wave_2', 'shockwave_2', 'ring shockwave'),
+                             ('Shock_Waves/Shock_Wave_3', 'shockwave_3', 'wide shockwave')):
+        fr = [lib.rgba(f) for f in natsort(glob.glob(os.path.join(root, folder, '*.png')))]
+        pk.add(eff, fr, fps=14, use=use, n='keep')
+    pk.done(zoom=4)
+
+
+# ------------------------------------------------------------------ XYEzawr Free Pixel Effects Pack #1-#3 (free use in games, NO redistribution)
+# These are written to vfx/xyezawr_*/, which vfx/.gitignore keeps out of the (public) repository: the licence allows
+# shipping them inside the game but not redistributing the files. Regenerate locally with this script.
+def xyezawr():
+    packs = (('xyezawr_pack_1', 'xyez_1/x/Fx_pack', 'https://xyezawr.itch.io/free', ('1', '2', '3')),
+             ('xyezawr_pack_2', 'xyez_2/x/*', 'https://xyezawr.itch.io/free-pixel-effects-pack-2', ('2', '4')),
+             ('xyezawr_pack_2_extra', 'xyez_2b/x/*', 'https://xyezawr.itch.io/free-pixel-effects-pack-2', ('1', '3/1', '3/2', '5', '6')),
+             ('xyezawr_pack_3', 'xyez_3/x/*', 'https://xyezawr.itch.io/free-pixel-effects-pack-3', ('1', '2', '3')))
+    for name, folder, url, effs in packs:
+        pk = Pack(name, author='XYEzawr', licence='itch.io licence: free and commercial projects, modify OK, credit optional; '
+                  'NOT to be redistributed or resold (so kept out of the public git repo)', credit='Free Pixel Effects Pack by XYEzawr (credit optional)',
+                  url=url, notes='100x100 frames, subsampled to 20 frames max. LOCAL ONLY (git-ignored).')
+        for e in effs:
+            files = natsort(glob.glob(os.path.join(DL, folder, e, '*.png')))
+            files = [f for f in files if os.path.isfile(f)]
+            fr = [lib.rgba(f) for f in files]
+            pk.add('effect_' + e.replace('/', '_'), fr, fps=24, n=20, blend='add', use='see preview')
+        pk.done(zoom=1)
+
+
 if __name__ == '__main__':
-    pvfx(); codemanu(); cethiel(); pixel_misc(); rendered(); textures()
+    pvfx(); codemanu(); cethiel(); pixel_misc(); rendered(); textures(); matheus(); xyezawr()
