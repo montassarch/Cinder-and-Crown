@@ -484,11 +484,11 @@ Credit: Free Pixel Effects Pack by XYEzawr (credit optional)
 
 | Asset | Author / licence | What is inside | Could be used for | Preview | Size |
 |---|---|---|---|---|---|
-| `bricks008` | ambientCG (Lennart Demes) - CC0 1.0 | . tile_64 / tile_128 tile seamlessly (4x4 / 8x8 game tiles). source/ has 512 px colour + normal maps for Blender. | clean church brick | [preview.png](../../game/art/library/textures/bricks008/preview.png) | 25 KB |
-| `bricks089` | ambientCG (Lennart Demes) - CC0 1.0 | . tile_64 / tile_128 tile seamlessly (4x4 / 8x8 game tiles). source/ has 512 px colour + normal maps for Blender. | dark medieval brick wall (cathedral / castle backdrop) | [preview.png](../../game/art/library/textures/bricks089/preview.png) | 31 KB |
-| `ground065` | ambientCG (Lennart Demes) - CC0 1.0 | . tile_64 / tile_128 tile seamlessly (4x4 / 8x8 game tiles). source/ has 512 px colour + normal maps for Blender. | rocky medieval ground (cemetery, swamp floor) | [preview.png](../../game/art/library/textures/ground065/preview.png) | 33 KB |
-| `pavingstones150` | ambientCG (Lennart Demes) - CC0 1.0 | . tile_64 / tile_128 tile seamlessly (4x4 / 8x8 game tiles). source/ has 512 px colour + normal maps for Blender. | paving stones (floor fill, courtyard) | [preview.png](../../game/art/library/textures/pavingstones150/preview.png) | 38 KB |
-| `rocks025` | ambientCG (Lennart Demes) - CC0 1.0 | . tile_64 / tile_128 tile seamlessly (4x4 / 8x8 game tiles). source/ has 512 px colour + normal maps for Blender. | rough stone wall (crypt, ruins) | [preview.png](../../game/art/library/textures/rocks025/preview.png) | 38 KB |
+| `bricks008` | ambientCG (Lennart Demes) - CC0 1.0 | . tile_64 / tile_128 tile seamlessly (4x4 / 8x8 game tiles). source/ has 512 px colour + normal maps for Blender. | clean church brick | [preview.png](../../game/art/library/textures/bricks008/preview.png) | 73 KB |
+| `bricks089` | ambientCG (Lennart Demes) - CC0 1.0 | . tile_64 / tile_128 tile seamlessly (4x4 / 8x8 game tiles). source/ has 512 px colour + normal maps for Blender. | dark medieval brick wall (cathedral / castle backdrop) | [preview.png](../../game/art/library/textures/bricks089/preview.png) | 85 KB |
+| `ground065` | ambientCG (Lennart Demes) - CC0 1.0 | . tile_64 / tile_128 tile seamlessly (4x4 / 8x8 game tiles). source/ has 512 px colour + normal maps for Blender. | rocky medieval ground (cemetery, swamp floor) | [preview.png](../../game/art/library/textures/ground065/preview.png) | 93 KB |
+| `pavingstones150` | ambientCG (Lennart Demes) - CC0 1.0 | . tile_64 / tile_128 tile seamlessly (4x4 / 8x8 game tiles). source/ has 512 px colour + normal maps for Blender. | paving stones (floor fill, courtyard) | [preview.png](../../game/art/library/textures/pavingstones150/preview.png) | 98 KB |
+| `rocks025` | ambientCG (Lennart Demes) - CC0 1.0 | . tile_64 / tile_128 tile seamlessly (4x4 / 8x8 game tiles). source/ has 512 px colour + normal maps for Blender. | rough stone wall (crypt, ruins) | [preview.png](../../game/art/library/textures/rocks025/preview.png) | 94 KB |
 
 ## Audio (`game/art/library/audio/`)
 

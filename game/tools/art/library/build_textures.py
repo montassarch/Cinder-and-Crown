@@ -57,5 +57,6 @@ for mid, use in MATS.items():
     for x in range(0, 256, 64):
         for y in range(0, 128, 64): tiled.alpha_composite(out[0], (x, y))
     rows.append((f'{mid}: tile_64 repeated, tile_128', [tiled, out[1]]))
+    lib.contact_sheet([rows[-1]], os.path.join(d, 'preview.png'), zoom=2, max_cols=2)
     print(mid)
 lib.contact_sheet(rows, os.path.join(lib.LIB, 'textures', 'preview.png'), zoom=2, max_cols=2)
