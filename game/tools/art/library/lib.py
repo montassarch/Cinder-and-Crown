@@ -170,12 +170,12 @@ def _font():
         return None
 
 
-def contact_sheet(rows, path, zoom=2, bg=(34, 30, 42, 255), max_cols=12, label_w=0):
+def contact_sheet(rows, path, zoom=2, bg=(34, 30, 42, 255), max_cols=12, max_rows=3):
     """rows: [(label, [frames])] -> one PNG, every row its own line(s), nearest-neighbour zoom."""
     font = _font()
     cells = []
     for label, frames in rows:
-        frames = frames[:max_cols * 3]
+        frames = frames[:max_cols * max_rows]
         if not frames: continue
         fw = max(f.width for f in frames); fh = max(f.height for f in frames)
         cells.append((label, frames, fw, fh))
