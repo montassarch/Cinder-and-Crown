@@ -1,0 +1,109 @@
+{
+ "name": "gv_church",
+ "author": "Luis Zuno (ansimuz)",
+ "licence": "CC0 1.0 (public domain)",
+ "credit": "Luis Zuno (@ansimuz) (credit optional)",
+ "url": "https://opengameart.org/content/gothicvania-church-pack",
+ "use": "cathedral interior: purple stone tiles, balustrade, altar, gothic window, skull column - the Cathedral world",
+ "notes": "",
+ "files": {
+  "tileset.png": {
+   "size": [
+    336,
+    224
+   ],
+   "what": "16 px tileset (stone floors, walls, altar, balustrade, arch)"
+  },
+  "ashen/tileset.png": {
+   "size": [
+    336,
+    224
+   ],
+   "what": "16 px tileset (stone floors, walls, altar, balustrade, arch) (ashen grade)"
+  },
+  "background_0.png": {
+   "size": [
+    160,
+    192
+   ],
+   "what": "background wall panel (window, skull pillar, altar, gargoyle, torch)"
+  },
+  "ashen/background_0.png": {
+   "size": [
+    160,
+    192
+   ],
+   "what": "background wall panel (window, skull pillar, altar, gargoyle, torch) (ashen grade)"
+  },
+  "background_1.png": {
+   "size": [
+    128,
+    192
+   ],
+   "what": "background wall panel (window, skull pillar, altar, gargoyle, torch)"
+  },
+  "ashen/background_1.png": {
+   "size": [
+    128,
+    192
+   ],
+   "what": "background wall panel (window, skull pillar, altar, gargoyle, torch) (ashen grade)"
+  },
+  "background_2.png": {
+   "size": [
+    128,
+    192
+   ],
+   "what": "background wall panel (window, skull pillar, altar, gargoyle, torch)"
+  },
+  "ashen/background_2.png": {
+   "size": [
+    128,
+    192
+   ],
+   "what": "background wall panel (window, skull pillar, altar, gargoyle, torch) (ashen grade)"
+  },
+  "background_3.png": {
+   "size": [
+    80,
+    192
+   ],
+   "what": "background wall panel (window, skull pillar, altar, gargoyle, torch)"
+  },
+  "ashen/background_3.png": {
+   "size": [
+    80,
+    192
+   ],
+   "what": "background wall panel (window, skull pillar, altar, gargoyle, torch) (ashen grade)"
+  },
+  "background_4.png": {
+   "size": [
+    64,
+    192
+   ],
+   "what": "background wall panel (window, skull pillar, altar, gargoyle, torch)"
+  },
+  "ashen/background_4.png": {
+   "size": [
+    64,
+    192
+   ],
+   "what": "background wall panel (window, skull pillar, altar, gargoyle, torch) (ashen grade)"
+  },
+  "column.png": {
+   "size": [
+    114,
+    190
+   ],
+   "what": "big foreground column"
+  },
+  "ashen/column.png": {
+   "size": [
+    114,
+    190
+   ],
+   "what": "big foreground column (ashen grade)"
+  }
+ }
+}

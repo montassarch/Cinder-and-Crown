@@ -1,0 +1,109 @@
+{
+ "name": "gv_night_town_bg",
+ "author": "Luis Zuno (ansimuz)",
+ "licence": "CC0 1.0 (public domain)",
+ "credit": "Luis Zuno (@ansimuz) (credit optional)",
+ "url": "https://opengameart.org/content/gothicvania-patreons-collection",
+ "use": "7-layer night parallax: sky, clouds, mountains (+ lit windows), forest, far buildings, town",
+ "notes": "",
+ "files": {
+  "clouds.png": {
+   "size": [
+    288,
+    224
+   ],
+   "what": "parallax layer"
+  },
+  "ashen/clouds.png": {
+   "size": [
+    288,
+    224
+   ],
+   "what": "parallax layer (ashen grade)"
+  },
+  "far-buildings.png": {
+   "size": [
+    320,
+    80
+   ],
+   "what": "parallax layer"
+  },
+  "ashen/far-buildings.png": {
+   "size": [
+    320,
+    80
+   ],
+   "what": "parallax layer (ashen grade)"
+  },
+  "forest.png": {
+   "size": [
+    64,
+    96
+   ],
+   "what": "parallax layer"
+  },
+  "ashen/forest.png": {
+   "size": [
+    64,
+    96
+   ],
+   "what": "parallax layer (ashen grade)"
+  },
+  "mountains-lights.png": {
+   "size": [
+    96,
+    224
+   ],
+   "what": "parallax layer"
+  },
+  "ashen/mountains-lights.png": {
+   "size": [
+    96,
+    224
+   ],
+   "what": "parallax layer (ashen grade)"
+  },
+  "mountains.png": {
+   "size": [
+    96,
+    224
+   ],
+   "what": "parallax layer"
+  },
+  "ashen/mountains.png": {
+   "size": [
+    96,
+    224
+   ],
+   "what": "parallax layer (ashen grade)"
+  },
+  "sky.png": {
+   "size": [
+    96,
+    224
+   ],
+   "what": "parallax layer"
+  },
+  "ashen/sky.png": {
+   "size": [
+    96,
+    224
+   ],
+   "what": "parallax layer (ashen grade)"
+  },
+  "town.png": {
+   "size": [
+    512,
+    99
+   ],
+   "what": "parallax layer"
+  },
+  "ashen/town.png": {
+   "size": [
+    512,
+    99
+   ],
+   "what": "parallax layer (ashen grade)"
+  }
+ }
+}

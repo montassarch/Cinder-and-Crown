@@ -1,0 +1,53 @@
+{
+ "name": "gv_gothic_horror",
+ "author": "Luis Zuno (ansimuz)",
+ "licence": "CC0 1.0 (public domain)",
+ "credit": "Luis Zuno (@ansimuz) (credit optional)",
+ "url": "https://opengameart.org/content/gothicvania-patreons-collection",
+ "use": "brick ruins against a cloudy town skyline",
+ "notes": "",
+ "files": {
+  "clouds.png": {
+   "size": [
+    256,
+    176
+   ],
+   "what": "layer"
+  },
+  "ashen/clouds.png": {
+   "size": [
+    256,
+    176
+   ],
+   "what": "layer (ashen grade)"
+  },
+  "town.png": {
+   "size": [
+    256,
+    176
+   ],
+   "what": "layer"
+  },
+  "ashen/town.png": {
+   "size": [
+    256,
+    176
+   ],
+   "what": "layer (ashen grade)"
+  },
+  "tiles.png": {
+   "size": [
+    1056,
+    176
+   ],
+   "what": "layer"
+  },
+  "ashen/tiles.png": {
+   "size": [
+    1056,
+    176
+   ],
+   "what": "layer (ashen grade)"
+  }
+ }
+}

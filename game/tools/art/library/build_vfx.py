@@ -1,4 +1,4 @@
-# Builds the effects library (game/art/library/fx/<pack>/<effect>/<n>.png) from licence-checked downloads.
+# Builds the effects library (game/art/library/vfx/<pack>/<effect>/<n>.png) from licence-checked downloads.
 #   python3 -I game/tools/art/library/build_fx.py <downloads dir> [pack ...]
 # Pixel-art effects keep their native size. Painted / rendered (HD) effects are shrunk so their longest side is about
 # 2x the size they should cover in the 384x216 view (draw them at scale 0.5, like game/art/fx_painted).
@@ -45,7 +45,7 @@ class Pack:
     def __init__(self, name, *, author, licence, credit, url, notes=''):
         self.name, self.meta, self.rows = name, dict(pack=name, author=author, licence=licence, credit=credit, url=url, notes=notes, effects={}), []
         self.skip = bool(ONLY) and name not in ONLY
-        if not self.skip: self.d = lib.out_dir('fx', name)
+        if not self.skip: self.d = lib.out_dir('vfx', name)
 
     def add(self, effect, frames, *, fps=12, longest=None, scale=None, pivot=None, blend='mix', draw_scale=1.0, use='', n=None):
         if self.skip: return
