@@ -14,6 +14,9 @@ Written 2026-10-22. The roadmap (`Roadmap.md`) has the big phases; this is the f
 ## The full game (2026-10-30, plan: `Design/Plans/2026-10-30-full-game.md`)
 - [x] Stage 1: four worlds, each with painted backdrops, tiles, weather, lights and two new enemies; four new rooms.
 - [x] Stage 2: a boss at the end of each world (Hollow Bishop, Rime Colossus, Forge Tyrant, Storm King).
+- [x] Music and sound (2026-11-03): a theme per world, boss / final boss / victory / fallen music, ambience per world,
+  combat, movement, enemy and hazard sounds, a Sound on/off button in the menu (audio/, credits in audio/CREDITS.md).
+- [ ] CC-BY music (Yubatake, Matthew Pablo, FoxSynergy, ISAo) needs its credit shown in the game: add a credits screen (Stage 5).
 - [ ] Stage 3: double jump, air dash, weapon art on the hero, weapon drops.
 - [ ] Stage 4: the hand-painted magic effects in combat.
 - [ ] Stage 5: title, victory and death screens, balance, full-run playtest.
