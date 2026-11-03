@@ -38,6 +38,10 @@ enum Kind { MELEE, PROJECTILE }
 @export var projectile_pierce: int = 0
 @export var projectile_tint: Color = Color(1.0, 0.9, 0.6)
 @export var projectile_radius: float = 2.5
+## An effect cue (see LibraryFx) the shot flies as, looping; empty draws a plain glowing dart.
+@export var projectile_fx: StringName = &""
+## An effect cue played where this move's hit lands (on top of the spark); empty plays none.
+@export var impact_fx: StringName = &""
 
 
 func is_valid() -> bool:

@@ -40,12 +40,25 @@ func _init() -> void:
 
 
 ## direction: +1 right, -1 left. Distances and speed in pixels.
+## A plain ember (no colour of its own) flies as this fireball when its pack is present.
+const FIREBALL_CUE := "xyezawr_pack_1/effect_3"
+
+var _fireball: AnimatedSprite2D
+
+
 func launch(direction: float, speed_px: float, max_distance_px: float, hit_damage: int, shooter: Node) -> void:
 	_direction = signf(direction) if direction != 0.0 else 1.0
 	_speed = speed_px
 	_max_distance = max_distance_px
 	damage = hit_damage
 	_shooter = shooter
+	if color == COLOR and _fireball == null:
+		_fireball = LibraryFx.sprite(FIREBALL_CUE, true)
+		if _fireball != null:
+			_fireball.scale.x = _direction * absf(_fireball.scale.x) * 0.7
+			_fireball.scale.y = absf(_fireball.scale.y) * 0.7
+			add_child(_fireball)
+			_fireball.play(&"play")
 	queue_redraw()
 
 
@@ -101,6 +114,10 @@ func _source_x() -> float:
 
 
 func _draw() -> void:
+	if _fireball != null:
+		_fireball.scale.x = _direction * absf(_fireball.scale.x)
+		_fireball.modulate = Color(0.6, 0.95, 1.0) if _reflected else Color.WHITE
+		return
 	var shown := REFLECTED_COLOR if _reflected else color
 	draw_circle(Vector2.ZERO, RADIUS, shown)
 	draw_circle(Vector2.ZERO, RADIUS * 0.5, Color.WHITE)

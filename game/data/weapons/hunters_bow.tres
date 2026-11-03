@@ -28,6 +28,7 @@ projectile_range_tiles = 14.0
 projectile_pierce = 0
 projectile_tint = Color(0.85, 1.0, 0.7, 1)
 projectile_radius = 2.5
+impact_fx = &"matheusgg28_pixel_fx/impact_projectile"
 
 [sub_resource type="Resource" id="move_2"]
 script = ExtResource("2_move")
@@ -54,6 +55,7 @@ projectile_range_tiles = 18.0
 projectile_pierce = 2
 projectile_tint = Color(1.0, 0.95, 0.5, 1)
 projectile_radius = 3.5
+impact_fx = &"matheusgg28_pixel_fx/impact_projectile"
 
 [sub_resource type="Resource" id="move_3"]
 script = ExtResource("2_move")
@@ -80,6 +82,7 @@ projectile_range_tiles = 14.0
 projectile_pierce = 0
 projectile_tint = Color(0.85, 1.0, 0.7, 1)
 projectile_radius = 2.5
+impact_fx = &"matheusgg28_pixel_fx/impact_projectile"
 
 [sub_resource type="Resource" id="move_4"]
 script = ExtResource("2_move")
@@ -106,6 +109,7 @@ projectile_range_tiles = 12.0
 projectile_pierce = 0
 projectile_tint = Color(0.85, 1.0, 0.7, 1)
 projectile_radius = 2.5
+impact_fx = &"matheusgg28_pixel_fx/impact_projectile"
 
 [resource]
 script = ExtResource("1_data")

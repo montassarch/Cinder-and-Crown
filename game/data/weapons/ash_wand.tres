@@ -28,6 +28,8 @@ projectile_range_tiles = 12.0
 projectile_pierce = 0
 projectile_tint = Color(0.75, 0.55, 1.0, 1)
 projectile_radius = 3.0
+impact_fx = &"codemanu_pixel_fx/magickahit"
+projectile_fx = &"codemanu_pixel_fx/bluefire"
 
 [sub_resource type="Resource" id="move_2"]
 script = ExtResource("2_move")
@@ -54,6 +56,8 @@ projectile_range_tiles = 8.0
 projectile_pierce = 3
 projectile_tint = Color(0.9, 0.6, 1.0, 1)
 projectile_radius = 5.0
+impact_fx = &"codemanu_pixel_fx/magickahit"
+projectile_fx = &"codemanu_pixel_fx/vortex"
 
 [sub_resource type="Resource" id="move_3"]
 script = ExtResource("2_move")
@@ -80,6 +84,8 @@ projectile_range_tiles = 10.0
 projectile_pierce = 0
 projectile_tint = Color(1.0, 0.65, 0.4, 1)
 projectile_radius = 3.5
+impact_fx = &"matheusgg28_pixel_fx/explosion_small"
+projectile_fx = &"codemanu_pixel_fx/sunburn"
 
 [sub_resource type="Resource" id="move_4"]
 script = ExtResource("2_move")
@@ -106,6 +112,8 @@ projectile_range_tiles = 9.0
 projectile_pierce = 0
 projectile_tint = Color(0.6, 0.8, 1.0, 1)
 projectile_radius = 2.5
+impact_fx = &"codemanu_pixel_fx/magickahit"
+projectile_fx = &"codemanu_pixel_fx/magicspell"
 
 [resource]
 script = ExtResource("1_data")

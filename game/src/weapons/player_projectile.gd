@@ -7,6 +7,8 @@ extends Area2D
 const WORLD_MASK: int = 1
 const ENEMY_HURTBOX_MASK: int = 16
 const TRAIL_PIXELS: float = 9.0
+## Spell art from the packs is drawn at this size on a shot (the pictures are made for big effects).
+const FX_SCALE: float = 0.55
 
 var _direction := Vector2.RIGHT
 var _speed: float = 0.0
@@ -16,6 +18,7 @@ var _pierce_left: int = 0
 var _weapon: Weapon
 var _move: WeaponMove
 var _hit: Array[Node] = []
+var _animated: bool = false
 
 
 func _init() -> void:
@@ -42,6 +45,13 @@ func launch(weapon: Weapon, move: WeaponMove, direction: Vector2) -> void:
 	_pierce_left = move.projectile_pierce
 	((get_child(0) as CollisionShape2D).shape as CircleShape2D).radius = move.projectile_radius
 	rotation = _direction.angle()
+	if move.projectile_fx != &"":
+		var art := LibraryFx.sprite(String(move.projectile_fx), true)
+		if art != null:
+			art.scale *= FX_SCALE
+			add_child(art)
+			art.play(&"play")
+			_animated = true
 	queue_redraw()
 
 
@@ -73,7 +83,7 @@ func _on_body_entered(_body: Node) -> void:
 
 
 func _draw() -> void:
-	if _move == null:
+	if _move == null or _animated:
 		return
 	var radius := _move.projectile_radius
 	var tint := _move.projectile_tint

@@ -12,6 +12,10 @@ signal guard_broken
 signal exploded
 ## A boss fell below its phase threshold and plays its second set of moves from now on.
 signal phase_changed(phase: int)
+## A slam hit the floor here (for the effects).
+signal slammed(at: Vector2)
+## A summoned enemy appeared here (for the effects).
+signal summoned(at: Vector2)
 
 enum State { MOVE, TELEGRAPH, STRIKE, RECOVER, DEAD, STUNNED }
 
@@ -632,11 +636,13 @@ func _summon(move: EnemyMove) -> void:
 		var minion: Enemy = level.spawn_enemy_at(move.summon, at)
 		if minion != null:
 			minion.target = _current_target()
+			summoned.emit(at)
 
 
 ## A slam sends a shockwave along the floor each way.
 func _launch_waves(move: EnemyMove) -> void:
 	var feet_y := global_position.y + GameConfig.tiles(data.body_size_tiles.y) / 2.0
+	slammed.emit(Vector2(global_position.x, feet_y))
 	for direction in [-1.0, 1.0]:
 		var wave := FloorWave.new()
 		get_parent().add_child(wave)

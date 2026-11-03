@@ -21,6 +21,8 @@ var damage_multiplier: float = 1.0
 ## Scales the next landed hit only (a riposte); whoever sets it clears it.
 var next_hit_multiplier: float = 1.0
 var rng := RandomNumberGenerator.new()
+## The move of the most recent hit (for the hit effects).
+var last_strike_move: WeaponMove
 ## Where shots are added (the level); the current scene when unset.
 var projectile_parent: Node
 
@@ -158,6 +160,7 @@ func _on_area_entered(area: Area2D) -> void:
 
 ## Lands one hit of `move` on `target`: damage, knockback, stun chance, the hit signal and the hit stop.
 func strike(target: Node, move: WeaponMove, source_x: float) -> void:
+	last_strike_move = move
 	var base := roundi(data.damage * move.damage_multiplier) + bonus_damage
 	var damage := Damage.compute(base, damage_multiplier * next_hit_multiplier, 0)
 	if target.has_method("take_hit"):

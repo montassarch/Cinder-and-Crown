@@ -1,0 +1,175 @@
+{
+ "pack": "matheusgg28_pixel_fx",
+ "author": "MatheusGG28",
+ "licence": "itch.io free licence: \"Free for personal and commercial use. No credits required.\"",
+ "credit": "Pixel FX Pack - 11 Visual Effects by MatheusGG28 (credit optional)",
+ "url": "https://matheusgg99.itch.io/impact-and-explosion-effects-pack",
+ "notes": "32x32 pixel effects at native size. The page states no redistribution limit; it also grants no explicit redistribution right.",
+ "effects": {
+  "explosion_small": {
+   "frames": 7,
+   "size": [
+    23,
+    23
+   ],
+   "fps": 14,
+   "pivot": [
+    11.0,
+    15.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "small blast / hit pop"
+  },
+  "explosion_medium": {
+   "frames": 7,
+   "size": [
+    25,
+    26
+   ],
+   "fps": 14,
+   "pivot": [
+    13.0,
+    14.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "medium blast"
+  },
+  "explosion_big": {
+   "frames": 7,
+   "size": [
+    31,
+    32
+   ],
+   "fps": 14,
+   "pivot": [
+    15.0,
+    16.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "big blast (powder keg)"
+  },
+  "impact_projectile": {
+   "frames": 5,
+   "size": [
+    12,
+    22
+   ],
+   "fps": 14,
+   "pivot": [
+    12.0,
+    11.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "arrow / bolt impact"
+  },
+  "impact_projectile_2": {
+   "frames": 5,
+   "size": [
+    12,
+    22
+   ],
+   "fps": 14,
+   "pivot": [
+    12.0,
+    12.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "magic bolt impact"
+  },
+  "impact_punch": {
+   "frames": 5,
+   "size": [
+    24,
+    24
+   ],
+   "fps": 14,
+   "pivot": [
+    12.0,
+    12.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "gauntlet punch / shield bash impact"
+  },
+  "dust": {
+   "frames": 9,
+   "size": [
+    30,
+    19
+   ],
+   "fps": 14,
+   "pivot": [
+    14.0,
+    3.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "run / land dust"
+  },
+  "dust_2": {
+   "frames": 9,
+   "size": [
+    30,
+    19
+   ],
+   "fps": 14,
+   "pivot": [
+    14.0,
+    3.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "dodge-roll dust"
+  },
+  "shockwave": {
+   "frames": 7,
+   "size": [
+    32,
+    32
+   ],
+   "fps": 14,
+   "pivot": [
+    16.0,
+    16.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "slam shockwave"
+  },
+  "shockwave_2": {
+   "frames": 7,
+   "size": [
+    32,
+    32
+   ],
+   "fps": 14,
+   "pivot": [
+    16.0,
+    16.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "ring shockwave"
+  },
+  "shockwave_3": {
+   "frames": 7,
+   "size": [
+    32,
+    32
+   ],
+   "fps": 14,
+   "pivot": [
+    16.0,
+    16.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "wide shockwave"
+  }
+ }
+}

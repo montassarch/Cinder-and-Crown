@@ -19,6 +19,7 @@ anim = &"attack1"
 fx = &"slash_a"
 fx_scale = 0.7
 fx_forward_tiles = 0.0
+impact_fx = &"matheusgg28_pixel_fx/impact_punch"
 
 [sub_resource type="Resource" id="move_2"]
 script = ExtResource("2_move")
@@ -36,6 +37,7 @@ anim = &"attack2"
 fx = &"slash_b"
 fx_scale = 0.8
 fx_forward_tiles = 0.0
+impact_fx = &"matheusgg28_pixel_fx/impact_punch"
 
 [sub_resource type="Resource" id="move_3"]
 script = ExtResource("2_move")
@@ -53,6 +55,7 @@ anim = &"attack3"
 fx = &"slash_c"
 fx_scale = 0.9
 fx_forward_tiles = 0.0
+impact_fx = &"matheusgg28_pixel_fx/impact_punch"
 
 [sub_resource type="Resource" id="move_4"]
 script = ExtResource("2_move")
@@ -70,6 +73,7 @@ anim = &"attack3"
 fx = &"slash_c"
 fx_scale = 1.0
 fx_forward_tiles = 0.0
+impact_fx = &"matheusgg28_pixel_fx/impact_punch"
 
 [sub_resource type="Resource" id="move_5"]
 script = ExtResource("2_move")
@@ -87,6 +91,7 @@ anim = &"attack1"
 fx = &"slash_a"
 fx_scale = 1.0
 fx_forward_tiles = 0.0
+impact_fx = &"matheusgg28_pixel_fx/impact_punch"
 
 [resource]
 script = ExtResource("1_data")

@@ -17,6 +17,11 @@ signal hit_landed(target: Node, damage: int)
 signal parried(perfect: bool)
 ## The flask's charges changed (drunk, refilled, or the maximum moved).
 signal flask_changed(charges: int, maximum: int)
+## For the effects: a roll began, the hero landed from the air, drank the flask, cast an ability (&"storm" / &"rend").
+signal rolled
+signal landed
+signal drank
+signal ability_cast(ability: StringName)
 
 const State := PlayerStateMachine.PlayerState
 
@@ -377,6 +382,7 @@ func _deflect(attacker: Node) -> void:
 
 
 func _drink() -> void:
+	drank.emit()
 	_flask = maxi(_flask - 1, 0)
 	_health.heal(FLASK_HEAL)
 	flask_changed.emit(_flask, flask_max())
@@ -447,8 +453,11 @@ func _enter_state(next: State) -> void:
 		_last_attack_end = _clock
 		if next in [State.JUMP, State.ROLL, State.HURT]:
 			_attack_queued = false
+	var was_airborne := _state in [State.JUMP, State.FALL]
 	_state = next
 	_state_time = 0.0
+	if was_airborne and next in [State.IDLE, State.RUN]:
+		landed.emit()
 	match next:
 		State.JUMP:
 			velocity.y = -GameConfig.tiles(sqrt(2.0 * GRAVITY * JUMP_HEIGHT))
@@ -456,6 +465,7 @@ func _enter_state(next: State) -> void:
 			InputRouter.consume_jump()
 		State.ROLL:
 			InputRouter.consume_roll()
+			rolled.emit()
 		State.ATTACK:
 			InputRouter.consume_attack()
 			_attack_queued = false
@@ -464,10 +474,12 @@ func _enter_state(next: State) -> void:
 			InputRouter.consume_skill(1)
 			_mana.spend(STORM_COST)
 			_cast_fired = false
+			ability_cast.emit(&"storm")
 		State.REND:
 			InputRouter.consume_skill(2)
 			_mana.spend(REND_COST)
 			_cast_fired = false
+			ability_cast.emit(&"rend")
 		State.PARRY:
 			InputRouter.consume_parry()
 			_parry_succeeded = false
@@ -503,6 +515,11 @@ func _start_move() -> void:
 
 func current_move() -> WeaponMove:
 	return _weapon.current_move()
+
+
+## The move whose hit landed last (a shot can land after the hero has moved on to another move).
+func strike_move() -> WeaponMove:
+	return _weapon.last_strike_move if _weapon.last_strike_move != null else _weapon.current_move()
 
 
 func _apply_velocity(delta: float) -> void:
