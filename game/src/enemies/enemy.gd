@@ -272,11 +272,14 @@ func _reaches_from_here(move: EnemyMove) -> bool:
 	if foe == null:
 		return false
 	var distance := absf(foe.global_position.x - global_position.x)
+	var level := absf(foe.global_position.y - global_position.y) <= GameConfig.tiles(2.0)
 	match move.kind:
 		EnemyMove.Kind.MELEE, EnemyMove.Kind.EXPLODE:
-			return distance <= GameConfig.tiles(move.reach_tiles * STRIKE_REACH_FACTOR)
+			return global_position.distance_to(foe.global_position) <= GameConfig.tiles(move.reach_tiles * STRIKE_REACH_FACTOR)
 		EnemyMove.Kind.DASH:
-			return distance <= GameConfig.tiles(move.speed_tiles * move.active_seconds)
+			return level and distance <= GameConfig.tiles(move.speed_tiles * move.active_seconds)
+		EnemyMove.Kind.SLAM:
+			return level
 	return true
 
 
@@ -465,7 +468,7 @@ func _think_move(foe: Node2D, delta: float) -> float:
 		EnemyData.Behaviour.KEEP_DISTANCE:
 			return _keep_distance(offset, speed)
 		_:
-			if absf(offset.x) <= reach * 0.9 and absf(offset.y) <= GameConfig.tiles(2.0):
+			if absf(offset.x) <= reach * 0.9 and (data.boss or absf(offset.y) <= GameConfig.tiles(2.0)):
 				begin_telegraph()
 				if data.boss and _state == State.MOVE and absf(offset.x) > GameConfig.tiles(1.0):
 					return signf(offset.x) * speed  # nothing it has reaches yet: close in

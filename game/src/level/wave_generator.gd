@@ -6,12 +6,15 @@ extends RefCounted
 
 const BASE_BUDGET: int = 4
 const BUDGET_PER_DEPTH: int = 2
+## From this depth on the budget grows by one per level instead (the last world is already crowded with heavy foes).
+const SLOW_GROWTH_FROM: int = 8
 ## However big the budget, a wave stays readable.
 const MAX_WAVE_SIZE: int = 6
 
 
 static func budget_for(depth: int) -> int:
-	return BASE_BUDGET + BUDGET_PER_DEPTH * maxi(depth, 0)
+	var d := maxi(depth, 0)
+	return BASE_BUDGET + BUDGET_PER_DEPTH * mini(d, SLOW_GROWTH_FROM) + maxi(d - SLOW_GROWTH_FROM, 0)
 
 
 static func roll(pool: Array[EnemyData], depth: int, rng: RandomNumberGenerator) -> Array[EnemyData]:

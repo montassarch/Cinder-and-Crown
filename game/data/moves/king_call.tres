@@ -12,5 +12,5 @@ active_seconds = 0.1
 recovery_seconds = 0.8
 damage = 0
 parryable = false
-count = 2
+count = 1
 summon = ExtResource("2_s")

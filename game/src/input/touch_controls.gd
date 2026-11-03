@@ -18,6 +18,9 @@ const STICK_ZONE_TOP_TILES: float = 4.5
 const STICK_EDGE_MARGIN_TILES: float = 0.4
 const STICK_DEADZONE: float = 0.25
 ## The ring is mostly see-through (only its rim is solid) so the hero is never hidden behind it.
+## Idle buttons are mostly see-through (rim and icon stay bright) so the fight under the thumb cluster shows.
+const BUTTON_IDLE_ALPHA: float = 0.35
+const BUTTON_PRESSED_ALPHA: float = 0.75
 const STICK_FILL_ALPHA_HELD: float = 0.2
 const STICK_FILL_ALPHA_IDLE: float = 0.1
 const STICK_KNOB_ALPHA_HELD: float = 0.6
@@ -245,7 +248,7 @@ func _draw_button(action: StringName, centre: Vector2) -> void:
 	var usable := button_enabled(action)
 	var overall := 0.95 if pressed else 0.82
 	_overlay.draw_circle(centre + Vector2(0.0, 1.8), radius, Color(0.0, 0.0, 0.0, 0.35))
-	_overlay.draw_circle(centre, radius, Color(BODY, 0.8 if not pressed else 0.92))
+	_overlay.draw_circle(centre, radius, Color(BODY, BUTTON_IDLE_ALPHA if not pressed else BUTTON_PRESSED_ALPHA))
 	_overlay.draw_arc(centre, radius * 0.84, deg_to_rad(200.0), deg_to_rad(290.0), 16, Color(1, 1, 1, 0.14), 2.0, true)
 	_draw_icon(action, centre, radius * (1.0 if usable else 0.9), overall if usable else overall * 0.5)
 	if not usable or button_fill(action) < 1.0:

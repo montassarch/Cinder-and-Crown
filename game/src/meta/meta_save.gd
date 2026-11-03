@@ -25,6 +25,16 @@ static func add_cells(amount: int) -> void:
 	_write()
 
 
+## Runs won (the last world's boss beaten).
+static func wins() -> int:
+	return _data().wins
+
+
+static func add_win() -> void:
+	_data().wins += 1
+	_write()
+
+
 static func rank(id: String) -> int:
 	return _data().ranks.get(id, 0)
 
@@ -88,6 +98,8 @@ static func _read(file: String) -> Dictionary:
 static func _coerced(raw: Dictionary) -> Dictionary:
 	var cells_value: Variant = raw.get("cells", 0)
 	var clean := {"cells": maxi(int(cells_value), 0) if (cells_value is int or cells_value is float) else 0, "ranks": {}}
+	var wins_value: Variant = raw.get("wins", 0)
+	clean["wins"] = maxi(int(wins_value), 0) if (wins_value is int or wins_value is float) else 0
 	var raw_ranks: Variant = raw.get("ranks", {})
 	if raw_ranks is Dictionary:
 		for key in raw_ranks:

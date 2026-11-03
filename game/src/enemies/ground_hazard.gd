@@ -6,6 +6,8 @@ extends Node2D
 
 const WARN_COLOR := Color(1.0, 0.3, 0.12)
 const FPS: float = 14.0
+## The warning: a glowing column this tall over a bright floor ellipse, pulsing faster as the eruption nears.
+const WARN_GLOW_HEIGHT: float = 14.0
 ## The painted effects are drawn a little larger than life so they read on a phone.
 const ART_SCALE: float = 1.5
 
@@ -91,12 +93,16 @@ func _draw() -> void:
 	if _warn_left <= 0.0:
 		return
 	var t := 1.0 - _warn_left / _warn_total
-	var pulse := 0.5 + 0.5 * sin(t * TAU * 3.0)
-	var colour := Color(WARN_COLOR, 0.25 + 0.45 * t + 0.15 * pulse)
-	# a flat glowing ellipse on the floor and a faint column of light rising from it
+	var pulse := 0.5 + 0.5 * sin(t * t * TAU * 6.0)
+	var colour := Color(WARN_COLOR, 0.45 + 0.4 * t + 0.15 * pulse)
+	# a bright ellipse on the floor, a glowing band above it and a faint column of light showing the reach
 	var points := PackedVector2Array()
-	for i in 20:
-		var a := TAU * i / 20.0
-		points.append(Vector2(cos(a) * _half_width, sin(a) * 3.0))
+	for i in 24:
+		var a := TAU * i / 24.0
+		points.append(Vector2(cos(a) * _half_width, sin(a) * 4.0))
 	draw_colored_polygon(points, colour)
-	draw_rect(Rect2(-_half_width * 0.6, -_height * t, _half_width * 1.2, _height * t), Color(WARN_COLOR, 0.12 * t))
+	for k in 4:
+		var h := WARN_GLOW_HEIGHT * (k + 1) / 4.0
+		draw_rect(Rect2(-_half_width, -h, _half_width * 2.0, h), Color(WARN_COLOR, (0.16 + 0.12 * pulse) * (1.0 - k / 4.0) * t))
+	draw_rect(Rect2(-_half_width * 0.6, -_height * t, _half_width * 1.2, _height * t), Color(WARN_COLOR, 0.1 * t))
+	draw_line(Vector2(-_half_width, 0), Vector2(_half_width, 0), Color(1.0, 0.85, 0.5, 0.6 + 0.4 * pulse), 1.5)

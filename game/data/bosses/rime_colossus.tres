@@ -7,6 +7,7 @@
 [ext_resource type="Resource" path="res://data/moves/colossus_slam.tres" id="m2"]
 [ext_resource type="Resource" path="res://data/moves/frost_fall_wide.tres" id="m3"]
 [ext_resource type="Resource" path="res://data/moves/frost_call.tres" id="m4"]
+[ext_resource type="Resource" path="res://data/moves/colossus_claw.tres" id="extra"]
 
 [resource]
 script = ExtResource("1_data")
@@ -19,7 +20,7 @@ attack_range_tiles = 8.0
 telegraph_seconds = 0.6
 recovery_seconds = 0.8
 behaviour = 0
-moves = Array[ExtResource("2_move")]([ExtResource("m0"), ExtResource("m1")])
+moves = Array[ExtResource("2_move")]([ExtResource("extra"), ExtResource("m0"), ExtResource("m1")])
 pattern = 1
 chain_gap_seconds = 0.2
 cooldown_seconds = 0.9
@@ -31,6 +32,6 @@ cell_reward = 60
 body_size_tiles = Vector2(2.2, 3.4)
 tint = Color(0.5, 0.7, 1.0, 1)
 boss = true
-phase_two_moves = Array[ExtResource("2_move")]([ExtResource("m0"), ExtResource("m2"), ExtResource("m3"), ExtResource("m4")])
+phase_two_moves = Array[ExtResource("2_move")]([ExtResource("extra"), ExtResource("m0"), ExtResource("m2"), ExtResource("m3"), ExtResource("m4")])
 phase_two_at = 0.5
 phase_two_speed = 1.3

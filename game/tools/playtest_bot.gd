@@ -119,6 +119,12 @@ func _physics_process(delta: float) -> bool:
 		stats["deaths"] += 1
 		level_time = 0.0
 		return false
+	var victory = level.get_node_or_null("VictoryScreen")
+	if victory != null and victory.is_open():
+		stats["wins"] = int(stats.get("wins", 0)) + 1
+		victory.press_new_run()
+		level_time = 0.0
+		return false
 	var picker = level.get_node_or_null("BoonPicker")
 	if picker != null and picker.is_open():
 		picker.choose(0)

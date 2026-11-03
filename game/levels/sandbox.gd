@@ -17,6 +17,8 @@ const PLATFORM_THICKNESS_TILES: float = 0.5
 ## hero can stand mid-screen at the ends instead of hiding under the stick or the thumb cluster.
 const CAMERA_MARGIN_TILES: float = 12.0
 const SPAWN_DISTANCE_TILES: float = 8.0
+## The camera looks this far ahead of the hero (to his right), so the fight sits left of the thumb buttons.
+const CAMERA_LEAD_TILES: float = 3.0
 const GROUND_SPAWN_HEIGHT_TILES: float = 2.0
 const AIR_SPAWN_HEIGHT_TILES: float = 5.0
 const RESPAWN_DELAY: float = 2.0
@@ -57,6 +59,7 @@ func _ready() -> void:
 
 	_camera.position_smoothing_enabled = true
 	_camera.position_smoothing_speed = 12.0  # tight follow: a lagging camera makes the run feel slow
+	_camera.offset.x = GameConfig.tiles(CAMERA_LEAD_TILES)
 	_apply_camera_limits()
 	_camera.global_position = player.global_position
 

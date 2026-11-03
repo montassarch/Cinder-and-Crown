@@ -32,6 +32,9 @@ var _banner: VBoxContainer
 var _banner_title: Label
 var _banner_sub: Label
 var _banner_left: float = 0.0
+## Banners sit on their own layer above the touch buttons, so a world's name is never cut by them.
+var _banner_layer: CanvasLayer
+const BANNER_LAYER: int = 15
 var _boss: Enemy
 var _boss_box: Control
 var _boss_fill: ColorRect
@@ -62,6 +65,9 @@ func _ready() -> void:
 	for label: Label in [_weapons, _enemies, _flask_label, _cells_label]:
 		label.theme = theme
 		label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		# a dark outline keeps the text readable over bright backdrops (the ice of the Ossuary)
+		label.add_theme_color_override("font_outline_color", Color(0.04, 0.02, 0.05))
+		label.add_theme_constant_override("outline_size", 4)
 	_weapons.position = Vector2(margin, mana_top + mana_bar.y + GameConfig.tiles(0.15))
 	_enemies.position = _weapons.position + Vector2(0.0, GameConfig.tiles(0.8))
 	_flask_label.position = _enemies.position + Vector2(0.0, GameConfig.tiles(0.8))
@@ -164,7 +170,11 @@ func _make_banner(theme: Theme) -> void:
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		_banner.add_child(label)
-	add_child(_banner)
+	_banner_layer = CanvasLayer.new()
+	_banner_layer.name = "BannerLayer"
+	_banner_layer.layer = BANNER_LAYER
+	add_child(_banner_layer)
+	_banner_layer.add_child(_banner)
 	_banner.visible = false
 
 
@@ -177,6 +187,10 @@ func show_banner(title: String, subtitle: String = "") -> void:
 	_banner.visible = true
 	_banner.reset_size()
 	_banner.position.x = (get_viewport().get_visible_rect().size.x - _banner.size.x) / 2.0
+
+
+func banner_layer() -> CanvasLayer:
+	return _banner_layer
 
 
 func hide_banner() -> void:

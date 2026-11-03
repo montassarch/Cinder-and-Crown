@@ -50,6 +50,11 @@ const COMBO_WINDOW: float = 0.4
 const ROLL_ATTACK_WINDOW: float = 0.25
 ## After taking a hit he pulls on the plague mask for this long.
 const MASK_SECONDS: float = 3.0
+## After a hit lands the hero cannot be hurt again for this long (he blinks), so hits cannot stack in one breath.
+const HIT_GRACE_SECONDS: float = 0.6
+const GRACE_BLINK_SECONDS: float = 0.06
+## Drawn in front of enemies, so he never disappears inside a crowd or a boss.
+const DRAW_ORDER: int = 5
 
 # Parry (all times in seconds). The window is generous because touch is slower than a keyboard.
 const PARRY_DURATION: float = 0.5
@@ -108,6 +113,7 @@ var _chain_open: bool = false
 ## A tap during a swing, kept until the swing ends (input buffering alone would expire it).
 var _attack_queued: bool = false
 var _mask_left: float = 0.0
+var _grace_left: float = 0.0
 var _mana: Mana
 var _storm_left: float = 0.0
 var _cast_fired: bool = false
@@ -128,6 +134,7 @@ var _base_max_health: int = 0
 
 
 func _ready() -> void:
+	z_index = DRAW_ORDER
 	var size := GameConfig.tiles_v(BODY_SIZE_TILES.x, BODY_SIZE_TILES.y)
 	(_shape.shape as RectangleShape2D).size = size
 	(_hurtbox_shape.shape as RectangleShape2D).size = size
@@ -167,6 +174,7 @@ func _physics_process(delta: float) -> void:
 	_state_time += delta
 	_clock += delta
 	_mask_left = maxf(0.0, _mask_left - delta)
+	_tick_grace(delta)
 	_tick_riposte(delta)
 	if _state != State.PARRY:
 		_parry_cooldown = maxf(0.0, _parry_cooldown - delta)
@@ -233,6 +241,8 @@ func storm_seconds_left() -> float:
 func enter_level(at: Vector2) -> void:
 	global_position = at
 	velocity = Vector2.ZERO
+	_grace_left = 0.0
+	_visual.visible = true
 	_weapon.cancel_attack()
 	_state = State.IDLE
 	_state_time = 0.0
@@ -332,7 +342,7 @@ func swap_weapons() -> void:
 
 
 func is_invincible() -> bool:
-	return _state == State.ROLL and _state_time >= IFRAME_WINDOW.x and _state_time <= IFRAME_WINDOW.y
+	return _grace_left > 0.0 or (_state == State.ROLL and _state_time >= IFRAME_WINDOW.x and _state_time <= IFRAME_WINDOW.y)
 
 
 ## Damage lands unless the roll's i-frames cover it. A hit mid-roll outside the
@@ -343,6 +353,7 @@ func take_hit(damage: int, source_x: float) -> void:
 	if _health.take_damage(damage) == 0:
 		return
 	_mask_left = MASK_SECONDS
+	_grace_left = HIT_GRACE_SECONDS
 	if _state != State.ROLL:
 		_hurt_pending = true
 		_hit_direction = signf(global_position.x - source_x)
@@ -404,6 +415,13 @@ func _clear_riposte() -> void:
 
 func riposte_seconds_left() -> float:
 	return _riposte_left
+
+
+func _tick_grace(delta: float) -> void:
+	if _grace_left <= 0.0:
+		return
+	_grace_left = maxf(0.0, _grace_left - delta)
+	_visual.visible = _grace_left <= 0.0 or int(_grace_left / GRACE_BLINK_SECONDS) % 2 == 0
 
 
 func _idle_while_dead(delta: float) -> void:

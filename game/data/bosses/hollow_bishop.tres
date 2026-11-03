@@ -12,7 +12,7 @@
 script = ExtResource("1_data")
 display_name = "The Hollow Bishop"
 art = "hollow_bishop"
-max_health = 520
+max_health = 760
 move_speed_tiles = 1.6
 attack_damage = 14
 attack_range_tiles = 8.0

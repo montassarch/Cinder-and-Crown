@@ -22,6 +22,8 @@ const GATE_SHUT_COLOR := Color(0.9, 0.2, 0.2, 0.45)
 const OFFER_COUNT: int = 3
 ## The boss appears once the hero is this far into its arena.
 const BOSS_TRIGGER_TILES: float = 4.0
+## The next room's wave waits while more than this many enemies are still up (waves do not pile on each other).
+const MAX_LIVE_BEFORE_NEXT_WAVE: int = 2
 
 @export var level_seed: int = 1
 @export var room_count: int = 6
@@ -46,6 +48,8 @@ var _boss: Enemy
 var _boss_spawn: Vector2
 var _boss_beaten: bool = false
 var _boss_spawned: bool = false
+var _gate_was_open: bool = false
+var _victory: VictoryScreen
 
 @onready var _rooms: Node2D = $Rooms
 @onready var _walls: Node2D = $Walls
@@ -64,6 +68,10 @@ func _ready() -> void:
 		if upgrade != null:
 			_meta_upgrades.append(upgrade)
 	_picker.chosen.connect(_on_boon_chosen)
+	_victory = VictoryScreen.new()
+	_victory.name = "VictoryScreen"
+	add_child(_victory)
+	_victory.new_run_requested.connect(reset_player)
 	_shop.start_requested.connect(reset_player)
 	player.set_run_bonuses(MetaSave.bonus_boons(_meta_upgrades))
 	player.start_new_run()
@@ -137,7 +145,10 @@ func _on_boss_died(data: EnemyData) -> void:
 	_hud.hide_boss()
 	if _depth >= BiomeData.load_all().back().boss_depth():
 		_hud.show_banner("VICTORY", "%s has fallen. The crown is yours." % data.display_name.trim_prefix("The "))
+		MetaSave.add_win()
 		run_won.emit()
+		_touch.release_all()
+		_victory.open(data.display_name, _cells_run, MetaSave.wins())
 	else:
 		_hud.show_banner("%s falls" % data.display_name, "The way on is open")
 
@@ -146,6 +157,8 @@ func _trigger_encounters() -> void:
 	if not encounters_enabled or player == null:
 		return
 	for encounter in _encounters:
+		if enemy_count() > MAX_LIVE_BEFORE_NEXT_WAVE:
+			return
 		if not encounter.spawned and player.global_position.x >= GameConfig.tiles(encounter.start + ENCOUNTER_TRIGGER_TILES):
 			encounter.spawned = true
 			_spawn_wave(encounter)
@@ -176,7 +189,12 @@ func _on_enemy_died(reward: int) -> void:
 
 ## The gate glows red while enemies live and shows its normal colour once the level is clear.
 func _update_exit_gate() -> void:
-	_gate_color = _gate_open_color if _exit_open() else GATE_SHUT_COLOR
+	var open := _exit_open()
+	# a hero already standing in the exit when it opens is offered the boons too (he does not have to step out and back)
+	if open and not _gate_was_open and player != null and _hero_on_exit(player):
+		_on_exit_entered.call_deferred(player)
+	_gate_was_open = open
+	_gate_color = _gate_open_color if open else GATE_SHUT_COLOR
 	for zone in _exit_zones:
 		if is_instance_valid(zone) and zone.has_node("Visual"):
 			(zone.get_node("Visual") as ColorRect).color = _gate_color
@@ -340,6 +358,10 @@ func _hero_on_exit(hero: Player) -> bool:
 func _on_exit_entered(body: Node) -> void:
 	if not (body is Player) or _picker.is_open() or not _hero_on_exit(body) or not _exit_open():
 		return
+	if is_boss_level() and _boss_beaten and _depth >= BiomeData.load_all().back().boss_depth():
+		if not _victory.is_open():
+			_victory.open(biome().boss.display_name, _cells_run, MetaSave.wins())
+		return
 	level_completed.emit()
 	var rng := RandomNumberGenerator.new()
 	rng.seed = level_seed
@@ -354,7 +376,8 @@ func _on_exit_entered(body: Node) -> void:
 func _on_boon_chosen(boon: BoonData) -> void:
 	player.apply_boon(boon)
 	player.refill_flask(FLASK_PER_LEVEL)
-	_depth += 1
+	# the last world's boss level is the end of a run: there is nothing deeper
+	_depth = mini(_depth + 1, BiomeData.load_all().back().boss_depth())
 	regenerate(level_seed + 1, true)
 
 
