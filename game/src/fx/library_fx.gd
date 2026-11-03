@@ -1,9 +1,9 @@
 class_name LibraryFx
-## Effects from the free packs in art/library/vfx (see Design/Assets/CREDITS.md): each pack has a meta.json listing its
+## Effects from the free packs in art/fx_packs (see Design/Assets/CREDITS.md): each pack has a meta.json listing its
 ## effects (frame count, size, fps, pivot, blend) and a folder of numbered PNG frames per effect. They are pixel art at
 ## the game's own scale. A cue names one effect as "<pack>/<effect>".
 
-const DIR := "res://art/library/vfx"
+const DIR := "res://art/fx_packs"
 
 static var _meta: Dictionary = {}
 static var _frames: Dictionary = {}

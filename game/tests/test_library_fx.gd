@@ -1,5 +1,5 @@
 extends GdUnitTestSuite
-## The free effect packs (art/library/vfx: CodeManu, MatheusGG28, xyezawr) and where the game plays them.
+## The free effect packs (art/fx_packs: CodeManu, MatheusGG28, xyezawr) and where the game plays them.
 ## The xyezawr packs are kept out of the public repo (their licence forbids redistributing the files), so tests that
 ## need them are skipped when they are absent.
 
