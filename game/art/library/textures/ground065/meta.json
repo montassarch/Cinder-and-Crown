@@ -1,0 +1,9 @@
+{
+ "name": "Ground065",
+ "author": "ambientCG (Lennart Demes)",
+ "licence": "CC0 1.0",
+ "url": "https://ambientcg.com/view?id=Ground065",
+ "credit": "Created using Ground065 from ambientCG.com, licensed under CC0 1.0 (credit optional)",
+ "use": "rocky medieval ground (cemetery, swamp floor)",
+ "notes": "tile_64 / tile_128 tile seamlessly (4x4 / 8x8 game tiles). source/ has 512 px colour + normal maps for Blender."
+}
