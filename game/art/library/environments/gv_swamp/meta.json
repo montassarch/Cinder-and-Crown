@@ -1,0 +1,95 @@
+{
+ "name": "gv_swamp",
+ "author": "Luis Zuno (ansimuz)",
+ "licence": "CC0 1.0 (public domain)",
+ "credit": "Luis Zuno (@ansimuz) (credit optional)",
+ "url": "https://opengameart.org/content/gotthicvania-swamp",
+ "use": "overgrown swamp with skull ground: a poison / sunken world",
+ "notes": "",
+ "files": {
+  "background.png": {
+   "size": [
+    96,
+    256
+   ],
+   "what": "sky strip (repeat)"
+  },
+  "ashen/background.png": {
+   "size": [
+    96,
+    256
+   ],
+   "what": "sky strip (repeat) (ashen grade)"
+  },
+  "mid-layer-01.png": {
+   "size": [
+    208,
+    256
+   ],
+   "what": "far trees (repeat)"
+  },
+  "ashen/mid-layer-01.png": {
+   "size": [
+    208,
+    256
+   ],
+   "what": "far trees (repeat) (ashen grade)"
+  },
+  "mid-layer-02.png": {
+   "size": [
+    208,
+    256
+   ],
+   "what": "near trees (repeat)"
+  },
+  "ashen/mid-layer-02.png": {
+   "size": [
+    208,
+    256
+   ],
+   "what": "near trees (repeat) (ashen grade)"
+  },
+  "tileset.png": {
+   "size": [
+    336,
+    112
+   ],
+   "what": "16 px tileset"
+  },
+  "ashen/tileset.png": {
+   "size": [
+    336,
+    112
+   ],
+   "what": "16 px tileset (ashen grade)"
+  },
+  "trees.png": {
+   "size": [
+    288,
+    208
+   ],
+   "what": "big trees"
+  },
+  "ashen/trees.png": {
+   "size": [
+    288,
+    208
+   ],
+   "what": "big trees (ashen grade)"
+  },
+  "props.png": {
+   "size": [
+    176,
+    43
+   ],
+   "what": "small props"
+  },
+  "ashen/props.png": {
+   "size": [
+    176,
+    43
+   ],
+   "what": "small props (ashen grade)"
+  }
+ }
+}

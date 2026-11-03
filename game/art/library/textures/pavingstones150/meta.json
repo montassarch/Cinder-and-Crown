@@ -1,0 +1,9 @@
+{
+ "name": "PavingStones150",
+ "author": "ambientCG (Lennart Demes)",
+ "licence": "CC0 1.0",
+ "url": "https://ambientcg.com/view?id=PavingStones150",
+ "credit": "Created using PavingStones150 from ambientCG.com, licensed under CC0 1.0 (credit optional)",
+ "use": "paving stones (floor fill, courtyard)",
+ "notes": "tile_64 / tile_128 tile seamlessly (4x4 / 8x8 game tiles). source/ has 512 px colour + normal maps for Blender."
+}

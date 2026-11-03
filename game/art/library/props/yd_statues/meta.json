@@ -1,0 +1,71 @@
+{
+ "category": "props",
+ "pxm": 26.0,
+ "view": "front",
+ "ashen": false,
+ "author": "yd (demon statue from a public-domain blend by Joseph)",
+ "licence": "CC0 1.0",
+ "credit": "yd (credit optional)",
+ "url": "https://opengameart.org/content/knight-statue | https://opengameart.org/content/demon-statue",
+ "exclude": {
+  "knight_statue_sitting.blend": [
+   "sword",
+   "shield.001"
+  ],
+  "knight_statue_lying.blend": [
+   "shield.001",
+   "sword"
+  ]
+ },
+ "objects": {
+  "knight_statue_kneeling": {
+   "source": "knight_statue.blend",
+   "px_per_unit": 26.0,
+   "canvas": [
+    40,
+    72
+   ],
+   "size": [
+    34,
+    65
+   ]
+  },
+  "knight_statue_sitting": {
+   "source": "knight_statue_sitting.blend",
+   "px_per_unit": 26.0,
+   "canvas": [
+    136,
+    160
+   ],
+   "size": [
+    34,
+    52
+   ]
+  },
+  "knight_statue_lying": {
+   "source": "knight_statue_lying.blend",
+   "px_per_unit": 26.0,
+   "canvas": [
+    136,
+    160
+   ],
+   "size": [
+    77,
+    46
+   ]
+  },
+  "demon_statue": {
+   "source": "demon_statue.blend",
+   "px_per_unit": 26.0,
+   "canvas": [
+    72,
+    96
+   ],
+   "size": [
+    54,
+    81
+   ]
+  }
+ },
+ "use": "crowned knight statue kneeling with his sword, a seated king on a sarcophagus, a knight lying on a tomb, a winged demon on a plinth: cathedral and crypt set-dressing, boss-arena statues"
+}

@@ -1,0 +1,23 @@
+{
+ "name": "gv_skeleton",
+ "canvas": [
+  40,
+  48
+ ],
+ "feet": [
+  24,
+  47
+ ],
+ "anims": {
+  "Walk": 8,
+  "Rise": 6
+ },
+ "fps": 10,
+ "author": "Luis Zuno (ansimuz)",
+ "licence": "CC0 1.0 (public domain)",
+ "credit": "Luis Zuno (@ansimuz) (credit optional)",
+ "url": "https://opengameart.org/content/gothicvania-cemetery-pack",
+ "graded": false,
+ "notes": "",
+ "use": "skeleton that climbs out of the ground: a summon for bosses"
+}

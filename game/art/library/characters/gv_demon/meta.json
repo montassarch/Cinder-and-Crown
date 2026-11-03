@@ -1,0 +1,24 @@
+{
+ "name": "gv_demon",
+ "canvas": [
+  232,
+  176
+ ],
+ "feet": [
+  105,
+  163
+ ],
+ "anims": {
+  "Idle": 6,
+  "Attack": 11,
+  "AttackNoBreath": 8
+ },
+ "fps": 10,
+ "author": "Luis Zuno (ansimuz)",
+ "licence": "CC0 1.0 (public domain)",
+ "credit": "Luis Zuno (@ansimuz) (credit optional)",
+ "url": "https://opengameart.org/content/gothicvania-patreons-collection",
+ "graded": false,
+ "notes": "",
+ "use": "big winged demon with a blue fire breath: boss (Storm Spire or a secret boss)"
+}

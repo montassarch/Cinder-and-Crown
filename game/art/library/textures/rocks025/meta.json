@@ -1,0 +1,9 @@
+{
+ "name": "Rocks025",
+ "author": "ambientCG (Lennart Demes)",
+ "licence": "CC0 1.0",
+ "url": "https://ambientcg.com/view?id=Rocks025",
+ "credit": "Created using Rocks025 from ambientCG.com, licensed under CC0 1.0 (credit optional)",
+ "use": "rough stone wall (crypt, ruins)",
+ "notes": "tile_64 / tile_128 tile seamlessly (4x4 / 8x8 game tiles). source/ has 512 px colour + normal maps for Blender."
+}

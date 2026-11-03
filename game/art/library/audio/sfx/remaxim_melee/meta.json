@@ -1,0 +1,12 @@
+{
+ "author": "remaxim",
+ "licence": "CC0 1.0",
+ "credit": "remaxim (credit optional)",
+ "url": "https://opengameart.org/content/3-melee-sounds",
+ "use": "sword / blunt / claw melee whooshes",
+ "files": {
+  "animal_melee_sound.ogg": 0.6,
+  "melee_sound.ogg": 0.61,
+  "sword_sound.ogg": 0.54
+ }
+}

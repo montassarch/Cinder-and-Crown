@@ -1,0 +1,578 @@
+{
+ "name": "ettingrinder_dark_fantasy",
+ "author": "ETTiNGRiNDER",
+ "licence": "CC0 1.0",
+ "credit": "ETTiNGRiNDER (credit optional)",
+ "url": "https://opengameart.org/content/misc-dark-fantasy-scenery-sprites and https://opengameart.org/content/dark-fantasy-item-sprites",
+ "use": "candelabras, a hanging gibbet cage, chains with hooks, impaled heads, skulls, gargoyle statues, sword-in-stone, armour/shield/weapon/potion/key/tome icons. Background dressing and pickup / shop icons.",
+ "notes": "",
+ "files": {
+  "objects/scenery_00.png": {
+   "size": [
+    36,
+    52
+   ],
+   "what": "scenery sprite"
+  },
+  "objects/scenery_01.png": {
+   "size": [
+    32,
+    77
+   ],
+   "what": "scenery sprite"
+  },
+  "objects/scenery_02.png": {
+   "size": [
+    6,
+    27
+   ],
+   "what": "scenery sprite"
+  },
+  "objects/scenery_03.png": {
+   "size": [
+    4,
+    24
+   ],
+   "what": "scenery sprite"
+  },
+  "objects/scenery_04.png": {
+   "size": [
+    5,
+    34
+   ],
+   "what": "scenery sprite"
+  },
+  "objects/scenery_05.png": {
+   "size": [
+    6,
+    40
+   ],
+   "what": "scenery sprite"
+  },
+  "objects/scenery_06.png": {
+   "size": [
+    4,
+    67
+   ],
+   "what": "scenery sprite"
+  },
+  "objects/scenery_07.png": {
+   "size": [
+    5,
+    67
+   ],
+   "what": "scenery sprite"
+  },
+  "objects/scenery_08.png": {
+   "size": [
+    10,
+    67
+   ],
+   "what": "scenery sprite"
+  },
+  "objects/scenery_09.png": {
+   "size": [
+    7,
+    16
+   ],
+   "what": "scenery sprite"
+  },
+  "objects/scenery_10.png": {
+   "size": [
+    6,
+    7
+   ],
+   "what": "scenery sprite"
+  },
+  "objects/scenery_11.png": {
+   "size": [
+    5,
+    7
+   ],
+   "what": "scenery sprite"
+  },
+  "objects/scenery_12.png": {
+   "size": [
+    7,
+    18
+   ],
+   "what": "scenery sprite"
+  },
+  "objects/scenery_13.png": {
+   "size": [
+    6,
+    7
+   ],
+   "what": "scenery sprite"
+  },
+  "objects/scenery_14.png": {
+   "size": [
+    21,
+    24
+   ],
+   "what": "scenery sprite"
+  },
+  "objects/scenery_15.png": {
+   "size": [
+    15,
+    3
+   ],
+   "what": "scenery sprite"
+  },
+  "objects/scenery_16.png": {
+   "size": [
+    13,
+    6
+   ],
+   "what": "scenery sprite"
+  },
+  "objects/scenery_17.png": {
+   "size": [
+    15,
+    3
+   ],
+   "what": "scenery sprite"
+  },
+  "objects/scenery_18.png": {
+   "size": [
+    10,
+    18
+   ],
+   "what": "scenery sprite"
+  },
+  "objects/scenery_19.png": {
+   "size": [
+    10,
+    20
+   ],
+   "what": "scenery sprite"
+  },
+  "objects/scenery_20.png": {
+   "size": [
+    10,
+    18
+   ],
+   "what": "scenery sprite"
+  },
+  "objects/scenery_21.png": {
+   "size": [
+    10,
+    20
+   ],
+   "what": "scenery sprite"
+  },
+  "objects/scenery_22.png": {
+   "size": [
+    27,
+    38
+   ],
+   "what": "scenery sprite"
+  },
+  "objects/scenery_23.png": {
+   "size": [
+    40,
+    78
+   ],
+   "what": "scenery sprite"
+  },
+  "objects/scenery_24.png": {
+   "size": [
+    15,
+    13
+   ],
+   "what": "scenery sprite"
+  },
+  "objects/scenery_25.png": {
+   "size": [
+    13,
+    13
+   ],
+   "what": "scenery sprite"
+  },
+  "objects/scenery_26.png": {
+   "size": [
+    14,
+    20
+   ],
+   "what": "scenery sprite"
+  },
+  "objects/scenery_27.png": {
+   "size": [
+    13,
+    17
+   ],
+   "what": "scenery sprite"
+  },
+  "objects/scenery_28.png": {
+   "size": [
+    22,
+    12
+   ],
+   "what": "scenery sprite"
+  },
+  "objects/scenery_29.png": {
+   "size": [
+    11,
+    14
+   ],
+   "what": "scenery sprite"
+  },
+  "objects/scenery_30.png": {
+   "size": [
+    11,
+    12
+   ],
+   "what": "scenery sprite"
+  },
+  "objects/scenery_31.png": {
+   "size": [
+    17,
+    9
+   ],
+   "what": "scenery sprite"
+  },
+  "objects/scenery_32.png": {
+   "size": [
+    7,
+    20
+   ],
+   "what": "scenery sprite"
+  },
+  "objects/scenery_33.png": {
+   "size": [
+    7,
+    21
+   ],
+   "what": "scenery sprite"
+  },
+  "objects/scenery_34.png": {
+   "size": [
+    26,
+    24
+   ],
+   "what": "scenery sprite"
+  },
+  "objects/item_00.png": {
+   "size": [
+    25,
+    21
+   ],
+   "what": "item sprite (pickups, shop icons)"
+  },
+  "objects/item_01.png": {
+   "size": [
+    29,
+    30
+   ],
+   "what": "item sprite (pickups, shop icons)"
+  },
+  "objects/item_02.png": {
+   "size": [
+    27,
+    34
+   ],
+   "what": "item sprite (pickups, shop icons)"
+  },
+  "objects/item_03.png": {
+   "size": [
+    28,
+    68
+   ],
+   "what": "item sprite (pickups, shop icons)"
+  },
+  "objects/item_04.png": {
+   "size": [
+    14,
+    16
+   ],
+   "what": "item sprite (pickups, shop icons)"
+  },
+  "objects/item_05.png": {
+   "size": [
+    12,
+    16
+   ],
+   "what": "item sprite (pickups, shop icons)"
+  },
+  "objects/item_06.png": {
+   "size": [
+    9,
+    22
+   ],
+   "what": "item sprite (pickups, shop icons)"
+  },
+  "objects/item_07.png": {
+   "size": [
+    9,
+    22
+   ],
+   "what": "item sprite (pickups, shop icons)"
+  },
+  "objects/item_08.png": {
+   "size": [
+    9,
+    22
+   ],
+   "what": "item sprite (pickups, shop icons)"
+  },
+  "objects/item_09.png": {
+   "size": [
+    43,
+    23
+   ],
+   "what": "item sprite (pickups, shop icons)"
+  },
+  "objects/item_10.png": {
+   "size": [
+    29,
+    28
+   ],
+   "what": "item sprite (pickups, shop icons)"
+  },
+  "objects/item_11.png": {
+   "size": [
+    27,
+    32
+   ],
+   "what": "item sprite (pickups, shop icons)"
+  },
+  "objects/item_12.png": {
+   "size": [
+    12,
+    11
+   ],
+   "what": "item sprite (pickups, shop icons)"
+  },
+  "objects/item_13.png": {
+   "size": [
+    14,
+    20
+   ],
+   "what": "item sprite (pickups, shop icons)"
+  },
+  "objects/item_14.png": {
+   "size": [
+    7,
+    15
+   ],
+   "what": "item sprite (pickups, shop icons)"
+  },
+  "objects/item_15.png": {
+   "size": [
+    24,
+    18
+   ],
+   "what": "item sprite (pickups, shop icons)"
+  },
+  "objects/item_16.png": {
+   "size": [
+    18,
+    30
+   ],
+   "what": "item sprite (pickups, shop icons)"
+  },
+  "objects/item_17.png": {
+   "size": [
+    25,
+    19
+   ],
+   "what": "item sprite (pickups, shop icons)"
+  },
+  "objects/item_18.png": {
+   "size": [
+    12,
+    15
+   ],
+   "what": "item sprite (pickups, shop icons)"
+  },
+  "objects/item_19.png": {
+   "size": [
+    11,
+    11
+   ],
+   "what": "item sprite (pickups, shop icons)"
+  },
+  "objects/item_20.png": {
+   "size": [
+    12,
+    15
+   ],
+   "what": "item sprite (pickups, shop icons)"
+  },
+  "objects/item_21.png": {
+   "size": [
+    9,
+    11
+   ],
+   "what": "item sprite (pickups, shop icons)"
+  },
+  "objects/item_22.png": {
+   "size": [
+    12,
+    15
+   ],
+   "what": "item sprite (pickups, shop icons)"
+  },
+  "objects/item_23.png": {
+   "size": [
+    25,
+    24
+   ],
+   "what": "item sprite (pickups, shop icons)"
+  },
+  "objects/item_24.png": {
+   "size": [
+    16,
+    16
+   ],
+   "what": "item sprite (pickups, shop icons)"
+  },
+  "objects/item_25.png": {
+   "size": [
+    12,
+    18
+   ],
+   "what": "item sprite (pickups, shop icons)"
+  },
+  "objects/item_26.png": {
+   "size": [
+    16,
+    22
+   ],
+   "what": "item sprite (pickups, shop icons)"
+  },
+  "objects/item_27.png": {
+   "size": [
+    17,
+    25
+   ],
+   "what": "item sprite (pickups, shop icons)"
+  },
+  "objects/item_28.png": {
+   "size": [
+    8,
+    10
+   ],
+   "what": "item sprite (pickups, shop icons)"
+  },
+  "objects/item_29.png": {
+   "size": [
+    8,
+    10
+   ],
+   "what": "item sprite (pickups, shop icons)"
+  },
+  "objects/item_30.png": {
+   "size": [
+    8,
+    10
+   ],
+   "what": "item sprite (pickups, shop icons)"
+  },
+  "objects/item_31.png": {
+   "size": [
+    5,
+    21
+   ],
+   "what": "item sprite (pickups, shop icons)"
+  },
+  "objects/item_32.png": {
+   "size": [
+    5,
+    21
+   ],
+   "what": "item sprite (pickups, shop icons)"
+  },
+  "objects/item_33.png": {
+   "size": [
+    13,
+    22
+   ],
+   "what": "item sprite (pickups, shop icons)"
+  },
+  "objects/item_34.png": {
+   "size": [
+    13,
+    22
+   ],
+   "what": "item sprite (pickups, shop icons)"
+  },
+  "objects/item_35.png": {
+   "size": [
+    13,
+    22
+   ],
+   "what": "item sprite (pickups, shop icons)"
+  },
+  "objects/item_36.png": {
+   "size": [
+    20,
+    17
+   ],
+   "what": "item sprite (pickups, shop icons)"
+  },
+  "objects/item_37.png": {
+   "size": [
+    19,
+    17
+   ],
+   "what": "item sprite (pickups, shop icons)"
+  },
+  "objects/item_38.png": {
+   "size": [
+    19,
+    17
+   ],
+   "what": "item sprite (pickups, shop icons)"
+  },
+  "objects/item_39.png": {
+   "size": [
+    15,
+    35
+   ],
+   "what": "item sprite (pickups, shop icons)"
+  },
+  "objects/item_40.png": {
+   "size": [
+    15,
+    34
+   ],
+   "what": "item sprite (pickups, shop icons)"
+  },
+  "objects/item_41.png": {
+   "size": [
+    35,
+    45
+   ],
+   "what": "item sprite (pickups, shop icons)"
+  },
+  "objects/item_42.png": {
+   "size": [
+    36,
+    44
+   ],
+   "what": "item sprite (pickups, shop icons)"
+  },
+  "objects/item_43.png": {
+   "size": [
+    42,
+    37
+   ],
+   "what": "item sprite (pickups, shop icons)"
+  },
+  "objects/item_44.png": {
+   "size": [
+    16,
+    21
+   ],
+   "what": "item sprite (pickups, shop icons)"
+  },
+  "objects/item_45.png": {
+   "size": [
+    50,
+    21
+   ],
+   "what": "item sprite (pickups, shop icons)"
+  }
+ }
+}

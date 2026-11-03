@@ -1,0 +1,26 @@
+{
+ "name": "lm_evil_wizard",
+ "canvas": [
+  104,
+  72
+ ],
+ "feet": [
+  34,
+  69
+ ],
+ "anims": {
+  "Idle": 8,
+  "Move": 8,
+  "Attack": 8,
+  "Hit": 4,
+  "Death": 5
+ },
+ "fps": 10,
+ "author": "LuizMelo",
+ "licence": "CC0 1.0",
+ "credit": "LuizMelo (credit optional)",
+ "url": "https://luizmelo.itch.io/evil-wizard",
+ "graded": true,
+ "notes": "",
+ "use": "fire-casting sorcerer: caster enemy or the Hollow Bishop stand-in"
+}

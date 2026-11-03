@@ -1,0 +1,39 @@
+{
+ "name": "jetrel_castle",
+ "author": "Jetrel",
+ "licence": "CC0 1.0",
+ "credit": "Jetrel (credit optional)",
+ "url": "https://opengameart.org/content/castle-platformer",
+ "use": "green-stone castle tiles with a big gothic column, spikes; interior parallax",
+ "notes": "The sheets had a flat background colour; it is keyed out to transparency.",
+ "files": {
+  "twilight_tiles.png": {
+   "size": [
+    256,
+    256
+   ],
+   "what": "16 px tiles + column + spikes"
+  },
+  "ashen/twilight_tiles.png": {
+   "size": [
+    256,
+    256
+   ],
+   "what": "16 px tiles + column + spikes (ashen grade)"
+  },
+  "parallaxBG-interior1.png": {
+   "size": [
+    256,
+    256
+   ],
+   "what": "interior parallax layer"
+  },
+  "parallaxBG-interior2.png": {
+   "size": [
+    256,
+    320
+   ],
+   "what": "interior parallax layer"
+  }
+ }
+}

@@ -1,0 +1,205 @@
+{
+ "category": "weapons",
+ "fit": 48,
+ "view": "icon",
+ "ashen": false,
+ "author": "Kay Lousberg",
+ "licence": "CC0 1.0",
+ "credit": "KayKit Adventurers by Kay Lousberg (credit optional)",
+ "url": "https://kaylousberg.itch.io/kaykit-adventurers",
+ "objects": {
+  "sword_1handed": {
+   "source": "sword_1handed.gltf",
+   "px_per_unit": 27.31,
+   "canvas": [
+    56,
+    56
+   ],
+   "size": [
+    37,
+    37
+   ]
+  },
+  "sword_2handed": {
+   "source": "sword_2handed.gltf",
+   "px_per_unit": 19.42,
+   "canvas": [
+    56,
+    56
+   ],
+   "size": [
+    35,
+    35
+   ]
+  },
+  "axe_1handed": {
+   "source": "axe_1handed.gltf",
+   "px_per_unit": 31.77,
+   "canvas": [
+    56,
+    56
+   ],
+   "size": [
+    41,
+    30
+   ]
+  },
+  "axe_2handed": {
+   "source": "axe_2handed.gltf",
+   "px_per_unit": 20.99,
+   "canvas": [
+    56,
+    56
+   ],
+   "size": [
+    35,
+    34
+   ]
+  },
+  "dagger": {
+   "source": "dagger.gltf",
+   "px_per_unit": 42.47,
+   "canvas": [
+    56,
+    56
+   ],
+   "size": [
+    39,
+    41
+   ]
+  },
+  "bow_withString": {
+   "source": "bow_withString.gltf",
+   "px_per_unit": 25.11,
+   "canvas": [
+    56,
+    56
+   ],
+   "size": [
+    36,
+    36
+   ]
+  },
+  "crossbow_2handed": {
+   "source": "crossbow_2handed.gltf",
+   "px_per_unit": 23.36,
+   "canvas": [
+    56,
+    56
+   ],
+   "size": [
+    27,
+    27
+   ]
+  },
+  "staff": {
+   "source": "staff.gltf",
+   "px_per_unit": 22.79,
+   "canvas": [
+    56,
+    56
+   ],
+   "size": [
+    39,
+    39
+   ]
+  },
+  "wand": {
+   "source": "wand.gltf",
+   "px_per_unit": 55.23,
+   "canvas": [
+    56,
+    56
+   ],
+   "size": [
+    42,
+    40
+   ]
+  },
+  "shield_badge": {
+   "source": "shield_badge.gltf",
+   "px_per_unit": 32.68,
+   "canvas": [
+    56,
+    56
+   ],
+   "size": [
+    39,
+    39
+   ]
+  },
+  "shield_round": {
+   "source": "shield_round.gltf",
+   "px_per_unit": 35.25,
+   "canvas": [
+    56,
+    56
+   ],
+   "size": [
+    33,
+    34
+   ]
+  },
+  "shield_spikes": {
+   "source": "shield_spikes.gltf",
+   "px_per_unit": 30.44,
+   "canvas": [
+    56,
+    56
+   ],
+   "size": [
+    37,
+    37
+   ]
+  },
+  "shield_square": {
+   "source": "shield_square.gltf",
+   "px_per_unit": 29.98,
+   "canvas": [
+    56,
+    56
+   ],
+   "size": [
+    44,
+    44
+   ]
+  },
+  "spellbook_open": {
+   "source": "spellbook_open.gltf",
+   "px_per_unit": 44.54,
+   "canvas": [
+    56,
+    56
+   ],
+   "size": [
+    46,
+    46
+   ]
+  },
+  "quiver": {
+   "source": "quiver.gltf",
+   "px_per_unit": 50.39,
+   "canvas": [
+    56,
+    56
+   ],
+   "size": [
+    40,
+    40
+   ]
+  },
+  "smokebomb": {
+   "source": "smokebomb.gltf",
+   "px_per_unit": 77.23,
+   "canvas": [
+    56,
+    56
+   ],
+   "size": [
+    31,
+    31
+   ]
+  }
+ },
+ "use": "16 weapon / gear icons (1H and 2H sword, axes, dagger, bow, crossbow, staff, wand, four shields, spellbook, quiver, smoke bomb); 48 px fit"
+}

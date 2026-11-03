@@ -1,0 +1,505 @@
+{
+ "category": "props",
+ "pxm": 17.5,
+ "view": "front",
+ "ashen": true,
+ "author": "Kay Lousberg",
+ "licence": "CC0 1.0",
+ "credit": "KayKit Dungeon Remastered by Kay Lousberg (credit optional)",
+ "url": "https://kaylousberg.itch.io/kaykit-dungeon-remastered",
+ "objects": {
+  "torch_lit": {
+   "source": "torch_lit.gltf",
+   "px_per_unit": 17.5,
+   "canvas": [
+    24,
+    32
+   ],
+   "size": [
+    12,
+    20
+   ]
+  },
+  "torch_mounted": {
+   "source": "torch_mounted.gltf",
+   "px_per_unit": 17.5,
+   "canvas": [
+    24,
+    32
+   ],
+   "size": [
+    11,
+    20
+   ]
+  },
+  "candle_triple": {
+   "source": "candle_triple.gltf",
+   "px_per_unit": 17.5,
+   "canvas": [
+    24,
+    24
+   ],
+   "size": [
+    11,
+    17
+   ]
+  },
+  "candle_lit": {
+   "source": "candle_lit.gltf",
+   "px_per_unit": 17.5,
+   "canvas": [
+    16,
+    32
+   ],
+   "size": [
+    8,
+    20
+   ]
+  },
+  "candle_melted": {
+   "source": "candle_melted.gltf",
+   "px_per_unit": 17.5,
+   "canvas": [
+    16,
+    24
+   ],
+   "size": [
+    8,
+    15
+   ]
+  },
+  "candle_thin_lit": {
+   "source": "candle_thin_lit.gltf",
+   "px_per_unit": 17.5,
+   "canvas": [
+    16,
+    32
+   ],
+   "size": [
+    6,
+    19
+   ]
+  },
+  "banner_red": {
+   "source": "banner_red.gltf",
+   "px_per_unit": 17.5,
+   "canvas": [
+    40,
+    64
+   ],
+   "size": [
+    27,
+    57
+   ]
+  },
+  "banner_patternA_red": {
+   "source": "banner_patternA_red.gltf",
+   "px_per_unit": 17.5,
+   "canvas": [
+    40,
+    64
+   ],
+   "size": [
+    27,
+    57
+   ]
+  },
+  "banner_shield_red": {
+   "source": "banner_shield_red.gltf",
+   "px_per_unit": 17.5,
+   "canvas": [
+    48,
+    72
+   ],
+   "size": [
+    39,
+    57
+   ]
+  },
+  "banner_thin_red": {
+   "source": "banner_thin_red.gltf",
+   "px_per_unit": 17.5,
+   "canvas": [
+    32,
+    64
+   ],
+   "size": [
+    21,
+    57
+   ]
+  },
+  "banner_triple_red": {
+   "source": "banner_triple_red.gltf",
+   "px_per_unit": 17.5,
+   "canvas": [
+    72,
+    72
+   ],
+   "size": [
+    65,
+    59
+   ]
+  },
+  "banner_patternC_brown": {
+   "source": "banner_patternC_brown.gltf",
+   "px_per_unit": 17.5,
+   "canvas": [
+    40,
+    64
+   ],
+   "size": [
+    27,
+    57
+   ]
+  },
+  "chest": {
+   "source": "chest.gltf",
+   "px_per_unit": 17.5,
+   "canvas": [
+    48,
+    40
+   ],
+   "size": [
+    37,
+    29
+   ]
+  },
+  "chest_gold": {
+   "source": "chest_gold.gltf",
+   "px_per_unit": 17.5,
+   "canvas": [
+    48,
+    40
+   ],
+   "size": [
+    37,
+    29
+   ]
+  },
+  "barrel_large": {
+   "source": "barrel_large.gltf",
+   "px_per_unit": 17.5,
+   "canvas": [
+    48,
+    56
+   ],
+   "size": [
+    34,
+    40
+   ]
+  },
+  "barrel_small_stack": {
+   "source": "barrel_small_stack.gltf",
+   "px_per_unit": 17.5,
+   "canvas": [
+    48,
+    48
+   ],
+   "size": [
+    36,
+    35
+   ]
+  },
+  "keg": {
+   "source": "keg.gltf",
+   "px_per_unit": 17.5,
+   "canvas": [
+    48,
+    56
+   ],
+   "size": [
+    37,
+    41
+   ]
+  },
+  "crates_stacked": {
+   "source": "crates_stacked.gltf",
+   "px_per_unit": 17.5,
+   "canvas": [
+    56,
+    56
+   ],
+   "size": [
+    33,
+    45
+   ]
+  },
+  "pillar": {
+   "source": "pillar.gltf",
+   "px_per_unit": 17.5,
+   "canvas": [
+    40,
+    88
+   ],
+   "size": [
+    30,
+    76
+   ]
+  },
+  "pillar_decorated": {
+   "source": "pillar_decorated.gltf",
+   "px_per_unit": 17.5,
+   "canvas": [
+    56,
+    88
+   ],
+   "size": [
+    39,
+    77
+   ]
+  },
+  "column": {
+   "source": "column.gltf",
+   "px_per_unit": 17.5,
+   "canvas": [
+    24,
+    40
+   ],
+   "size": [
+    18,
+    28
+   ]
+  },
+  "rubble_large": {
+   "source": "rubble_large.gltf",
+   "px_per_unit": 17.5,
+   "canvas": [
+    160,
+    88
+   ],
+   "size": [
+    142,
+    71
+   ]
+  },
+  "rubble_half": {
+   "source": "rubble_half.gltf",
+   "px_per_unit": 17.5,
+   "canvas": [
+    96,
+    88
+   ],
+   "size": [
+    76,
+    68
+   ]
+  },
+  "sword_shield_broken": {
+   "source": "sword_shield_broken.gltf",
+   "px_per_unit": 17.5,
+   "canvas": [
+    32,
+    48
+   ],
+   "size": [
+    25,
+    37
+   ]
+  },
+  "sword_shield": {
+   "source": "sword_shield.gltf",
+   "px_per_unit": 17.5,
+   "canvas": [
+    48,
+    40
+   ],
+   "size": [
+    39,
+    32
+   ]
+  },
+  "coin_stack_large": {
+   "source": "coin_stack_large.gltf",
+   "px_per_unit": 17.5,
+   "canvas": [
+    40,
+    40
+   ],
+   "size": [
+    27,
+    26
+   ]
+  },
+  "keyring_hanging": {
+   "source": "keyring_hanging.gltf",
+   "px_per_unit": 17.5,
+   "canvas": [
+    24,
+    32
+   ],
+   "size": [
+    13,
+    24
+   ]
+  },
+  "shelf_small_candles": {
+   "source": "shelf_small_candles.gltf",
+   "px_per_unit": 17.5,
+   "canvas": [
+    32,
+    32
+   ],
+   "size": [
+    22,
+    19
+   ]
+  },
+  "table_long_broken": {
+   "source": "table_long_broken.gltf",
+   "px_per_unit": 17.5,
+   "canvas": [
+    72,
+    48
+   ],
+   "size": [
+    58,
+    37
+   ]
+  },
+  "table_medium_broken": {
+   "source": "table_medium_broken.gltf",
+   "px_per_unit": 17.5,
+   "canvas": [
+    64,
+    40
+   ],
+   "size": [
+    46,
+    25
+   ]
+  },
+  "wall_archedwindow_gated": {
+   "source": "wall_archedwindow_gated.gltf",
+   "px_per_unit": 17.5,
+   "canvas": [
+    80,
+    88
+   ],
+   "size": [
+    74,
+    78
+   ]
+  },
+  "wall_broken": {
+   "source": "wall_broken.gltf",
+   "px_per_unit": 17.5,
+   "canvas": [
+    80,
+    88
+   ],
+   "size": [
+    74,
+    78
+   ]
+  },
+  "wall_cracked": {
+   "source": "wall_cracked.gltf",
+   "px_per_unit": 17.5,
+   "canvas": [
+    80,
+    88
+   ],
+   "size": [
+    74,
+    78
+   ]
+  },
+  "wall_doorway": {
+   "source": "wall_doorway.gltf",
+   "px_per_unit": 17.5,
+   "canvas": [
+    80,
+    88
+   ],
+   "size": [
+    74,
+    78
+   ]
+  },
+  "floor_tile_big_spikes": {
+   "source": "floor_tile_big_spikes.gltf",
+   "px_per_unit": 17.5,
+   "canvas": [
+    96,
+    64
+   ],
+   "size": [
+    90,
+    51
+   ]
+  },
+  "bed_frame": {
+   "source": "bed_frame.gltf",
+   "px_per_unit": 17.5,
+   "canvas": [
+    48,
+    40
+   ],
+   "size": [
+    44,
+    30
+   ]
+  },
+  "stool": {
+   "source": "stool.gltf",
+   "px_per_unit": 17.5,
+   "canvas": [
+    24,
+    24
+   ],
+   "size": [
+    18,
+    14
+   ]
+  },
+  "trunk_large_A": {
+   "source": "trunk_large_A.gltf",
+   "px_per_unit": 17.5,
+   "canvas": [
+    40,
+    32
+   ],
+   "size": [
+    34,
+    23
+   ]
+  },
+  "bottle_A_green": {
+   "source": "bottle_A_green.gltf",
+   "px_per_unit": 17.5,
+   "canvas": [
+    16,
+    24
+   ],
+   "size": [
+    8,
+    18
+   ]
+  },
+  "barrier_column": {
+   "source": "barrier_column.gltf",
+   "px_per_unit": 17.5,
+   "canvas": [
+    80,
+    40
+   ],
+   "size": [
+    72,
+    29
+   ]
+  },
+  "stairs": {
+   "source": "stairs.gltf",
+   "px_per_unit": 17.5,
+   "canvas": [
+    112,
+    120
+   ],
+   "size": [
+    106,
+    108
+   ]
+  }
+ },
+ "use": "banners, chests, barrels, kegs, pillars, columns, rubble, broken tables, spike floor, gated/broken walls and doorway, stairs, coins, candles and torches (add a vfx flame): dungeon / crypt dressing at the kk_* scale"
+}

@@ -1,0 +1,453 @@
+{
+ "name": "game_icons",
+ "licence": "CC-BY 3.0 (game-icons.net)",
+ "url": "https://game-icons.net",
+ "credit": "Icons made by carl-olsen, delapouite, faithtoken, guard13007, lorc, sbed, skoll, zeromancer from game-icons.net, CC-BY 3.0",
+ "icons": {
+  "broadsword": {
+   "author": "lorc",
+   "use": "sword weapon"
+  },
+  "two-handed-sword": {
+   "author": "delapouite",
+   "use": "greatsword"
+  },
+  "gauntlet": {
+   "author": "delapouite",
+   "use": "gauntlet weapon"
+  },
+  "pocket-bow": {
+   "author": "lorc",
+   "use": "bow weapon"
+  },
+  "wizard-staff": {
+   "author": "lorc",
+   "use": "wand / staff weapon"
+  },
+  "crossed-swords": {
+   "author": "lorc",
+   "use": "combat / duel"
+  },
+  "sword-clash": {
+   "author": "lorc",
+   "use": "parry"
+  },
+  "sword-break": {
+   "author": "lorc",
+   "use": "guard break"
+  },
+  "broken-shield": {
+   "author": "lorc",
+   "use": "stagger"
+  },
+  "checked-shield": {
+   "author": "lorc",
+   "use": "block"
+  },
+  "shield-reflect": {
+   "author": "lorc",
+   "use": "riposte"
+  },
+  "dodging": {
+   "author": "lorc",
+   "use": "dodge roll"
+  },
+  "sprint": {
+   "author": "lorc",
+   "use": "dash"
+  },
+  "heavy-fall": {
+   "author": "lorc",
+   "use": "plunge attack"
+  },
+  "jump-across": {
+   "author": "delapouite",
+   "use": "double jump"
+  },
+  "campfire": {
+   "author": "lorc",
+   "use": "bonfire / rest"
+  },
+  "flame": {
+   "author": "carl-olsen",
+   "use": "fire boon"
+  },
+  "fire-ray": {
+   "author": "lorc",
+   "use": "fire beam"
+  },
+  "fireball": {
+   "author": "lorc",
+   "use": "fire bolt"
+  },
+  "lightning-frequency": {
+   "author": "lorc",
+   "use": "chain lightning"
+  },
+  "snowflake-1": {
+   "author": "lorc",
+   "use": "frost boon"
+  },
+  "frozen-orb": {
+   "author": "lorc",
+   "use": "ice orb"
+  },
+  "ice-spell-cast": {
+   "author": "delapouite",
+   "use": "frost cast"
+  },
+  "drop": {
+   "author": "lorc",
+   "use": "blood / bleed"
+  },
+  "bleeding-wound": {
+   "author": "lorc",
+   "use": "bleed status"
+  },
+  "poison-bottle": {
+   "author": "lorc",
+   "use": "poison"
+  },
+  "death-skull": {
+   "author": "sbed",
+   "use": "death"
+  },
+  "skull-crossed-bones": {
+   "author": "lorc",
+   "use": "danger"
+  },
+  "crowned-skull": {
+   "author": "lorc",
+   "use": "boss"
+  },
+  "crown": {
+   "author": "lorc",
+   "use": "the crown / victory"
+  },
+  "crowned-heart": {
+   "author": "lorc",
+   "use": "max health"
+  },
+  "heart-plus": {
+   "author": "zeromancer",
+   "use": "heal"
+  },
+  "health-potion": {
+   "author": "delapouite",
+   "use": "flask"
+  },
+  "heart-bottle": {
+   "author": "lorc",
+   "use": "estus-like flask"
+  },
+  "shining-heart": {
+   "author": "lorc",
+   "use": "regen"
+  },
+  "coins": {
+   "author": "delapouite",
+   "use": "cells / currency"
+  },
+  "two-coins": {
+   "author": "delapouite",
+   "use": "shop price"
+  },
+  "key": {
+   "author": "lorc",
+   "use": "key"
+  },
+  "locked-chest": {
+   "author": "lorc",
+   "use": "chest"
+  },
+  "open-treasure-chest": {
+   "author": "skoll",
+   "use": "loot"
+  },
+  "scroll-unfurled": {
+   "author": "lorc",
+   "use": "lore"
+  },
+  "book-cover": {
+   "author": "delapouite",
+   "use": "codex"
+  },
+  "hourglass": {
+   "author": "lorc",
+   "use": "timer"
+  },
+  "stopwatch": {
+   "author": "lorc",
+   "use": "cooldown"
+  },
+  "candle-flame": {
+   "author": "lorc",
+   "use": "checkpoint candle"
+  },
+  "candle-light": {
+   "author": "lorc",
+   "use": "light"
+  },
+  "holy-grail": {
+   "author": "lorc",
+   "use": "relic"
+  },
+  "church": {
+   "author": "delapouite",
+   "use": "cathedral world"
+  },
+  "tombstone": {
+   "author": "lorc",
+   "use": "graveyard"
+  },
+  "coffin": {
+   "author": "lorc",
+   "use": "crypt"
+  },
+  "ghost": {
+   "author": "lorc",
+   "use": "ghost"
+  },
+  "spectre": {
+   "author": "lorc",
+   "use": "phantom"
+  },
+  "raise-skeleton": {
+   "author": "skoll",
+   "use": "summon skeletons"
+  },
+  "skeleton": {
+   "author": "skoll",
+   "use": "undead"
+  },
+  "bat-wing": {
+   "author": "lorc",
+   "use": "bat"
+  },
+  "imp": {
+   "author": "lorc",
+   "use": "imp"
+  },
+  "horned-skull": {
+   "author": "lorc",
+   "use": "demon"
+  },
+  "anvil": {
+   "author": "lorc",
+   "use": "forge / upgrade"
+  },
+  "anvil-impact": {
+   "author": "lorc",
+   "use": "forge world"
+  },
+  "hammer-drop": {
+   "author": "lorc",
+   "use": "slam"
+  },
+  "thunder-struck": {
+   "author": "lorc",
+   "use": "storm world"
+  },
+  "tornado": {
+   "author": "lorc",
+   "use": "whirlwind"
+  },
+  "whirlwind": {
+   "author": "lorc",
+   "use": "spin attack"
+  },
+  "magic-swirl": {
+   "author": "lorc",
+   "use": "magic"
+  },
+  "all-seeing-eye": {
+   "author": "delapouite",
+   "use": "reveal"
+  },
+  "evil-eyes": {
+   "author": "skoll",
+   "use": "enemy aware"
+  },
+  "visored-helm": {
+   "author": "lorc",
+   "use": "armour"
+  },
+  "barbute": {
+   "author": "lorc",
+   "use": "knight helm"
+  },
+  "mailed-fist": {
+   "author": "lorc",
+   "use": "strength"
+  },
+  "muscle-up": {
+   "author": "lorc",
+   "use": "power"
+  },
+  "run": {
+   "author": "lorc",
+   "use": "speed"
+  },
+  "boot-stomp": {
+   "author": "lorc",
+   "use": "stomp"
+  },
+  "angel-wings": {
+   "author": "lorc",
+   "use": "holy"
+  },
+  "bolt-shield": {
+   "author": "lorc",
+   "use": "ward"
+  },
+  "cracked-shield": {
+   "author": "lorc",
+   "use": "shield break"
+  },
+  "burning-skull": {
+   "author": "skoll",
+   "use": "fire skull"
+  },
+  "flaming-trident": {
+   "author": "lorc",
+   "use": "fire spear"
+  },
+  "pentagram-rose": {
+   "author": "lorc",
+   "use": "curse"
+  },
+  "death-zone": {
+   "author": "lorc",
+   "use": "hazard"
+  },
+  "pause-button": {
+   "author": "guard13007",
+   "use": "pause"
+  },
+  "settings-knobs": {
+   "author": "delapouite",
+   "use": "settings"
+  },
+  "exit-door": {
+   "author": "delapouite",
+   "use": "quit"
+  },
+  "trophy": {
+   "author": "lorc",
+   "use": "achievement"
+  },
+  "swap-bag": {
+   "author": "lorc",
+   "use": "inventory"
+  },
+  "card-random": {
+   "author": "faithtoken",
+   "use": "random boon"
+  }
+ },
+ "authors": {
+  "lorc": [
+   "broadsword",
+   "pocket-bow",
+   "wizard-staff",
+   "crossed-swords",
+   "sword-clash",
+   "sword-break",
+   "broken-shield",
+   "checked-shield",
+   "shield-reflect",
+   "dodging",
+   "sprint",
+   "heavy-fall",
+   "campfire",
+   "fire-ray",
+   "fireball",
+   "lightning-frequency",
+   "snowflake-1",
+   "frozen-orb",
+   "drop",
+   "bleeding-wound",
+   "poison-bottle",
+   "skull-crossed-bones",
+   "crowned-skull",
+   "crown",
+   "crowned-heart",
+   "heart-bottle",
+   "shining-heart",
+   "key",
+   "locked-chest",
+   "scroll-unfurled",
+   "hourglass",
+   "stopwatch",
+   "candle-flame",
+   "candle-light",
+   "holy-grail",
+   "tombstone",
+   "coffin",
+   "ghost",
+   "spectre",
+   "bat-wing",
+   "imp",
+   "horned-skull",
+   "anvil",
+   "anvil-impact",
+   "hammer-drop",
+   "thunder-struck",
+   "tornado",
+   "whirlwind",
+   "magic-swirl",
+   "visored-helm",
+   "barbute",
+   "mailed-fist",
+   "muscle-up",
+   "run",
+   "boot-stomp",
+   "angel-wings",
+   "bolt-shield",
+   "cracked-shield",
+   "flaming-trident",
+   "pentagram-rose",
+   "death-zone",
+   "trophy",
+   "swap-bag"
+  ],
+  "delapouite": [
+   "two-handed-sword",
+   "gauntlet",
+   "jump-across",
+   "ice-spell-cast",
+   "health-potion",
+   "coins",
+   "two-coins",
+   "book-cover",
+   "church",
+   "all-seeing-eye",
+   "settings-knobs",
+   "exit-door"
+  ],
+  "carl-olsen": [
+   "flame"
+  ],
+  "sbed": [
+   "death-skull"
+  ],
+  "zeromancer": [
+   "heart-plus"
+  ],
+  "skoll": [
+   "open-treasure-chest",
+   "raise-skeleton",
+   "skeleton",
+   "evil-eyes",
+   "burning-skull"
+  ],
+  "guard13007": [
+   "pause-button"
+  ],
+  "faithtoken": [
+   "card-random"
+  ]
+ },
+ "notes": "White glyphs: tint with modulate. card48/ = gold-on-dark boon tiles.",
+ "use": "boon, ability, status and menu icons (white glyphs to tint, or the gold card48 tiles)"
+}

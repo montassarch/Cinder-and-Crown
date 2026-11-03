@@ -1,0 +1,23 @@
+{
+ "name": "gv_nightmare",
+ "canvas": [
+  128,
+  96
+ ],
+ "feet": [
+  51,
+  95
+ ],
+ "anims": {
+  "Idle": 4,
+  "Gallop": 4
+ },
+ "fps": 10,
+ "author": "Luis Zuno (ansimuz)",
+ "licence": "CC0 1.0 (public domain)",
+ "credit": "Luis Zuno (@ansimuz) (credit optional)",
+ "url": "https://opengameart.org/content/gothicvania-patreons-collection",
+ "graded": false,
+ "notes": "",
+ "use": "black spectral horse with blue flame mane: charging mini-boss / mount"
+}

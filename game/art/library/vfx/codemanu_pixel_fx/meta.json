@@ -1,0 +1,310 @@
+{
+ "pack": "codemanu_pixel_fx",
+ "author": "CodeManu",
+ "licence": "CC-BY 4.0 (itch.io licence field; the page text says public domain - we credit to be safe)",
+ "credit": "Free Pixel Effects Pack by CodeManu (CC-BY 4.0)",
+ "url": "https://codemanu.itch.io/pixelart-effect-pack",
+ "notes": "100x100 grid sheets, empty cells dropped, subsampled to 16 frames max.",
+ "effects": {
+  "magicspell": {
+   "frames": 16,
+   "size": [
+    47,
+    46
+   ],
+   "fps": 16,
+   "pivot": [
+    25.0,
+    21.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "spell burst"
+  },
+  "magic8": {
+   "frames": 16,
+   "size": [
+    33,
+    59
+   ],
+   "fps": 16,
+   "pivot": [
+    18.0,
+    27.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "figure-eight rune trail"
+  },
+  "bluefire": {
+   "frames": 16,
+   "size": [
+    45,
+    42
+   ],
+   "fps": 16,
+   "pivot": [
+    15.0,
+    -1.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "soul fire"
+  },
+  "casting": {
+   "frames": 16,
+   "size": [
+    27,
+    51
+   ],
+   "fps": 16,
+   "pivot": [
+    15.0,
+    24.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "cast glyph"
+  },
+  "magickahit": {
+   "frames": 16,
+   "size": [
+    15,
+    61
+   ],
+   "fps": 16,
+   "pivot": [
+    9.0,
+    29.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "magic impact"
+  },
+  "flamelash": {
+   "frames": 16,
+   "size": [
+    44,
+    42
+   ],
+   "fps": 16,
+   "pivot": [
+    22.0,
+    15.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "fire whip slash"
+  },
+  "firespin": {
+   "frames": 16,
+   "size": [
+    38,
+    38
+   ],
+   "fps": 16,
+   "pivot": [
+    18.0,
+    13.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "fire vortex"
+  },
+  "protectioncircle": {
+   "frames": 16,
+   "size": [
+    34,
+    34
+   ],
+   "fps": 16,
+   "pivot": [
+    16.0,
+    11.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "ward circle"
+  },
+  "brightfire": {
+   "frames": 16,
+   "size": [
+    16,
+    32
+   ],
+   "fps": 16,
+   "pivot": [
+    5.0,
+    13.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "holy fire"
+  },
+  "weaponhit": {
+   "frames": 16,
+   "size": [
+    37,
+    37
+   ],
+   "fps": 16,
+   "pivot": [
+    18.0,
+    16.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "weapon hit spark"
+  },
+  "fire": {
+   "frames": 16,
+   "size": [
+    24,
+    51
+   ],
+   "fps": 16,
+   "pivot": [
+    9.0,
+    23.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "fire column"
+  },
+  "nebula": {
+   "frames": 16,
+   "size": [
+    75,
+    76
+   ],
+   "fps": 16,
+   "pivot": [
+    35.0,
+    35.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "mist cloud"
+  },
+  "vortex": {
+   "frames": 16,
+   "size": [
+    76,
+    73
+   ],
+   "fps": 16,
+   "pivot": [
+    36.0,
+    36.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "void vortex"
+  },
+  "phantom": {
+   "frames": 16,
+   "size": [
+    69,
+    71
+   ],
+   "fps": 16,
+   "pivot": [
+    35.0,
+    31.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "ghost / soul burst"
+  },
+  "loading": {
+   "frames": 16,
+   "size": [
+    62,
+    62
+   ],
+   "fps": 16,
+   "pivot": [
+    27.0,
+    29.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "spinner (loading / saving icon)"
+  },
+  "sunburn": {
+   "frames": 16,
+   "size": [
+    60,
+    56
+   ],
+   "fps": 16,
+   "pivot": [
+    33.0,
+    27.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "sun flare"
+  },
+  "felspell": {
+   "frames": 16,
+   "size": [
+    71,
+    70
+   ],
+   "fps": 16,
+   "pivot": [
+    35.0,
+    33.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "curse cast"
+  },
+  "midnight": {
+   "frames": 16,
+   "size": [
+    56,
+    56
+   ],
+   "fps": 16,
+   "pivot": [
+    27.0,
+    25.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "dark burst"
+  },
+  "freezing": {
+   "frames": 16,
+   "size": [
+    80,
+    78
+   ],
+   "fps": 16,
+   "pivot": [
+    41.0,
+    35.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "ice burst"
+  },
+  "magicbubbles": {
+   "frames": 16,
+   "size": [
+    50,
+    53
+   ],
+   "fps": 16,
+   "pivot": [
+    24.0,
+    21.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "bubbles (poison / swamp)"
+  }
+ }
+}

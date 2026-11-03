@@ -1,0 +1,400 @@
+{
+ "pack": "pvfx_foundry",
+ "author": "nerijs",
+ "licence": "CC0 1.0",
+ "credit": "PVFX Foundry by nerijs (credit optional)",
+ "url": "https://nerijs.itch.io/pvfx-foundry",
+ "notes": "Pixel-art effects at native size, 20 fps. Pivots come from the pack manifests.",
+ "effects": {
+  "crescent_slash": {
+   "frames": 10,
+   "size": [
+    72,
+    36
+   ],
+   "fps": 20,
+   "pivot": [
+    30.0,
+    28.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "sword arc for heavy attacks"
+  },
+  "electric_impact": {
+   "frames": 14,
+   "size": [
+    76,
+    51
+   ],
+   "fps": 20,
+   "pivot": [
+    37.0,
+    29.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "Storm Spire hit spark / lightning weapon"
+  },
+  "warm_explosion": {
+   "frames": 15,
+   "size": [
+    69,
+    70
+   ],
+   "fps": 20,
+   "pivot": [
+    34.0,
+    47.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "powder keg / fire bomb blast"
+  },
+  "smoke_puff": {
+   "frames": 14,
+   "size": [
+    63,
+    46
+   ],
+   "fps": 20,
+   "pivot": [
+    31.0,
+    17.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "death puff, dodge-roll trail"
+  },
+  "landing_dust": {
+   "frames": 14,
+   "size": [
+    81,
+    45
+   ],
+   "fps": 20,
+   "pivot": [
+    40.0,
+    19.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "jump landing / boss slam dust"
+  },
+  "void_implosion": {
+   "frames": 14,
+   "size": [
+    69,
+    52
+   ],
+   "fps": 20,
+   "pivot": [
+    34.0,
+    27.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "dark magic / boss summon"
+  },
+  "ember_jet": {
+   "frames": 14,
+   "size": [
+    81,
+    48
+   ],
+   "fps": 20,
+   "pivot": [
+    21.0,
+    30.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "forge vent, fire breath"
+  },
+  "arcane_parry": {
+   "frames": 16,
+   "size": [
+    85,
+    78
+   ],
+   "fps": 20,
+   "pivot": [
+    45.0,
+    59.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "parry flash"
+  },
+  "earth_rupture": {
+   "frames": 20,
+   "size": [
+    88,
+    59
+   ],
+   "fps": 20,
+   "pivot": [
+    43.0,
+    43.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "ground slam shockwave"
+  },
+  "focus_charge": {
+   "frames": 14,
+   "size": [
+    69,
+    57
+   ],
+   "fps": 20,
+   "pivot": [
+    34.0,
+    28.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "charged attack wind-up"
+  },
+  "solar_shrapnel": {
+   "frames": 14,
+   "size": [
+    77,
+    67
+   ],
+   "fps": 20,
+   "pivot": [
+    38.0,
+    29.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "crit hit burst"
+  },
+  "frost_nova": {
+   "frames": 13,
+   "size": [
+    75,
+    53
+   ],
+   "fps": 20,
+   "pivot": [
+    37.0,
+    36.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "Frost Ossuary ice burst"
+  },
+  "rift_portal": {
+   "frames": 16,
+   "size": [
+    69,
+    69
+   ],
+   "fps": 20,
+   "pivot": [
+    34.0,
+    34.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "level exit / boss arrival portal (loops)"
+  },
+  "radiant_heal": {
+   "frames": 14,
+   "size": [
+    61,
+    67
+   ],
+   "fps": 20,
+   "pivot": [
+    30.0,
+    49.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "heal / bonfire rest"
+  },
+  "magical_projectile": {
+   "frames": 12,
+   "size": [
+    84,
+    39
+   ],
+   "fps": 20,
+   "pivot": [
+    39.0,
+    23.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "wand bolt"
+  },
+  "beam_cutoff_burst": {
+   "frames": 14,
+   "size": [
+    88,
+    50
+   ],
+   "fps": 20,
+   "pivot": [
+    63.0,
+    22.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "beam end burst"
+  },
+  "resonant_break": {
+   "frames": 34,
+   "size": [
+    73,
+    75
+   ],
+   "fps": 20,
+   "pivot": [
+    36.0,
+    36.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "guard break"
+  },
+  "hush_lock": {
+   "frames": 36,
+   "size": [
+    81,
+    59
+   ],
+   "fps": 20,
+   "pivot": [
+    40.0,
+    29.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "silence / seal ward"
+  },
+  "counterfall": {
+   "frames": 40,
+   "size": [
+    59,
+    55
+   ],
+   "fps": 20,
+   "pivot": [
+    29.0,
+    47.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "counter-attack burst (loops)"
+  },
+  "mass_release": {
+   "frames": 30,
+   "size": [
+    81,
+    77
+   ],
+   "fps": 20,
+   "pivot": [
+    40.0,
+    69.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "big release / boss phase change"
+  },
+  "spectral_bloom": {
+   "frames": 16,
+   "size": [
+    69,
+    57
+   ],
+   "fps": 20,
+   "pivot": [
+    34.0,
+    41.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "soul pickup bloom"
+  },
+  "suturelight": {
+   "frames": 36,
+   "size": [
+    31,
+    46
+   ],
+   "fps": 20,
+   "pivot": [
+    15.0,
+    25.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "holy light seam"
+  },
+  "harvest_seal": {
+   "frames": 36,
+   "size": [
+    82,
+    62
+   ],
+   "fps": 20,
+   "pivot": [
+    37.0,
+    41.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "magic circle seal on the floor"
+  },
+  "acid_splash": {
+   "frames": 14,
+   "size": [
+    69,
+    64
+   ],
+   "fps": 20,
+   "pivot": [
+    34.0,
+    46.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "poison splash"
+  },
+  "dripping_runoff": {
+   "frames": 16,
+   "size": [
+    47,
+    83
+   ],
+   "fps": 20,
+   "pivot": [
+    23.0,
+    75.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "blood/water drip (loops)"
+  },
+  "choir_moths": {
+   "frames": 60,
+   "size": [
+    71,
+    64
+   ],
+   "fps": 20,
+   "pivot": [
+    35.0,
+    32.0
+   ],
+   "blend": "mix",
+   "draw_scale": 1.0,
+   "use": "ambient moths around candles (loops)"
+  }
+ }
+}

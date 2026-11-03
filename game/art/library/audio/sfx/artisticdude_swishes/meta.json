@@ -1,0 +1,22 @@
+{
+ "author": "artisticdude",
+ "licence": "CC0 1.0",
+ "credit": "artisticdude (credit optional)",
+ "url": "https://opengameart.org/content/swishes-sound-pack",
+ "use": "13 whooshes (4 light, 9 heavy): swings that miss, dodge roll, spear thrust",
+ "files": {
+  "swish_1.ogg": 0.1,
+  "swish_2.ogg": 0.08,
+  "swish_3.ogg": 0.11,
+  "swish_4.ogg": 0.1,
+  "swish_5.ogg": 0.1,
+  "swish_6.ogg": 0.1,
+  "swish_7.ogg": 0.12,
+  "swish_8.ogg": 0.12,
+  "swish_9.ogg": 0.13,
+  "swish_10.ogg": 0.08,
+  "swish_11.ogg": 0.07,
+  "swish_12.ogg": 0.06,
+  "swish_13.ogg": 0.06
+ }
+}

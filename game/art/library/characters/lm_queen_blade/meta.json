@@ -1,0 +1,31 @@
+{
+ "name": "lm_queen_blade",
+ "canvas": [
+  152,
+  112
+ ],
+ "feet": [
+  71,
+  111
+ ],
+ "anims": {
+  "Idle": 8,
+  "Run": 8,
+  "Attack1": 4,
+  "Attack2": 4,
+  "Attack3": 4,
+  "Hit": 4,
+  "HitFlash": 4,
+  "Jump": 2,
+  "Fall": 2,
+  "Death": 6
+ },
+ "fps": 10,
+ "author": "LuizMelo",
+ "licence": "CC0 1.0",
+ "credit": "LuizMelo (credit optional)",
+ "url": "https://luizmelo.itch.io/medieval-king-pack-2",
+ "graded": true,
+ "notes": "",
+ "use": "caped royal duellist: rival / mini-boss"
+}

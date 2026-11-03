@@ -1,0 +1,70 @@
+{
+ "pack": "magic_circles",
+ "author": "Luke.RUSTLTD",
+ "licence": "CC0 1.0",
+ "credit": "Luke.RUSTLTD (credit optional)",
+ "url": "https://opengameart.org/content/4-summoning-circles",
+ "notes": "Single images (spin / scale them in code). 128 px; tint with modulate.",
+ "effects": {
+  "circle4": {
+   "frames": 1,
+   "size": [
+    128,
+    128
+   ],
+   "fps": 1,
+   "pivot": [
+    64.0,
+    64.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "summoning / boss floor circle, ward under the player"
+  },
+  "circle5": {
+   "frames": 1,
+   "size": [
+    128,
+    128
+   ],
+   "fps": 1,
+   "pivot": [
+    64.0,
+    64.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "summoning / boss floor circle, ward under the player"
+  },
+  "circle6": {
+   "frames": 1,
+   "size": [
+    128,
+    128
+   ],
+   "fps": 1,
+   "pivot": [
+    64.0,
+    64.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "summoning / boss floor circle, ward under the player"
+  },
+  "circle7": {
+   "frames": 1,
+   "size": [
+    128,
+    128
+   ],
+   "fps": 1,
+   "pivot": [
+    64.0,
+    64.0
+   ],
+   "blend": "add",
+   "draw_scale": 1.0,
+   "use": "summoning / boss floor circle, ward under the player"
+  }
+ }
+}

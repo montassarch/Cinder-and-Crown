@@ -1,0 +1,32 @@
+{
+ "name": "gv_gothic_castle",
+ "author": "Luis Zuno (ansimuz)",
+ "licence": "CC0 1.0 (public domain)",
+ "credit": "Luis Zuno (@ansimuz) (credit optional)",
+ "url": "https://opengameart.org/content/gothicvania-patreons-collection",
+ "use": "castle hall with stained windows, chandeliers, gargoyles and gold stairs: a castle / throne world",
+ "notes": "",
+ "files": {
+  "background.png": {
+   "size": [
+    480,
+    336
+   ],
+   "what": "hall wall (repeat)"
+  },
+  "tileset.png": {
+   "size": [
+    336,
+    240
+   ],
+   "what": "16 px tileset"
+  },
+  "preview_scene.png": {
+   "size": [
+    1024,
+    336
+   ],
+   "what": "how the author put it together"
+  }
+ }
+}

@@ -1,0 +1,123 @@
+{
+ "name": "gv_town",
+ "author": "Luis Zuno (ansimuz)",
+ "licence": "CC0 1.0 (public domain)",
+ "credit": "Luis Zuno (@ansimuz) (credit optional)",
+ "url": "https://opengameart.org/content/gothicvania-town",
+ "use": "ruined night town: sky, far town, tiles, houses, carts, crates, well, lamp post - a hub / between-runs village",
+ "notes": "",
+ "files": {
+  "background.png": {
+   "size": [
+    384,
+    288
+   ],
+   "what": "sky (far layer)"
+  },
+  "ashen/background.png": {
+   "size": [
+    384,
+    288
+   ],
+   "what": "sky (far layer) (ashen grade)"
+  },
+  "middleground.png": {
+   "size": [
+    384,
+    288
+   ],
+   "what": "distant town (mid layer)"
+  },
+  "ashen/middleground.png": {
+   "size": [
+    384,
+    288
+   ],
+   "what": "distant town (mid layer) (ashen grade)"
+  },
+  "tileset.png": {
+   "size": [
+    592,
+    192
+   ],
+   "what": "16 px tileset"
+  },
+  "ashen/tileset.png": {
+   "size": [
+    592,
+    192
+   ],
+   "what": "16 px tileset (ashen grade)"
+  },
+  "objects/house_00.png": {
+   "size": [
+    207,
+    244
+   ],
+   "what": "house facade"
+  },
+  "objects/house_01.png": {
+   "size": [
+    167,
+    181
+   ],
+   "what": "house facade"
+  },
+  "objects/house_02.png": {
+   "size": [
+    220,
+    177
+   ],
+   "what": "house facade"
+  },
+  "objects/prop_00.png": {
+   "size": [
+    73,
+    68
+   ],
+   "what": "street prop"
+  },
+  "objects/prop_01.png": {
+   "size": [
+    35,
+    44
+   ],
+   "what": "street prop"
+  },
+  "objects/prop_02.png": {
+   "size": [
+    24,
+    30
+   ],
+   "what": "street prop"
+  },
+  "objects/prop_03.png": {
+   "size": [
+    35,
+    108
+   ],
+   "what": "street prop"
+  },
+  "objects/prop_04.png": {
+   "size": [
+    93,
+    75
+   ],
+   "what": "street prop"
+  },
+  "objects/prop_05.png": {
+   "size": [
+    64,
+    65
+   ],
+   "what": "street prop"
+  },
+  "objects/prop_06.png": {
+   "size": [
+    39,
+    35
+   ],
+   "what": "street prop"
+  }
+ }
+}

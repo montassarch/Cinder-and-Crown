@@ -1,0 +1,25 @@
+{
+ "name": "gothic_window_tiles",
+ "author": "Max Johnson (Shoehorn)",
+ "licence": "CC0 1.0 (public domain)",
+ "credit": "Max Johnson (credit optional)",
+ "url": "https://opengameart.org/content/gothic-window-tileset",
+ "use": "modular stained-glass tracery (lead lines) - lay over a coloured glow for huge cathedral windows",
+ "notes": "",
+ "files": {
+  "gothic_window_sheet.png": {
+   "size": [
+    768,
+    384
+   ],
+   "what": "128 px tracery tiles"
+  },
+  "stained_glass_figure.png": {
+   "size": [
+    800,
+    384
+   ],
+   "what": "stained glass figure panel (religious figure; swap for a saint/knight if preferred)"
+  }
+ }
+}

@@ -1,0 +1,25 @@
+{
+ "name": "gv_hell_hound",
+ "canvas": [
+  56,
+  48
+ ],
+ "feet": [
+  24,
+  47
+ ],
+ "anims": {
+  "Idle": 6,
+  "Walk": 12,
+  "Run": 5,
+  "Jump": 6
+ },
+ "fps": 10,
+ "author": "Luis Zuno (ansimuz)",
+ "licence": "CC0 1.0 (public domain)",
+ "credit": "Luis Zuno (@ansimuz) (credit optional)",
+ "url": "https://opengameart.org/content/gothicvania-patreons-collection",
+ "graded": false,
+ "notes": "",
+ "use": "undead hound with ember stripes: fast pouncing enemy"
+}

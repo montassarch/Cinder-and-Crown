@@ -1,0 +1,32 @@
+{
+ "name": "gv_old_dark_castle",
+ "author": "Luis Zuno (ansimuz)",
+ "licence": "CC0 1.0 (public domain)",
+ "credit": "Luis Zuno (@ansimuz) (credit optional)",
+ "url": "https://opengameart.org/content/gothicvania-patreons-collection",
+ "use": "mossy dungeon interior with a stained-glass window, arches and stairs: crypt / Frost Ossuary variant",
+ "notes": "",
+ "files": {
+  "background.png": {
+   "size": [
+    960,
+    304
+   ],
+   "what": "interior wall (far layer)"
+  },
+  "tileset.png": {
+   "size": [
+    832,
+    240
+   ],
+   "what": "16 px tileset"
+  },
+  "preview_scene.png": {
+   "size": [
+    960,
+    304
+   ],
+   "what": "example scene"
+  }
+ }
+}

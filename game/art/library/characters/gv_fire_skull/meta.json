@@ -1,0 +1,23 @@
+{
+ "name": "gv_fire_skull",
+ "canvas": [
+  96,
+  104
+ ],
+ "feet": [
+  50,
+  98
+ ],
+ "anims": {
+  "Idle": 8,
+  "NoFire": 4
+ },
+ "fps": 10,
+ "author": "Luis Zuno (ansimuz)",
+ "licence": "CC0 1.0 (public domain)",
+ "credit": "Luis Zuno (@ansimuz) (credit optional)",
+ "url": "https://opengameart.org/content/gothicvania-patreons-collection",
+ "graded": false,
+ "notes": "",
+ "use": "flaming skull: an Ember Wisp variant / Molten Forge flyer"
+}

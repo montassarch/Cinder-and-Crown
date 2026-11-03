@@ -1,0 +1,37 @@
+{
+ "name": "dark_knight",
+ "canvas": [
+  120,
+  80
+ ],
+ "feet": [
+  59,
+  79
+ ],
+ "anims": {
+  "Idle": 6,
+  "Walk": 8,
+  "Run": 8,
+  "Attack1": 8,
+  "Slash": 9,
+  "Slash2": 14,
+  "Slash3": 10,
+  "Block": 4,
+  "BlockIdle": 4,
+  "Impact": 4,
+  "Death": 10,
+  "Jump": 6,
+  "Kick": 8,
+  "Casting": 8,
+  "PowerUp": 8,
+  "DrawSword": 6
+ },
+ "fps": 12,
+ "author": "comphonia",
+ "licence": "CC0 1.0",
+ "credit": "comphonia (comphonia.com) (credit optional)",
+ "url": "https://opengameart.org/content/dark-knight-2d-character-sprites",
+ "graded": false,
+ "notes": "Shrunk from 3D-rendered sheets (every 2nd-3rd frame kept), 24 colours, dark outline - the enemy_pixel.py look. The full 37-animation sheets (28 MB) are not kept; download again to regenerate.",
+ "use": "the most Souls-like figure in the library: a black-armoured knight with block, parry-able slashes, kick and cast. An elite enemy, a mirror-knight boss, or an alternative hero"
+}

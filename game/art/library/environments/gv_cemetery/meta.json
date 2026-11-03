@@ -1,0 +1,207 @@
+{
+ "name": "gv_cemetery",
+ "author": "Luis Zuno (ansimuz)",
+ "licence": "CC0 1.0 (public domain)",
+ "credit": "Luis Zuno (@ansimuz) (credit optional)",
+ "url": "https://opengameart.org/content/gothicvania-cemetery-pack",
+ "use": "graveyard under a blood moon: parallax sky/mountains/graves, grassy tiles, dead trees, statue, tombstones",
+ "notes": "",
+ "files": {
+  "background.png": {
+   "size": [
+    384,
+    224
+   ],
+   "what": "sky with the moon (far layer)"
+  },
+  "ashen/background.png": {
+   "size": [
+    384,
+    224
+   ],
+   "what": "sky with the moon (far layer) (ashen grade)"
+  },
+  "mountains.png": {
+   "size": [
+    192,
+    179
+   ],
+   "what": "mountains (repeat horizontally)"
+  },
+  "ashen/mountains.png": {
+   "size": [
+    192,
+    179
+   ],
+   "what": "mountains (repeat horizontally) (ashen grade)"
+  },
+  "graveyard.png": {
+   "size": [
+    384,
+    123
+   ],
+   "what": "graves (near layer)"
+  },
+  "ashen/graveyard.png": {
+   "size": [
+    384,
+    123
+   ],
+   "what": "graves (near layer) (ashen grade)"
+  },
+  "tileset.png": {
+   "size": [
+    448,
+    160
+   ],
+   "what": "16 px tileset"
+  },
+  "ashen/tileset.png": {
+   "size": [
+    448,
+    160
+   ],
+   "what": "16 px tileset (ashen grade)"
+  },
+  "objects/bush-large.png": {
+   "size": [
+    76,
+    65
+   ],
+   "what": "prop"
+  },
+  "ashen/objects/bush-large.png": {
+   "size": [
+    76,
+    65
+   ],
+   "what": "prop (ashen grade)"
+  },
+  "objects/bush-small.png": {
+   "size": [
+    34,
+    29
+   ],
+   "what": "prop"
+  },
+  "ashen/objects/bush-small.png": {
+   "size": [
+    34,
+    29
+   ],
+   "what": "prop (ashen grade)"
+  },
+  "objects/statue.png": {
+   "size": [
+    63,
+    75
+   ],
+   "what": "prop"
+  },
+  "ashen/objects/statue.png": {
+   "size": [
+    63,
+    75
+   ],
+   "what": "prop (ashen grade)"
+  },
+  "objects/stone-1.png": {
+   "size": [
+    27,
+    39
+   ],
+   "what": "prop"
+  },
+  "ashen/objects/stone-1.png": {
+   "size": [
+    27,
+    39
+   ],
+   "what": "prop (ashen grade)"
+  },
+  "objects/stone-2.png": {
+   "size": [
+    27,
+    40
+   ],
+   "what": "prop"
+  },
+  "ashen/objects/stone-2.png": {
+   "size": [
+    27,
+    40
+   ],
+   "what": "prop (ashen grade)"
+  },
+  "objects/stone-3.png": {
+   "size": [
+    27,
+    33
+   ],
+   "what": "prop"
+  },
+  "ashen/objects/stone-3.png": {
+   "size": [
+    27,
+    33
+   ],
+   "what": "prop (ashen grade)"
+  },
+  "objects/stone-4.png": {
+   "size": [
+    19,
+    38
+   ],
+   "what": "prop"
+  },
+  "ashen/objects/stone-4.png": {
+   "size": [
+    19,
+    38
+   ],
+   "what": "prop (ashen grade)"
+  },
+  "objects/tree-1.png": {
+   "size": [
+    166,
+    117
+   ],
+   "what": "prop"
+  },
+  "ashen/objects/tree-1.png": {
+   "size": [
+    166,
+    117
+   ],
+   "what": "prop (ashen grade)"
+  },
+  "objects/tree-2.png": {
+   "size": [
+    166,
+    117
+   ],
+   "what": "prop"
+  },
+  "ashen/objects/tree-2.png": {
+   "size": [
+    166,
+    117
+   ],
+   "what": "prop (ashen grade)"
+  },
+  "objects/tree-3.png": {
+   "size": [
+    176,
+    171
+   ],
+   "what": "prop"
+  },
+  "ashen/objects/tree-3.png": {
+   "size": [
+    176,
+    171
+   ],
+   "what": "prop (ashen grade)"
+  }
+ }
+}

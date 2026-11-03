@@ -1,0 +1,21 @@
+{
+ "author": "HaelDB",
+ "licence": "CC0 1.0 (dual-licensed CC0 / OGA-BY 3.0; used under CC0)",
+ "credit": "HaelDB (credit optional)",
+ "url": "https://opengameart.org/content/footsteps-leather-cloth-armor",
+ "use": "leather, cloth and metal-armour footsteps",
+ "files": {
+  "step_cloth1.ogg": 0.05,
+  "step_cloth2.ogg": 0.13,
+  "step_cloth3.ogg": 0.25,
+  "step_cloth4.ogg": 0.08,
+  "step_lth1.ogg": 0.16,
+  "step_lth2.ogg": 0.15,
+  "step_lth4.ogg": 0.25,
+  "step_lth33.ogg": 0.25,
+  "step_metal.ogg": 0.15,
+  "step_metal__2.ogg": 0.19,
+  "step_metal__3.ogg": 0.18,
+  "step_metal__4.ogg": 0.14
+ }
+}

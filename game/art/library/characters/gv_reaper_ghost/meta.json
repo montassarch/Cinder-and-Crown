@@ -1,0 +1,25 @@
+{
+ "name": "gv_reaper_ghost",
+ "canvas": [
+  56,
+  72
+ ],
+ "feet": [
+  27,
+  54
+ ],
+ "anims": {
+  "Idle": 7,
+  "Appear": 7,
+  "Shriek": 4,
+  "Vanish": 7
+ },
+ "fps": 10,
+ "author": "Luis Zuno (ansimuz)",
+ "licence": "CC0 1.0 (public domain)",
+ "credit": "Luis Zuno (@ansimuz) (credit optional)",
+ "url": "https://opengameart.org/content/gothicvania-patreons-collection",
+ "graded": false,
+ "notes": "",
+ "use": "hooded wraith that fades in/out and shrieks: a hollow phantom enemy"
+}

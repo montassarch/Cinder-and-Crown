@@ -1,0 +1,22 @@
+{
+ "name": "gv_hell_cat",
+ "canvas": [
+  96,
+  40
+ ],
+ "feet": [
+  23,
+  39
+ ],
+ "anims": {
+  "Run": 4
+ },
+ "fps": 10,
+ "author": "Luis Zuno (ansimuz)",
+ "licence": "CC0 1.0 (public domain)",
+ "credit": "Luis Zuno (@ansimuz) (credit optional)",
+ "url": "https://opengameart.org/content/gothicvania-cemetery-pack",
+ "graded": false,
+ "notes": "",
+ "use": "flaming hell-cat runner"
+}
