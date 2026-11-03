@@ -181,3 +181,12 @@ func test_wand_shots_fly_as_animated_spells() -> void:
 	shot.launch(_level.player._weapon, bolt, Vector2.RIGHT)
 	assert_int(_library(String(bolt.projectile_fx), shot).size()).is_equal(1)
 	shot.queue_free()
+
+
+func test_a_double_jump_bursts_a_ring_under_the_feet_and_an_air_dash_leaves_a_trail() -> void:
+	Sound.clear_history()
+	_level.player.double_jumped.emit()
+	assert_int(_library(CombatFx.CUE_DOUBLE_JUMP).size()).is_equal(1)
+	_level.player.air_dashed.emit()
+	assert_int(_library(CombatFx.CUE_AIR_DASH).size()).is_equal(1)
+	assert_bool(Sound.history().has(&"roll")).is_true()

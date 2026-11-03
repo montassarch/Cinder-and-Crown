@@ -34,6 +34,8 @@ const CUE_REND_CAST := "codemanu_pixel_fx/flamelash"
 const CUE_KEG := "matheusgg28_pixel_fx/explosion_big"
 const CUE_SLAM := "matheusgg28_pixel_fx/shockwave"
 const CUE_SUMMON := "codemanu_pixel_fx/protectioncircle"
+const CUE_DOUBLE_JUMP := "codemanu_pixel_fx/weaponhit"
+const CUE_AIR_DASH := "matheusgg28_pixel_fx/dust_2"
 ## A boss goes out in this many big explosions, this far apart in time and space.
 const BOSS_BLASTS: int = 4
 const BOSS_BLAST_GAP: float = 0.18
@@ -62,6 +64,10 @@ func bind(level: Node2D, player: Player, camera: Camera2D) -> void:
 	player.drank.connect(func() -> void: LibraryFx.spawn(_level, CUE_DRINK, _player.global_position + Vector2(0.0, -4.0)))
 	player.ability_cast.connect(_on_ability_cast)
 	player.rolled.connect(func() -> void: Sound.play(&"roll"))
+	player.double_jumped.connect(func() -> void: _at_feet(CUE_DOUBLE_JUMP, _player.facing(), 0.8))
+	player.air_dashed.connect(func() -> void:
+		LibraryFx.spawn(_level, CUE_AIR_DASH, _player.global_position + Vector2(-_player.facing() * 10.0, 0.0), _player.facing() > 0.0, 1.1)
+		Sound.play(&"roll"))
 	player.landed.connect(func() -> void: Sound.play(&"land"))
 	player.jumped.connect(func() -> void: Sound.play(&"jump"))
 	player.drank.connect(func() -> void: Sound.play(&"drink"))

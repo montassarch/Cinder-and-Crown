@@ -73,6 +73,8 @@ fx_forward_tiles = 1.2
 
 [resource]
 script = ExtResource("1_data")
+icon = "spear"
+hero_art = "spear"
 display_name = "Ember Spear"
 damage = 12
 chain = Array[ExtResource("2_move")]([SubResource("move_1"), SubResource("move_2")])

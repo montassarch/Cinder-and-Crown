@@ -113,6 +113,8 @@ impact_fx = &"matheusgg28_pixel_fx/impact_projectile"
 
 [resource]
 script = ExtResource("1_data")
+icon = "bow"
+hero_art = "bow"
 display_name = "Hunter's Bow"
 damage = 7
 chain = Array[ExtResource("2_move")]([SubResource("move_1"), SubResource("move_2")])

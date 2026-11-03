@@ -90,7 +90,8 @@ func show_state(state: State, facing: float, feet_y: float, action_seconds: floa
 static func animation_for(state: State, combo_step: int) -> StringName:
 	match state:
 		State.RUN: return &"run"
-		State.JUMP: return &"jump"
+		State.JUMP, State.DOUBLE_JUMP: return &"jump"
+		State.AIR_DASH: return &"roll"
 		State.FALL: return &"fall"
 		State.ROLL: return &"roll"
 		State.ATTACK: return COMBO_ANIMS[combo_step % COMBO_ANIMS.size()]

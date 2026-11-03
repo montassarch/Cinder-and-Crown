@@ -17,12 +17,16 @@ extends RefCounted
 ##   parry_succeeded  this parry deflected a strike (attack or roll may then cut it short)
 ##   heal_buffered / heal_ready  the flask button was pressed / a drink would help (charge and missing health)
 ##   heal_duration  seconds a drink lasts
+##   air_jumps_left  jumps left before landing (the double jump)
+##   air_dash_ready  the air dash has not been used since the hero left the ground
 
-enum PlayerState { IDLE, RUN, JUMP, FALL, ROLL, ATTACK, HURT, STORM, REND, PARRY, HEAL }
+enum PlayerState { IDLE, RUN, JUMP, FALL, ROLL, ATTACK, HURT, STORM, REND, PARRY, HEAL, DOUBLE_JUMP, AIR_DASH }
 
 const ROLL_DURATION: float = 0.32
 const HURT_DURATION: float = 0.25
 const AXIS_EPSILON: float = 0.01
+## The air dash: a short committed burst forward (its i-frames are the point, like the roll's).
+const AIR_DASH_DURATION: float = 0.22
 
 
 static func next_state(current: PlayerState, ctx: Dictionary) -> PlayerState:
@@ -31,6 +35,10 @@ static func next_state(current: PlayerState, ctx: Dictionary) -> PlayerState:
 	# A roll is committed: nothing interrupts it, hits included (its i-frames are the point).
 	if current == PlayerState.ROLL and state_time < ROLL_DURATION:
 		return PlayerState.ROLL
+	if current == PlayerState.AIR_DASH:
+		if state_time < AIR_DASH_DURATION:
+			return PlayerState.AIR_DASH
+		return _settled_state(ctx)
 
 	if ctx.get("hurt", false):
 		return PlayerState.HURT
@@ -71,19 +79,36 @@ static func next_state(current: PlayerState, ctx: Dictionary) -> PlayerState:
 						return PlayerState.ROLL
 				return PlayerState.PARRY
 			return _settled_state(ctx)
-		PlayerState.JUMP:
+		PlayerState.JUMP, PlayerState.DOUBLE_JUMP:
+			var air_move := _air_move(ctx)
+			if air_move >= 0:
+				return air_move as PlayerState
 			if ctx.get("vel_y", 0.0) < 0.0:
 				if ctx.get("attack_buffered", false):
 					return PlayerState.ATTACK
-				return PlayerState.JUMP
+				return current
 			return _settled_state(ctx)
 		_:
 			return _free_state(ctx)
 
 
+## In the air: a roll button is the air dash, a jump past the coyote time is the double jump (-1: neither).
+static func _air_move(ctx: Dictionary) -> int:
+	if ctx.get("on_floor", false):
+		return -1
+	if ctx.get("roll_buffered", false) and ctx.get("air_dash_ready", false):
+		return PlayerState.AIR_DASH
+	if ctx.get("jump_buffered", false) and ctx.get("coyote_time", 0.0) <= 0.0 and ctx.get("air_jumps_left", 0) > 0:
+		return PlayerState.DOUBLE_JUMP
+	return -1
+
+
 ## IDLE, RUN and FALL: the states that may start any action.
 static func _free_state(ctx: Dictionary) -> PlayerState:
 	var on_floor: bool = ctx.get("on_floor", false)
+	var air_move := _air_move(ctx)
+	if air_move >= 0:
+		return air_move as PlayerState
 	if on_floor and ctx.get("roll_buffered", false):
 		return PlayerState.ROLL
 	if ctx.get("jump_buffered", false) and (on_floor or ctx.get("coyote_time", 0.0) > 0.0):

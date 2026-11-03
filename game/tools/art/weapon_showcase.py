@@ -238,9 +238,9 @@ WEAPONS = {
     'wand':     (wand,     'hand_l', [('idle', 'Spell_Simple_Idle_Loop', 0.0), ('attack', 'Spell_Simple_Shoot', 0.6)]),
     'gauntlet': (gauntlet, None,     [('idle', 'Idle_Loop', 0.0), ('attack', 'Punch_Jab', 0.5)]),
 }
-build_skull()
-for name, (builder, bone, poses) in WEAPONS.items():
-    if only and name not in only: continue
+def mount(name, builder, bone):
+    """Builds weapon `name` in the rest pose and parents it to the hand (turned by GRIP_TURN); returns its parts and pivot."""
+    global HX
     # parent in the rest pose: parenting to a bone keeps wherever the weapon is relative to the bone's current pose
     rig.animation_data_create(); rig.animation_data.action = None
     rig.data.pose_position = 'REST'; sc.frame_set(1); bpy.context.view_layer.update()
@@ -268,6 +268,76 @@ for name, (builder, bone, poses) in WEAPONS.items():
         pivot.rotation_mode = 'XYZ'
         pivot.rotation_euler = tuple(math.radians(v) for v in turn)
     rig.data.pose_position = 'POSE'
+    return made, pivot
+
+
+# The hero's full game animation set with one weapon in hand (HERO_WEAPON=<name>, frames to HERO_OUT):
+#   anim dir -> (library action, frames, loops?, played backwards?). Same names and counts as skeleton_knight_render.py,
+#   so PlayerVisual can swap sets; the attacks are each weapon's own (thrusts, shots, casts, punches).
+COMMON = {'Run': ('Jog_Fwd_Loop', 10, True, False), 'Jump': ('Jump_Start', 3, False, False), 'Fall': ('Jump_Loop', 4, True, False),
+          'Roll': ('Roll', 9, False, False), 'Hurt': ('Hit_Chest', 3, False, False), 'Death': ('Death01', 10, False, False)}
+HERO_JOBS = {
+    'spear': dict(COMMON, Idle=('Sword_Idle', 8, True, False), Attack1=('Sword_Attack', 6, False, False),
+                  Attack2=('Punch_Cross', 6, False, False), Attack3=('Punch_Jab', 8, False, False)),
+    'bow': dict(COMMON, Idle=('Pistol_Idle_Loop', 8, True, False), Attack1=('Pistol_Shoot', 6, False, False),
+                Attack2=('Pistol_Shoot', 6, False, False), Attack3=('Pistol_Shoot', 8, False, False)),
+    'wand': dict(COMMON, Idle=('Spell_Simple_Idle_Loop', 8, True, False), Attack1=('Spell_Simple_Shoot', 6, False, False),
+                 Attack2=('Spell_Simple_Enter', 6, False, False), Attack3=('Spell_Simple_Shoot', 8, False, False)),
+    'gauntlet': dict(COMMON, Idle=('Idle_Loop', 8, True, False), Attack1=('Punch_Jab', 6, False, False),
+                     Attack2=('Punch_Cross', 6, False, False), Attack3=('Sword_Attack', 8, False, False)),
+}
+
+
+build_skull()
+if os.environ.get('ICON_OUT'):
+    # one icon per weapon: the weapon alone, side on, framed to fit a square (ICON_OUT/<weapon>.png, 256x256)
+    icon_out = os.environ['ICON_OUT']; os.makedirs(icon_out, exist_ok=True)
+    sc.render.resolution_x = sc.render.resolution_y = 256
+    sc.render.film_transparent = True
+    for o in bpy.data.objects:
+        if o.type == 'MESH': o.hide_render = True
+    for name, (builder, bone, _) in WEAPONS.items():
+        made, pivot = mount(name, builder, bone)
+        parts = [p[1] if isinstance(p, tuple) else p for p in made if not (isinstance(p, tuple) and p[0] == 'hand_l')]
+        bpy.context.view_layer.update()
+        pts = [o.matrix_world @ mathutils.Vector(c) for o in parts for c in o.bound_box]
+        lo = mathutils.Vector((min(v.y for v in pts), min(v.z for v in pts)))
+        hi = mathutils.Vector((max(v.y for v in pts), max(v.z for v in pts)))
+        centre = (lo + hi) / 2
+        cam.data.ortho_scale = max(hi.x - lo.x, hi.y - lo.y) * 1.15
+        cam.location = (-6, centre.x, centre.y)
+        for o in parts: o.hide_render = False
+        sc.render.filepath = os.path.join(icon_out, name + '.png')
+        bpy.ops.render.render(write_still=True)
+        for p in made:
+            o = p[1] if isinstance(p, tuple) else p
+            bpy.data.objects.remove(o, do_unlink=True)
+        bpy.data.objects.remove(pivot, do_unlink=True)
+        print('done icon', name)
+    sys.exit(0)
+if os.environ.get('HERO_WEAPON'):
+    name = os.environ['HERO_WEAPON']
+    builder, bone, _ = WEAPONS[name]
+    mount(name, builder, bone)
+    if os.environ.get('SAMPLES'): sc.cycles.samples = int(os.environ['SAMPLES'])
+    hero_out = os.environ['HERO_OUT']
+    for game_anim, (action, count, loops, backwards) in HERO_JOBS[name].items():
+        act = anim_actions[action]
+        rig.animation_data.action = act
+        if hasattr(rig.animation_data, 'action_slot') and act.slots: rig.animation_data.action_slot = act.slots[0]
+        f0, f1 = act.frame_range
+        d = os.path.join(hero_out, game_anim); os.makedirs(d, exist_ok=True)
+        for i in range(count):
+            t = i / count if loops else (i / (count - 1) if count > 1 else 0)
+            if backwards: t = 1 - t
+            sc.frame_set(round(f0 + (f1 - f0) * t))
+            sc.render.filepath = os.path.join(d, f'{i}.png')
+            bpy.ops.render.render(write_still=True)
+        print('done', name, game_anim)
+    sys.exit(0)
+for name, (builder, bone, poses) in WEAPONS.items():
+    if only and name not in only: continue
+    made, pivot = mount(name, builder, bone)
     for pose, action, t in poses:
         act = anim_actions[action]
         rig.animation_data_create(); rig.animation_data.action = act

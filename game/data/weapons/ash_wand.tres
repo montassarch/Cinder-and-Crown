@@ -117,6 +117,8 @@ projectile_fx = &"codemanu_pixel_fx/magicspell"
 
 [resource]
 script = ExtResource("1_data")
+icon = "wand"
+hero_art = "wand"
 display_name = "Ash Wand"
 damage = 6
 chain = Array[ExtResource("2_move")]([SubResource("move_1"), SubResource("move_2")])

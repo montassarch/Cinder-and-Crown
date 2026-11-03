@@ -95,6 +95,8 @@ impact_fx = &"matheusgg28_pixel_fx/impact_punch"
 
 [resource]
 script = ExtResource("1_data")
+icon = "gauntlet"
+hero_art = "gauntlet"
 display_name = "Iron Gauntlet"
 damage = 6
 chain = Array[ExtResource("2_move")]([SubResource("move_1"), SubResource("move_2"), SubResource("move_3")])

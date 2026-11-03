@@ -6,6 +6,9 @@ extends Resource
 ## that defines no chain.
 
 @export var display_name: String = ""
+## art/weapon_icons/<icon>.png (pickups) and which hero art set holds it (art/skeleton_knight/<hero_art>; "" = the sword set).
+@export var icon: String = "sword"
+@export var hero_art: String = ""
 @export var damage: int = 1
 @export var attack_duration: float = 0.3
 ## Start/end seconds within the attack during which the hitbox is live.

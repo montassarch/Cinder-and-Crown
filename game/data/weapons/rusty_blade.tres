@@ -90,6 +90,8 @@ fx_forward_tiles = 0.0
 
 [resource]
 script = ExtResource("1_data")
+icon = "sword"
+hero_art = ""
 display_name = "Rusty Blade"
 damage = 8
 chain = Array[ExtResource("2_move")]([SubResource("move_1"), SubResource("move_2"), SubResource("move_3")])

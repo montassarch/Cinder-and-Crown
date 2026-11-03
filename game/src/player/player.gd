@@ -19,6 +19,9 @@ signal parried(perfect: bool)
 signal flask_changed(charges: int, maximum: int)
 ## For the effects: a roll began, the hero landed from the air, drank the flask, cast an ability (&"storm" / &"rend").
 signal rolled
+## The double jump (also emits jumped) and the air dash, for the effects.
+signal double_jumped
+signal air_dashed
 signal jumped
 signal weapon_swapped
 signal landed
@@ -57,6 +60,10 @@ const HIT_GRACE_SECONDS: float = 0.6
 const GRACE_BLINK_SECONDS: float = 0.06
 ## Drawn in front of enemies, so he never disappears inside a crowd or a boss.
 const DRAW_ORDER: int = 5
+## Movement in the air: one extra jump before landing, a little lower than the first, and one air dash.
+const AIR_JUMPS: int = 1
+const DOUBLE_JUMP_HEIGHT: float = 2.4
+const AIR_DASH_SPEED: float = 15.0
 
 # Parry (all times in seconds). The window is generous because touch is slower than a keyboard.
 const PARRY_DURATION: float = 0.5
@@ -116,6 +123,8 @@ var _chain_open: bool = false
 var _attack_queued: bool = false
 var _mask_left: float = 0.0
 var _grace_left: float = 0.0
+var _air_jumps_left: int = AIR_JUMPS
+var _air_dash_ready: bool = true
 var _mana: Mana
 var _storm_left: float = 0.0
 var _cast_fired: bool = false
@@ -189,6 +198,9 @@ func _physics_process(delta: float) -> void:
 	_tick_storm(delta)
 	_refuse_unaffordable_skills()
 	_coyote = COYOTE_TIME if is_on_floor() else maxf(0.0, _coyote - delta)
+	if is_on_floor():
+		_air_jumps_left = AIR_JUMPS
+		_air_dash_ready = true
 
 	var hurt_now := _hurt_pending
 	_hurt_pending = false
@@ -215,6 +227,8 @@ func _update_visual() -> void:
 		action = REND_CAST_SECONDS
 	elif _state == State.PARRY:
 		action = PARRY_DURATION
+	elif _state == State.AIR_DASH:
+		action = PlayerStateMachine.AIR_DASH_DURATION
 	_visual.modulate = HEAL_TINT if _state == State.HEAL else Color.WHITE
 	_visual.show_state(_state, _facing, GameConfig.tiles(BODY_SIZE_TILES.y) / 2.0, action, _combo_step, not _health.is_alive(), _mask_left > 0.0, anim)
 
@@ -345,7 +359,7 @@ func swap_weapons() -> void:
 
 
 func is_invincible() -> bool:
-	return _grace_left > 0.0 or (_state == State.ROLL and _state_time >= IFRAME_WINDOW.x and _state_time <= IFRAME_WINDOW.y)
+	return _grace_left > 0.0 or _state == State.AIR_DASH or (_state == State.ROLL and _state_time >= IFRAME_WINDOW.x and _state_time <= IFRAME_WINDOW.y)
 
 
 ## Damage lands unless the roll's i-frames cover it. A hit mid-roll outside the
@@ -454,6 +468,8 @@ func _build_context(hurt_now: bool) -> Dictionary:
 		"rend_ready": _mana.can_afford(REND_COST),
 		"cast_duration": STORM_CAST_SECONDS if _state == State.STORM else REND_CAST_SECONDS,
 		"roll_buffered": InputRouter.roll_buffered(),
+		"air_jumps_left": _air_jumps_left,
+		"air_dash_ready": _air_dash_ready,
 		"state_time": _state_time,
 		"coyote_time": _coyote,
 		"hurt": hurt_now,
@@ -488,6 +504,16 @@ func _enter_state(next: State) -> void:
 		State.ROLL:
 			InputRouter.consume_roll()
 			rolled.emit()
+		State.DOUBLE_JUMP:
+			velocity.y = -GameConfig.tiles(sqrt(2.0 * GRAVITY * DOUBLE_JUMP_HEIGHT))
+			_air_jumps_left -= 1
+			InputRouter.consume_jump()
+			jumped.emit()
+			double_jumped.emit()
+		State.AIR_DASH:
+			_air_dash_ready = false
+			InputRouter.consume_roll()
+			air_dashed.emit()
 		State.ATTACK:
 			InputRouter.consume_attack()
 			_attack_queued = false
@@ -546,12 +572,14 @@ func strike_move() -> WeaponMove:
 
 func _apply_velocity(delta: float) -> void:
 	var axis := InputRouter.move_axis()
-	if absf(axis) > PlayerStateMachine.AXIS_EPSILON and _state != State.ROLL and _state != State.HURT:
+	if absf(axis) > PlayerStateMachine.AXIS_EPSILON and _state != State.ROLL and _state != State.HURT and _state != State.AIR_DASH:
 		_facing = signf(axis)
 
 	match _state:
 		State.ROLL:
 			velocity.x = _facing * GameConfig.tiles(ROLL_SPEED)
+		State.AIR_DASH:
+			velocity.x = _facing * GameConfig.tiles(AIR_DASH_SPEED)
 		State.HURT:
 			velocity.x = move_toward(velocity.x, 0.0, GameConfig.tiles(HURT_KNOCKBACK_DECAY) * delta)
 		State.STORM, State.REND, State.PARRY, State.HEAL:
@@ -564,7 +592,10 @@ func _apply_velocity(delta: float) -> void:
 		_:
 			velocity.x = axis * _run_speed()
 
-	velocity.y += GameConfig.tiles(GRAVITY) * delta
+	if _state == State.AIR_DASH:
+		velocity.y = 0.0  # a dash holds its height
+	else:
+		velocity.y += GameConfig.tiles(GRAVITY) * delta
 	if _state == State.JUMP and velocity.y < 0.0 and not InputRouter.jump_held():
 		velocity.y *= JUMP_RELEASE_FACTOR
 

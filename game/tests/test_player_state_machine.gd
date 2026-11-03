@@ -166,3 +166,33 @@ func test_a_hit_interrupts_a_drink() -> void:
 func test_a_rising_hero_may_start_an_attack() -> void:
 	var rising := _ctx({"vel_y": -5.0, "on_floor": false, "attack_buffered": true})
 	assert_int(PlayerStateMachine.next_state(State.JUMP, rising)).is_equal(State.ATTACK)
+
+
+# ---- double jump and air dash (stage 3)
+
+func _air(overrides: Dictionary = {}) -> Dictionary:
+	var ctx := _ctx({"on_floor": false, "vel_y": 4.0, "coyote_time": 0.0, "air_jumps_left": 1, "air_dash_ready": true})
+	ctx.merge(overrides, true)
+	return ctx
+
+func test_a_jump_pressed_in_the_air_is_a_double_jump_while_one_is_left() -> void:
+	assert_int(PlayerStateMachine.next_state(State.FALL, _air({"jump_buffered": true}))).is_equal(State.DOUBLE_JUMP)
+	assert_int(PlayerStateMachine.next_state(State.JUMP, _air({"jump_buffered": true, "vel_y": -3.0}))).is_equal(State.DOUBLE_JUMP)
+	assert_int(PlayerStateMachine.next_state(State.FALL, _air({"jump_buffered": true, "air_jumps_left": 0}))).is_equal(State.FALL)
+
+func test_a_double_jump_rises_then_falls() -> void:
+	assert_int(PlayerStateMachine.next_state(State.DOUBLE_JUMP, _air({"vel_y": -3.0, "air_jumps_left": 0}))).is_equal(State.DOUBLE_JUMP)
+	assert_int(PlayerStateMachine.next_state(State.DOUBLE_JUMP, _air({"vel_y": 1.0, "air_jumps_left": 0}))).is_equal(State.FALL)
+
+func test_a_rising_double_jump_can_still_attack() -> void:
+	assert_int(PlayerStateMachine.next_state(State.DOUBLE_JUMP, _air({"vel_y": -3.0, "attack_buffered": true}))).is_equal(State.ATTACK)
+
+func test_a_roll_pressed_in_the_air_is_an_air_dash_once() -> void:
+	for state in [State.JUMP, State.FALL, State.DOUBLE_JUMP]:
+		assert_int(PlayerStateMachine.next_state(state, _air({"roll_buffered": true, "vel_y": -1.0 if state != State.FALL else 2.0}))).is_equal(State.AIR_DASH)
+	assert_int(PlayerStateMachine.next_state(State.FALL, _air({"roll_buffered": true, "air_dash_ready": false}))).is_equal(State.FALL)
+
+func test_an_air_dash_is_committed_then_falls() -> void:
+	var dashing := _air({"state_time": 0.05, "hurt": true})
+	assert_int(PlayerStateMachine.next_state(State.AIR_DASH, dashing)).is_equal(State.AIR_DASH)
+	assert_int(PlayerStateMachine.next_state(State.AIR_DASH, _air({"state_time": PlayerStateMachine.AIR_DASH_DURATION + 0.01}))).is_equal(State.FALL)

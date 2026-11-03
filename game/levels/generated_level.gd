@@ -24,6 +24,7 @@ const OFFER_COUNT: int = 3
 const BOSS_TRIGGER_TILES: float = 4.0
 ## The next room's wave waits while more than this many enemies are still up (waves do not pile on each other).
 const MAX_LIVE_BEFORE_NEXT_WAVE: int = 2
+const WEAPON_DIR := "res://data/weapons"
 
 @export var level_seed: int = 1
 @export var room_count: int = 6
@@ -153,6 +154,7 @@ func _on_boss_died(data: EnemyData) -> void:
 		_touch.release_all()
 		_victory.open(data.display_name, _cells_run, MetaSave.wins())
 	else:
+		_drop_weapon(_boss_spawn)
 		_hud.show_banner("%s falls" % data.display_name, "The way on is open")
 		Sound.music(biome().music)
 
@@ -311,6 +313,21 @@ func _build_arena() -> void:
 	var wall_height := WALL_HEIGHT_TILES + GROUND_THICKNESS_TILES
 	_add_block(Rect2(-CAMERA_MARGIN_TILES, wall_top, CAMERA_MARGIN_TILES, wall_height), GROUND_COLOR, false, _walls)
 	_add_block(Rect2(_width_tiles, wall_top, CAMERA_MARGIN_TILES, wall_height), GROUND_COLOR, false, _walls)
+
+
+## A beaten boss leaves a weapon the hero is not carrying (picked by the level's seed).
+func _drop_weapon(at: Vector2) -> void:
+	var held: Array = [player.weapon_in_slot(0), player.weapon_in_slot(1)].filter(func(w: WeaponData) -> bool: return w != null).map(func(w: WeaponData) -> String: return w.resource_path)
+	var options: Array[WeaponData] = []
+	for path in DataScanner.list(WEAPON_DIR):
+		if not held.has(path):
+			options.append(load(path))
+	if options.is_empty():
+		return
+	var rng := RandomNumberGenerator.new()
+	rng.seed = level_seed * 31 + _depth
+	var floor_y := GameConfig.tiles(GROUND_TOP_TILES) - WeaponPickup.SIZE.y / 2.0
+	WeaponPickup.spawn(self, options[rng.randi_range(0, options.size() - 1)], Vector2(at.x - GameConfig.tiles(2.0), floor_y))
 
 
 ## A boss level: a spawn room, the arena, an exit (picked by the level's seed when there are several).
