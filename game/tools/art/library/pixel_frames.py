@@ -42,7 +42,7 @@ def characters(raw, cid):
         frames[a] = [shrink(f) for f in files]
     flat = [f for v in frames.values() for f in v]
     flat = lib.quantize_set(flat, int(opt('--colours', 24)))
-    if opt('--ashen'): flat = [lib.ashen(f, sat=0.6, val=0.95) for f in flat]
+    if opt('--ashen'): flat = [lib.ashen(f, sat=0.55, val=0.8) for f in flat]     # bone-white KayKit skeletons read too bright otherwise
     i = 0
     eye = meta.get('eye_colour')
     for a in frames:

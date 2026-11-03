@@ -1,0 +1,301 @@
+{
+ "category": "weapons",
+ "fit": 48,
+ "view": "icon",
+ "ashen": false,
+ "author": "Quaternius",
+ "licence": "CC0 1.0",
+ "credit": "LowPoly Medieval Weapons by Quaternius (credit optional)",
+ "url": "https://quaternius.itch.io/lowpoly-medieval-weapons",
+ "objects": {
+  "arrow": {
+   "source": "Arrow.fbx",
+   "px_per_unit": 20.69,
+   "canvas": [
+    56,
+    56
+   ],
+   "size": [
+    42,
+    42
+   ]
+  },
+  "axe": {
+   "source": "Axe.fbx",
+   "px_per_unit": 9.68,
+   "canvas": [
+    56,
+    56
+   ],
+   "size": [
+    37,
+    40
+   ]
+  },
+  "axe_double": {
+   "source": "Axe_Double.fbx",
+   "px_per_unit": 7.39,
+   "canvas": [
+    56,
+    56
+   ],
+   "size": [
+    38,
+    37
+   ]
+  },
+  "axe_small": {
+   "source": "Axe_Small.fbx",
+   "px_per_unit": 15.08,
+   "canvas": [
+    56,
+    56
+   ],
+   "size": [
+    36,
+    43
+   ]
+  },
+  "bow_evil": {
+   "source": "Bow_Evil.fbx",
+   "px_per_unit": 8.59,
+   "canvas": [
+    56,
+    56
+   ],
+   "size": [
+    36,
+    36
+   ]
+  },
+  "bow_golden": {
+   "source": "Bow_Golden.fbx",
+   "px_per_unit": 8.87,
+   "canvas": [
+    56,
+    56
+   ],
+   "size": [
+    38,
+    37
+   ]
+  },
+  "bow_wooden": {
+   "source": "Bow_Wooden.fbx",
+   "px_per_unit": 9.01,
+   "canvas": [
+    56,
+    56
+   ],
+   "size": [
+    37,
+    37
+   ]
+  },
+  "bow_wooden2": {
+   "source": "Bow_Wooden2.fbx",
+   "px_per_unit": 9.01,
+   "canvas": [
+    56,
+    56
+   ],
+   "size": [
+    38,
+    38
+   ]
+  },
+  "claymore": {
+   "source": "Claymore.fbx",
+   "px_per_unit": 8.22,
+   "canvas": [
+    56,
+    56
+   ],
+   "size": [
+    40,
+    40
+   ]
+  },
+  "dagger": {
+   "source": "Dagger.fbx",
+   "px_per_unit": 19.65,
+   "canvas": [
+    56,
+    56
+   ],
+   "size": [
+    40,
+    37
+   ]
+  },
+  "dagger_2": {
+   "source": "Dagger_2.fbx",
+   "px_per_unit": 16.6,
+   "canvas": [
+    56,
+    56
+   ],
+   "size": [
+    39,
+    39
+   ]
+  },
+  "hammer_double": {
+   "source": "Hammer_Double.fbx",
+   "px_per_unit": 8.66,
+   "canvas": [
+    56,
+    56
+   ],
+   "size": [
+    39,
+    39
+   ]
+  },
+  "hammer_small": {
+   "source": "Hammer_Small.fbx",
+   "px_per_unit": 10.7,
+   "canvas": [
+    56,
+    56
+   ],
+   "size": [
+    36,
+    43
+   ]
+  },
+  "scythe": {
+   "source": "Scythe.fbx",
+   "px_per_unit": 7.23,
+   "canvas": [
+    56,
+    56
+   ],
+   "size": [
+    31,
+    38
+   ]
+  },
+  "shield_celtic_golden": {
+   "source": "Shield_Celtic_Golden.fbx",
+   "px_per_unit": 9.76,
+   "canvas": [
+    56,
+    56
+   ],
+   "size": [
+    33,
+    33
+   ]
+  },
+  "shield_heater": {
+   "source": "Shield_Heater.fbx",
+   "px_per_unit": 13.62,
+   "canvas": [
+    56,
+    56
+   ],
+   "size": [
+    37,
+    37
+   ]
+  },
+  "shield_heater_2": {
+   "source": "Shield_Heater_2.fbx",
+   "px_per_unit": 13.62,
+   "canvas": [
+    56,
+    56
+   ],
+   "size": [
+    37,
+    37
+   ]
+  },
+  "shield_round": {
+   "source": "Shield_Round.fbx",
+   "px_per_unit": 15.56,
+   "canvas": [
+    56,
+    56
+   ],
+   "size": [
+    34,
+    34
+   ]
+  },
+  "shield_round_2": {
+   "source": "Shield_Round_2.fbx",
+   "px_per_unit": 15.56,
+   "canvas": [
+    56,
+    56
+   ],
+   "size": [
+    34,
+    34
+   ]
+  },
+  "spear": {
+   "source": "Spear.fbx",
+   "px_per_unit": 6.07,
+   "canvas": [
+    56,
+    56
+   ],
+   "size": [
+    44,
+    43
+   ]
+  },
+  "sword": {
+   "source": "Sword.fbx",
+   "px_per_unit": 9.43,
+   "canvas": [
+    56,
+    56
+   ],
+   "size": [
+    39,
+    39
+   ]
+  },
+  "sword_2": {
+   "source": "Sword_2.fbx",
+   "px_per_unit": 9.46,
+   "canvas": [
+    56,
+    56
+   ],
+   "size": [
+    40,
+    37
+   ]
+  },
+  "sword_big": {
+   "source": "Sword_Big.fbx",
+   "px_per_unit": 8.34,
+   "canvas": [
+    56,
+    56
+   ],
+   "size": [
+    41,
+    41
+   ]
+  },
+  "sword_golden": {
+   "source": "Sword_Golden.fbx",
+   "px_per_unit": 8.67,
+   "canvas": [
+    56,
+    56
+   ],
+   "size": [
+    39,
+    39
+   ]
+  }
+ },
+ "use": "24 weapon icons (swords, claymore, golden sword, spear, axes, hammers, scythe, bows, shields, arrow): loot, shop and weapon-select icons; 48 px fit"
+}

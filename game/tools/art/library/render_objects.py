@@ -14,7 +14,7 @@ KA = os.path.join(DL, 'kaykit_adventurers/x/KayKit_Adventurers_2.0_FREE/KayKit_A
 
 SETS = {
     # KayKit units: the characters are ~2.6 tall, so 17.5 px per unit keeps props in scale with kk_* characters and the hero
-    'kaykit_dungeon_props': dict(category='props', pxm=17.5, view='front', ashen=True, author='Kay Lousberg', licence='CC0 1.0',
+    'kaykit_dungeon_props': dict(use='dungeon / crypt dressing at the kk_* scale', category='props', pxm=17.5, view='front', ashen=True, author='Kay Lousberg', licence='CC0 1.0',
                                  credit='KayKit Dungeon Remastered by Kay Lousberg (credit optional)', url='https://kaylousberg.itch.io/kaykit-dungeon-remastered',
                                  files={n: os.path.join(KD, n + '.gltf') for n in (
                                      'torch_lit', 'torch_mounted', 'candle_triple', 'candle_lit', 'candle_melted', 'candle_thin_lit', 'banner_red', 'banner_patternA_red',
@@ -23,16 +23,17 @@ SETS = {
                                      'sword_shield_broken', 'sword_shield', 'coin_stack_large', 'keyring_hanging', 'shelf_small_candles', 'table_long_broken',
                                      'table_medium_broken', 'wall_archedwindow_gated', 'wall_broken', 'wall_cracked', 'wall_doorway', 'floor_tile_big_spikes',
                                      'bed_frame', 'stool', 'trunk_large_A', 'bottle_A_green', 'barrier_column', 'stairs')}),
-    'yd_statues': dict(category='props', pxm=26.0, view='front', ashen=False, author='yd (demon statue from a public-domain blend by Joseph)',
+    'yd_statues': dict(use='cathedral / crypt statues and tombs', category='props', pxm=26.0, view='front', ashen=False, author='yd (demon statue from a public-domain blend by Joseph)',
                        licence='CC0 1.0', credit='yd (credit optional)', url='https://opengameart.org/content/knight-statue | https://opengameart.org/content/demon-statue',
+                       exclude={'knight_statue_sitting.blend': ('sword', 'shield.001'), 'knight_statue_lying.blend': ('shield.001', 'sword')},
                        files={'knight_statue_kneeling': os.path.join(DL, 'statue_knight/knight_statue.blend'),
                               'knight_statue_sitting': os.path.join(DL, 'statue_knight/knight_statue_sitting.blend'),
                               'knight_statue_lying': os.path.join(DL, 'statue_knight/knight_statue_lying.blend'),
                               'demon_statue': os.path.join(DL, 'statue_demon/demon_statue.blend')}),
-    'quaternius_weapons': dict(category='weapons', fit=48, view='icon', ashen=False, author='Quaternius', licence='CC0 1.0',
+    'quaternius_weapons': dict(use='weapon icons', category='weapons', fit=48, view='icon', ashen=False, author='Quaternius', licence='CC0 1.0',
                                credit='LowPoly Medieval Weapons by Quaternius (credit optional)', url='https://quaternius.itch.io/lowpoly-medieval-weapons',
                                files={os.path.splitext(f)[0].lower(): os.path.join(QW, f) for f in sorted(os.listdir(QW)) if f.endswith('.fbx')} if os.path.isdir(QW) else {}),
-    'kaykit_weapons': dict(category='weapons', fit=48, view='icon', ashen=False, author='Kay Lousberg', licence='CC0 1.0',
+    'kaykit_weapons': dict(use='weapon / gear icons', category='weapons', fit=48, view='icon', ashen=False, author='Kay Lousberg', licence='CC0 1.0',
                            credit='KayKit Adventurers by Kay Lousberg (credit optional)', url='https://kaylousberg.itch.io/kaykit-adventurers',
                            files={n: os.path.join(KA, n + '.gltf') for n in ('sword_1handed', 'sword_2handed', 'axe_1handed', 'axe_2handed', 'dagger', 'bow_withString',
                                                                               'crossbow_2handed', 'staff', 'wand', 'shield_badge', 'shield_round', 'shield_spikes',
@@ -52,11 +53,15 @@ def load(path):
     elif ext == '.fbx': bpy.ops.import_scene.fbx(filepath=path)
     elif ext == '.blend':
         with bpy.data.libraries.load(path, link=False) as (src, dst): dst.objects = [n for n in src.objects]
+        skip = S.get('exclude', {}).get(os.path.basename(path), ())      # spare parts the author left beside the statue
         for o in dst.objects:
-            if o is not None and o.type == 'MESH': bpy.context.scene.collection.objects.link(o)
+            if o is not None and o.type in ('MESH', 'ARMATURE') and o.name not in skip: bpy.context.scene.collection.objects.link(o)
     objs = [o for o in bpy.data.objects if o not in before]
     for o in objs:
         if o.type in ('CAMERA', 'LIGHT'): bpy.data.objects.remove(o, do_unlink=True)
+    for m in bpy.data.materials:          # FBX exports often arrive with alpha 0 (an empty transparency slot) - force opaque
+        b = m.node_tree.nodes.get('Principled BSDF') if m.use_nodes else None
+        if b and not b.inputs['Alpha'].links: b.inputs['Alpha'].default_value = 1.0
     return [o for o in bpy.data.objects if o.type == 'MESH']
 
 

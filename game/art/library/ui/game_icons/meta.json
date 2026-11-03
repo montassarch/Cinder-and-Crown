@@ -448,5 +448,6 @@
    "card-random"
   ]
  },
- "notes": "White glyphs: tint with modulate. card48/ = gold-on-dark boon tiles."
+ "notes": "White glyphs: tint with modulate. card48/ = gold-on-dark boon tiles.",
+ "use": "boon, ability, status and menu icons (white glyphs to tint, or the gold card48 tiles)"
 }

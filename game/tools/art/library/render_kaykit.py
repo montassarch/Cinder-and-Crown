@@ -51,19 +51,45 @@ FEET_X = 0.40
 
 bpy.ops.wm.read_factory_settings(use_empty=True)
 sc = bpy.context.scene
+# weapons are placed from the glTF hand-slot node itself (see gltf_node_world), so any bone heuristic works
+HEUR = os.environ.get('HEUR', 'BLENDER')
 
 for f in ('Rig_Medium_General.glb', 'Rig_Medium_MovementBasic.glb', 'Rig_Medium_MovementAdvanced.glb', 'Rig_Medium_CombatMelee.glb',
           'Rig_Medium_CombatRanged.glb', 'Rig_Medium_Special.glb'):
-    bpy.ops.import_scene.gltf(filepath=os.path.join(AN, f))
+    bpy.ops.import_scene.gltf(filepath=os.path.join(AN, f), bone_heuristic=HEUR)
     for o in list(bpy.data.objects): bpy.data.objects.remove(o, do_unlink=True)
 actions = {a.name: a for a in bpy.data.actions}
 
 before = set(bpy.data.objects)
-bpy.ops.import_scene.gltf(filepath=os.path.join(*SPEC['model']))
+bpy.ops.import_scene.gltf(filepath=os.path.join(*SPEC['model']), bone_heuristic=HEUR)
 new = [o for o in bpy.data.objects if o not in before]
 rig = [o for o in new if o.type == 'ARMATURE'][0]
 for o in new:
     if o.type == 'MESH' and o.name.startswith('Icosphere'): bpy.data.objects.remove(o, do_unlink=True)
+
+
+def gltf_node_world(glb_path, node_name):
+    """rest world matrix of a node, read straight from the .glb JSON (glTF space, Y up) and converted to Blender space.
+    Blender's importer re-orients bones, so the bone matrix is not the node matrix the weapons were authored against."""
+    import struct
+    data = open(glb_path, 'rb').read()
+    n = struct.unpack('<I', data[12:16])[0]
+    doc = json.loads(data[20:20 + n])
+    nodes = doc['nodes']
+    parent = {c: i for i, nd in enumerate(nodes) for c in nd.get('children', [])}
+
+    def local(nd):
+        if 'matrix' in nd: return mathutils.Matrix([nd['matrix'][i::4] for i in range(4)])
+        t = mathutils.Vector(nd.get('translation', (0, 0, 0)))
+        x, y, z, w = nd.get('rotation', (0, 0, 0, 1))
+        s = nd.get('scale', (1, 1, 1))
+        return mathutils.Matrix.Translation(t) @ mathutils.Quaternion((w, x, y, z)).to_matrix().to_4x4() @ mathutils.Matrix.Diagonal((*s, 1))
+    i = next(k for k, nd in enumerate(nodes) if nd.get('name') == node_name)
+    m = mathutils.Matrix.Identity(4)
+    while i is not None:
+        m = local(nodes[i]) @ m; i = parent.get(i)
+    C = mathutils.Matrix(((1, 0, 0, 0), (0, 0, -1, 0), (0, 1, 0, 0), (0, 0, 0, 1)))     # glTF (x, y, z) -> Blender (x, -z, y)
+    return C @ m @ C.inverted()
 
 
 def attach(path, bone):
@@ -72,8 +98,7 @@ def attach(path, bone):
     objs = [o for o in bpy.data.objects if o not in b4]
     roots = [o for o in objs if o.parent is None]
     bpy.context.view_layer.update()
-    pb = rig.pose.bones[bone]
-    M = rig.matrix_world @ pb.matrix
+    M = rig.matrix_world @ gltf_node_world(os.path.join(*SPEC['model']), bone)
     for r in roots:
         r.matrix_world = M @ r.matrix_world
         bpy.context.view_layer.update()
@@ -128,7 +153,7 @@ def light(name, loc, energy, color):
     sc.collection.objects.link(o)
 
 
-light('key', (-5, -2.5, 3.5), 2200, (1.0, 0.84, 0.68)); light('rim', (5, 2, 3.2), 2600, (0.5, 0.6, 1.0)); light('fill', (-5, 3, 1.0), 400, (0.85, 0.8, 1.0))
+light('key', (-5, -2.5, 3.5), 1100, (1.0, 0.9, 0.8)); light('rim', (5, 2, 3.2), 1500, (0.5, 0.6, 1.0)); light('fill', (-5, 3, 1.0), 250, (0.85, 0.8, 1.0))
 sc.world = bpy.data.worlds.new('w'); sc.world.use_nodes = True
 sc.world.node_tree.nodes['Background'].inputs['Color'].default_value = (0.04, 0.04, 0.06, 1)
 sc.world.node_tree.nodes['Background'].inputs['Strength'].default_value = 0.5

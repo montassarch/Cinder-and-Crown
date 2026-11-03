@@ -4,5 +4,6 @@
  "licence": "CC0 1.0",
  "credit": "tiopalada (credit optional)",
  "url": "https://opengameart.org/content/tiny-rpg-dark-dwellers-gui",
- "notes": "Pixel-art dark GUI: *9Slices* are NinePatchRect frames (96 px, 32 px corners), *-Sheet are button / cursor state strips."
+ "notes": "Pixel-art dark GUI: *9Slices* are NinePatchRect frames (96 px, 32 px corners), *-Sheet are button / cursor state strips.",
+ "use": "dark pixel GUI: 9-slice panels, buttons with states, health/stamina bars, cursors, equipment and portrait frames"
 }
