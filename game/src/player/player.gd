@@ -157,6 +157,7 @@ func _ready() -> void:
 	for slot in mini(WEAPON_SLOTS, starting_weapons.size()):
 		_weapons[slot] = starting_weapons[slot]
 	_weapon.equip(_weapons[_active_slot])
+	_show_weapon_art()
 	_weapon.projectile_parent = get_parent()
 	_mana = Mana.new()
 	_mana.name = "Mana"
@@ -334,6 +335,13 @@ func set_weapon(slot: int, data: WeaponData) -> void:
 	_weapons[slot] = data
 	if slot == _active_slot:
 		_weapon.equip(data)
+		_show_weapon_art()
+
+
+## The hero's sprite holds the weapon in his hand.
+func _show_weapon_art() -> void:
+	var data := _weapons[_active_slot]
+	_visual.set_art_set(data.hero_art if data != null else "")
 
 
 func weapon_in_slot(slot: int) -> WeaponData:
@@ -355,6 +363,7 @@ func swap_weapons() -> void:
 		return
 	_active_slot = other
 	_weapon.equip(_weapons[_active_slot])
+	_show_weapon_art()
 	weapon_swapped.emit()
 
 

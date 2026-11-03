@@ -7,7 +7,8 @@ from PIL import Image, ImageEnhance
 import glob, json, os, shutil, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-OUT = os.path.join(HERE, '..', '..', 'art', 'skeleton_knight')
+# HERO_SET=<weapon> writes that weapon's set (from weapon_showcase.py HERO_WEAPON renders) into art/skeleton_knight/<weapon>
+OUT = os.path.join(HERE, '..', '..', 'art', 'skeleton_knight', os.environ.get('HERO_SET', ''))
 SHRINK = 8
 COLOURS = 28
 OUTLINE = (10, 6, 16)

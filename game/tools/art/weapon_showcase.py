@@ -252,7 +252,7 @@ def mount(name, builder, bone):
         if isinstance(p, tuple): attach(p[1], p[0])
         else: attach(p, bone)
     turn = GRIP_TURN.get(name)
-    if turn:
+    if turn or any(n == name for n, _ in ANIM_TURN):
         # re-parent the parts to a pivot at the hand, itself on the hand bone, then turn the pivot
         for p in made:
             o = p[1] if isinstance(p, tuple) else p
@@ -265,8 +265,7 @@ def mount(name, builder, bone):
             bpy.ops.object.select_all(action='DESELECT'); o.select_set(True); pivot.select_set(True)
             bpy.context.view_layer.objects.active = pivot
             bpy.ops.object.parent_set(type='OBJECT', keep_transform=True)
-        pivot.rotation_mode = 'XYZ'
-        pivot.rotation_euler = tuple(math.radians(v) for v in turn)
+        set_turn(pivot, turn)
     rig.data.pose_position = 'POSE'
     return made, pivot
 
@@ -288,7 +287,44 @@ HERO_JOBS = {
 }
 
 
+# Per-animation aim for poses the weapon's usual grip does not suit: the spear is held like a sword (blade up and back), so
+# in the punch-based thrusts it is re-aimed every frame to point straight ahead, level with the fist (world -Y is the
+# hero's front, to the right in the camera). Maps (weapon, anim) -> world direction of the tip (the weapon's local -Y).
+ANIM_TURN = {('spear', 'Attack2'): (0, -1, -0.04), ('spear', 'Attack3'): (0, -1, -0.04)}
+
+
+def aim(pivot, direction):
+    """Turns `pivot` (on the hand bone) so the weapon's tip, along its rest -Y, points along world `direction`."""
+    set_turn(pivot, None); bpy.context.view_layer.update()
+    m = pivot.matrix_world.copy()
+    rot = m.to_3x3().normalized()
+    q = (rot @ mathutils.Vector((0, -1, 0))).rotation_difference(mathutils.Vector(direction).normalized())
+    pivot.matrix_world = mathutils.Matrix.Translation(m.translation) @ (q.to_matrix() @ rot).to_4x4() @ mathutils.Matrix.Diagonal(m.to_scale().to_4d())
+    bpy.context.view_layer.update()
+
+
+def set_turn(pivot, turn):
+    pivot.rotation_mode = 'XYZ'
+    pivot.rotation_euler = tuple(math.radians(v) for v in (turn or (0, 0, 0)))
+
+
 build_skull()
+if os.environ.get('PROBE_TURNS'):
+    # PROBE_TURNS="x,y,z;x,y,z" PROBE_ACTION=Punch_Jab PROBE_T=0.5 PROBE_OUT=dir: one low-res frame per turn, to pick a grip
+    name = os.environ['HERO_WEAPON']; builder, bone, _ = WEAPONS[name]
+    made, pivot = mount(name, builder, bone)
+    sc.render.resolution_percentage = 40; sc.cycles.samples = 8
+    act = anim_actions[os.environ['PROBE_ACTION']]
+    rig.animation_data.action = act
+    if hasattr(rig.animation_data, 'action_slot') and act.slots: rig.animation_data.action_slot = act.slots[0]
+    f0, f1 = act.frame_range
+    sc.frame_set(round(f0 + (f1 - f0) * float(os.environ.get('PROBE_T', '0.5'))))
+    for i, turn in enumerate(os.environ['PROBE_TURNS'].split(';')):
+        if os.environ.get('PROBE_AIM'): aim(pivot, tuple(float(v) for v in turn.split(',')))
+        else: set_turn(pivot, tuple(float(v) for v in turn.split(',')))
+        sc.render.filepath = os.path.join(os.environ['PROBE_OUT'], f'{i}.png')
+        bpy.ops.render.render(write_still=True)
+    sys.exit(0)
 if os.environ.get('ICON_OUT'):
     # one icon per weapon: the weapon alone, side on, framed to fit a square (ICON_OUT/<weapon>.png, 256x256)
     icon_out = os.environ['ICON_OUT']; os.makedirs(icon_out, exist_ok=True)
@@ -318,19 +354,24 @@ if os.environ.get('ICON_OUT'):
 if os.environ.get('HERO_WEAPON'):
     name = os.environ['HERO_WEAPON']
     builder, bone, _ = WEAPONS[name]
-    mount(name, builder, bone)
+    made, pivot = mount(name, builder, bone)
     if os.environ.get('SAMPLES'): sc.cycles.samples = int(os.environ['SAMPLES'])
     hero_out = os.environ['HERO_OUT']
+    only_anims = os.environ.get('HERO_ONLY', '').split(',') if os.environ.get('HERO_ONLY') else None  # e.g. Attack2,Attack3
     for game_anim, (action, count, loops, backwards) in HERO_JOBS[name].items():
+        if only_anims and game_anim not in only_anims: continue
         act = anim_actions[action]
         rig.animation_data.action = act
         if hasattr(rig.animation_data, 'action_slot') and act.slots: rig.animation_data.action_slot = act.slots[0]
+        aim_at = ANIM_TURN.get((name, game_anim))
+        set_turn(pivot, GRIP_TURN.get(name))
         f0, f1 = act.frame_range
         d = os.path.join(hero_out, game_anim); os.makedirs(d, exist_ok=True)
         for i in range(count):
             t = i / count if loops else (i / (count - 1) if count > 1 else 0)
             if backwards: t = 1 - t
             sc.frame_set(round(f0 + (f1 - f0) * t))
+            if aim_at: aim(pivot, aim_at)
             sc.render.filepath = os.path.join(d, f'{i}.png')
             bpy.ops.render.render(write_still=True)
         print('done', name, game_anim)

@@ -178,4 +178,27 @@ func test_the_hero_swings_with_the_move_animation_of_the_weapon() -> void:
 	_equip(SPEAR)
 	await _tap()
 	await _frames(4)
-	assert_str(_player.get_node("Visual").animation).is_equal("parry")
+	assert_str(_player.get_node("Visual").animation).is_equal("attack2")   # the spear thrust
+
+
+func test_the_hero_is_drawn_holding_the_weapon_in_his_hand() -> void:
+	await _land()
+	var visual := _player.get_node("Visual") as PlayerVisual
+	_equip(BOW)
+	assert_str(visual.art_set()).is_equal("bow")
+	_player.set_weapon(0, load("res://data/weapons/rusty_blade.tres"))
+	assert_str(visual.art_set()).is_equal("")
+
+
+func test_a_weapon_without_its_own_art_falls_back_to_the_sword_set() -> void:
+	var visual := _player.get_node("Visual") as PlayerVisual
+	visual.set_art_set("no_such_set")
+	assert_str(visual.art_set()).is_equal("")
+	assert_object(visual.sprite_frames.get_frame_texture(&"idle", 0)).is_not_null()
+
+
+func test_every_weapon_but_the_sword_ships_its_own_hero_art() -> void:
+	for weapon in ["ash_wand", "ember_spear", "hunters_bow", "iron_gauntlet"]:
+		var data: WeaponData = load("res://data/weapons/%s.tres" % weapon)
+		assert_str(data.hero_art).override_failure_message(weapon).is_not_empty()
+		assert_bool(PlayerVisual.has_art_set(data.hero_art)).override_failure_message(weapon).is_true()

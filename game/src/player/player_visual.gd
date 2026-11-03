@@ -37,14 +37,47 @@ const State := PlayerStateMachine.PlayerState
 var _plain: SpriteFrames
 var _masked: SpriteFrames
 var _is_masked: bool = false
+## Which weapon the art shows in his hand: "" is the sword set (art/skeleton_knight/plain|masked), otherwise
+## art/skeleton_knight/<set>/plain|masked (rendered by weapon_showcase.py with HERO_WEAPON).
+var _set: String = ""
+static var _sets: Dictionary = {}
 
 
 func _ready() -> void:
 	centered = false
-	_plain = _build_frames("plain")
-	_masked = _build_frames("masked")
+	_load_set(_set)
 	sprite_frames = _plain
 	play(&"idle")
+
+
+static func has_art_set(set_name: String) -> bool:
+	return set_name == "" or ResourceLoader.exists("%s/%s/plain/Idle/SkeletonKnight_Idle_0.png" % [ART_DIR, set_name])
+
+
+func art_set() -> String:
+	return _set
+
+
+## Shows the hero holding another weapon; a set that has not been rendered falls back to the sword.
+func set_art_set(set_name: String) -> void:
+	if not has_art_set(set_name):
+		set_name = ""
+	if set_name == _set and _plain != null:
+		return
+	_set = set_name
+	if not is_node_ready():
+		return
+	var anim := animation
+	_load_set(set_name)
+	sprite_frames = _masked if _is_masked else _plain
+	play(anim if sprite_frames.has_animation(anim) else &"idle")
+
+
+func _load_set(set_name: String) -> void:
+	if not _sets.has(set_name):
+		_sets[set_name] = [_build_frames("plain", set_name), _build_frames("masked", set_name)]
+	_plain = _sets[set_name][0]
+	_masked = _sets[set_name][1]
 
 
 func is_masked() -> bool:
@@ -102,7 +135,8 @@ static func animation_for(state: State, combo_step: int) -> StringName:
 		_: return &"idle"
 
 
-func _build_frames(variant: String) -> SpriteFrames:
+func _build_frames(variant: String, set_name: String = "") -> SpriteFrames:
+	var root := ART_DIR if set_name == "" else "%s/%s" % [ART_DIR, set_name]
 	var frames := SpriteFrames.new()
 	frames.remove_animation(&"default")
 	for anim in ANIMS:
@@ -111,7 +145,7 @@ func _build_frames(variant: String) -> SpriteFrames:
 		frames.set_animation_speed(anim, spec["fps"])
 		frames.set_animation_loop(anim, spec["loop"])
 		for i in _frame_indices(spec):
-			frames.add_frame(anim, load("%s/%s/%s/SkeletonKnight_%s_%d.png" % [ART_DIR, variant, spec["dir"], spec["dir"], i]))
+			frames.add_frame(anim, load("%s/%s/%s/SkeletonKnight_%s_%d.png" % [root, variant, spec["dir"], spec["dir"], i]))
 	return frames
 
 
