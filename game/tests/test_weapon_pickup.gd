@@ -61,7 +61,38 @@ func test_a_beaten_boss_drops_a_weapon_the_hero_does_not_carry() -> void:
 	level.set_depth(2)
 	level.regenerate(5)
 	level._on_boss_died(level.biome().boss)
+	await get_tree().process_frame
 	var drops := level.get_children().filter(func(n: Node) -> bool: return n is WeaponPickup)
 	assert_int(drops.size()).is_equal(1)
 	var held := [level.player.weapon_in_slot(0), level.player.weapon_in_slot(1)].map(func(w: WeaponData) -> String: return w.resource_path)
 	assert_bool(held.has((drops[0] as WeaponPickup).weapon().resource_path)).is_false()
+
+
+# The bot found it: a boss killed by a hit (a physics callback) dropped its weapon while physics was flushing, which the
+# engine refuses ("Can't change this state while flushing queries") and the drop could not be picked up.
+func test_a_weapon_dropped_by_a_boss_killed_in_a_physics_callback_can_be_picked_up() -> void:
+	_level = load(LEVEL).instantiate()
+	_level.level_seed = 5
+	add_child(_level)
+	var level := _level as GeneratedLevel
+	level.set_depth(2)
+	level.regenerate(5)
+	await _frames(30)
+	var killer := Area2D.new()   # stands in for the hero's blade: it lands during the physics step
+	killer.collision_mask = 2
+	var shape := CollisionShape2D.new()
+	shape.shape = CircleShape2D.new()
+	(shape.shape as CircleShape2D).radius = 40.0
+	killer.add_child(shape)
+	killer.body_entered.connect(func(_body: Node) -> void: level._on_boss_died(level.biome().boss), CONNECT_ONE_SHOT)
+	level.add_child(killer)
+	killer.global_position = level.player.global_position
+	await _frames(10)
+	await get_tree().process_frame
+	var drops := level.get_children().filter(func(n: Node) -> bool: return n is WeaponPickup)
+	assert_int(drops.size()).is_equal(1)
+	var dropped := (drops[0] as WeaponPickup).weapon()
+	killer.queue_free()
+	level.player.global_position = (drops[0] as WeaponPickup).global_position
+	await _frames(6)
+	assert_object(level.player.weapon_in_slot(level.player.active_slot())).is_same(dropped)

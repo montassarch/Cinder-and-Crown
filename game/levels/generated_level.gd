@@ -154,7 +154,7 @@ func _on_boss_died(data: EnemyData) -> void:
 		_touch.release_all()
 		_victory.open(data.display_name, _cells_run, MetaSave.wins())
 	else:
-		_drop_weapon(_boss_spawn)
+		_drop_weapon.call_deferred(_boss_spawn)   # the killing blow lands in a physics callback: no new areas until it ends
 		_hud.show_banner("%s falls" % data.display_name, "The way on is open")
 		Sound.music(biome().music)
 
