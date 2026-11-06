@@ -10,7 +10,7 @@ const Powerups := preload("res://src/items/powerups.gd")
 const Fx := preload("res://src/fx/fx.gd")
 const Hud := preload("res://src/ui/hud.gd")
 
-enum State { COUNTDOWN, RACING, FINISHED }
+enum State { LOADING, COUNTDOWN, RACING, FINISHED }
 
 const LAPS: int = 3
 const CAR_COUNT: int = 8
@@ -18,6 +18,8 @@ const PLAYER_GRID_SLOT: int = 5
 const COUNTDOWN_SECONDS: float = 3.0
 const CAR_RADIUS: float = 1.2
 const FPS_WINDOW_SEC: float = 5.0
+const HITCH_MS: float = 40.0
+const PREWARM_FRAMES: int = 10
 const CAR_COLORS: Array[Color] = [
 	Color(0.15, 0.45, 0.95), Color(0.9, 0.2, 0.2), Color(0.95, 0.8, 0.15), Color(0.2, 0.75, 0.35),
 	Color(0.7, 0.3, 0.9), Color(0.95, 0.55, 0.15), Color(0.15, 0.8, 0.85), Color(0.9, 0.9, 0.9),
@@ -32,13 +34,17 @@ var _powerups: Powerups
 var _hud: Node
 var _camera: Camera3D
 var _sun: DirectionalLight3D
-var _state: State = State.COUNTDOWN
+var _state: State = State.LOADING
 var _countdown: float = COUNTDOWN_SECONDS
 var _race_time: float = 0.0
 var _player_brake: bool = false
 var _auto_player: bool = false
 var _frame_log: Array[Vector2] = []  # x = timestamp (sec), y = frame time (sec)
 var _max_lateral_seen: float = 0.0
+var _hitch_count: int = 0
+var _last_hitch_text: String = "-"
+var _last_event: String = "-"
+var _last_event_msec: int = 0
 
 
 func _ready() -> void:
@@ -47,8 +53,10 @@ func _ready() -> void:
 	_build_environment()
 	_build_track_and_scenery()
 	_build_cars()
+	Fx.setup(self)
 	_powerups = Powerups.new()
 	add_child(_powerups)
+	_powerups.event.connect(_note_event)
 	_powerups.setup(_track, _cars)
 	_build_camera()
 	_hud = Hud.new()
@@ -59,6 +67,7 @@ func _ready() -> void:
 	_hud.shadows_toggled.connect(func(on: bool) -> void: _sun.shadow_enabled = on)
 	_hud.particles_toggled.connect(func(on: bool) -> void: Fx.enabled = on)
 	_hud.render_scale_changed.connect(func(value: float) -> void: get_viewport().scaling_3d_scale = value)
+	await _prewarm()
 	_restart()
 	if "--selftest" in OS.get_cmdline_user_args():
 		_run_selftest()
@@ -147,7 +156,7 @@ func _build_cars() -> void:
 		add_child(car)
 		_cars.append(car)
 		var driver := AiDriver.new()
-		driver.lane_offset = _rng.randf_range(-3.5, 3.5)
+		driver.lane_offset = _rng.randf_range(-0.5, 0.5) * Track.HALF_WIDTH
 		driver.caution = _rng.randf_range(0.9, 1.15)
 		_drivers.append(driver)
 		if car.is_player:
@@ -171,7 +180,7 @@ func _restart() -> void:
 	for slot in CAR_COUNT:
 		var row: int = slot / 2
 		var index: int = _track.wrap_index(Track.SAMPLE_COUNT - 3 - row * 3)
-		var lane: float = -2.5 if slot % 2 == 0 else 2.5
+		var lane: float = Track.HALF_WIDTH * (-0.3 if slot % 2 == 0 else 0.3)
 		var pos: Vector3 = _track.points[index] + _track.rights[index] * lane
 		_cars[slot].place(pos, _track.heading_at(index))
 		_cars[slot].track_index = index
@@ -182,11 +191,36 @@ func _restart() -> void:
 	_state = State.COUNTDOWN
 	_countdown = COUNTDOWN_SECONDS
 	_race_time = 0.0
+	_hitch_count = 0
+	_last_hitch_text = "-"
+
+
+# --- loading ---------------------------------------------------------------------
+
+## Plays every effect once in front of the camera, behind a cover, so the browser compiles
+## its shaders now instead of as a hitch in the middle of the race.
+func _prewarm() -> void:
+	_hud.set_cover(true)
+	_update_camera(1.0)
+	var spot: Vector3 = _camera.global_position - _camera.global_transform.basis.z * 6.0
+	Fx.prewarm(spot)
+	_powerups.prewarm(spot)
+	for frame in PREWARM_FRAMES:
+		await get_tree().process_frame
+	_powerups.end_prewarm()
+	_hud.set_cover(false)
+
+
+func _note_event(text: String) -> void:
+	_last_event = text
+	_last_event_msec = Time.get_ticks_msec()
 
 
 # --- simulation (no rendering; the self-test calls this directly) ----------------
 
 func _sim_step(dt: float) -> void:
+	if _state == State.LOADING:
+		return
 	if _state == State.COUNTDOWN:
 		_countdown -= dt
 		if _countdown <= 0.0:
@@ -306,12 +340,19 @@ func _update_hud(delta: float) -> void:
 		worst = maxf(worst, sample.y)
 		total += sample.y
 	var average_fps: float = float(_frame_log.size()) / maxf(total, 0.0001)
+	if _state == State.RACING and delta * 1000.0 > HITCH_MS:
+		_hitch_count += 1
+		_last_hitch_text = "%d ms, %.1f s after %s" % [
+			roundi(delta * 1000.0), float(Time.get_ticks_msec() - _last_event_msec) / 1000.0, _last_event]
 	var item_text: String = _powerups.item_name(_player.item)
 	_hud.set_stats("P %d/%d  LAP %d/%d  %d km/h  ITEM %s\nFPS %d  avg %d  worst %d ms" % [
 		_race_place(_player), CAR_COUNT, clampi(_player.lap, 1, LAPS), LAPS,
 		roundi(absf(_player.speed()) * 3.6), item_text if item_text != "" else "-",
-		Engine.get_frames_per_second(), roundi(average_fps), roundi(worst * 1000.0)])
+		Engine.get_frames_per_second(), roundi(average_fps), roundi(worst * 1000.0)]
+		+ "\nHITCHES >%d ms: %d  last: %s" % [roundi(HITCH_MS), _hitch_count, _last_hitch_text])
 	match _state:
+		State.LOADING:
+			_hud.set_message("")
 		State.COUNTDOWN:
 			_hud.set_message(str(ceili(_countdown)))
 		State.RACING:

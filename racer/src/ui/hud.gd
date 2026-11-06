@@ -20,6 +20,7 @@ var _steer_view: SteerView
 var _stats: Label
 var _message: Label
 var _scale_step: int = 0
+var _cover: ColorRect
 
 
 class SteerView extends Control:
@@ -41,6 +42,7 @@ func _ready() -> void:
 	add_child(_steer_view)
 	_build_buttons()
 	_build_top_left()
+	_build_cover()
 	_message = Label.new()
 	_message.set_anchors_preset(Control.PRESET_CENTER_TOP)
 	_message.position = Vector2(-300, 150)
@@ -58,6 +60,25 @@ func set_stats(text: String) -> void:
 
 func set_message(text: String) -> void:
 	_message.text = text
+
+
+## Black cover with a loading label; hides the effect warm-up at startup.
+func set_cover(visible_now: bool) -> void:
+	_cover.visible = visible_now
+
+
+func _build_cover() -> void:
+	_cover = ColorRect.new()
+	_cover.color = Color.BLACK
+	_cover.set_anchors_preset(Control.PRESET_FULL_RECT)
+	var label := Label.new()
+	label.text = "LOADING"
+	label.set_anchors_preset(Control.PRESET_FULL_RECT)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.add_theme_font_size_override("font_size", 40)
+	_cover.add_child(label)
+	add_child(_cover)
 
 
 func _input(event: InputEvent) -> void:

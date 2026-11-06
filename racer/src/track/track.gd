@@ -4,7 +4,7 @@ extends RefCounted
 ## The track is flat for now.
 
 const SAMPLE_COUNT: int = 400
-const HALF_WIDTH: float = 7.0
+const HALF_WIDTH: float = 11.0
 const BARRIER_HEIGHT: float = 1.0
 
 var points: Array[Vector3] = []
