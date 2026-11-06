@@ -1,10 +1,10 @@
-; Throwaway feasibility probe: Blur-style arcade racer on iPhone Safari.
+; Blur-style arcade racer for iPhone Safari (Godot 4.7, GL Compatibility).
 config_version=5
 
 [application]
 
-config/name="Race Probe"
-run/main_scene="res://main.tscn"
+config/name="Racer"
+run/main_scene="res://scenes/main.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 
 [display]

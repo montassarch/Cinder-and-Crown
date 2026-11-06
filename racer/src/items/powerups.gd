@@ -1,9 +1,9 @@
 extends Node3D
 ## Item pads, the four items (boost, homing shot, mine, shock) and their projectiles and mines.
 
-const Car := preload("res://car.gd")
-const Track := preload("res://track.gd")
-const Fx := preload("res://fx.gd")
+const Car := preload("res://src/cars/car.gd")
+const Track := preload("res://src/track/track.gd")
+const Fx := preload("res://src/fx/fx.gd")
 
 const PAD_RADIUS: float = 2.6
 const PAD_RESPAWN_SECONDS: float = 6.0

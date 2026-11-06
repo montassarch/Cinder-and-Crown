@@ -2,7 +2,7 @@ extends Node3D
 ## Arcade car: a simple velocity model with drift, boost and stun, plus a low-poly body.
 ## Heading 0 faces +Z; positive steer turns right.
 
-const Fx := preload("res://fx.gd")
+const Fx := preload("res://src/fx/fx.gd")
 
 enum Item { NONE, BOOST, SHOT, MINE, SHOCK }
 

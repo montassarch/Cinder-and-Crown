@@ -2,8 +2,8 @@ extends RefCounted
 ## Steers a car along the track centre line with a per-driver lane offset,
 ## braking for upcoming sharp corners.
 
-const Car := preload("res://car.gd")
-const Track := preload("res://track.gd")
+const Car := preload("res://src/cars/car.gd")
+const Track := preload("res://src/track/track.gd")
 
 var lane_offset: float = 0.0
 var caution: float = 1.0  ## Scales how early the driver slows for corners.

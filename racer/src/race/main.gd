@@ -3,12 +3,12 @@ extends Node3D
 ## One player car and seven AI cars race three laps with four items and particle effects.
 ## Not game code; do not build on it.
 
-const Car := preload("res://car.gd")
-const Track := preload("res://track.gd")
-const AiDriver := preload("res://ai_driver.gd")
-const Powerups := preload("res://powerups.gd")
-const Fx := preload("res://fx.gd")
-const Hud := preload("res://hud.gd")
+const Car := preload("res://src/cars/car.gd")
+const Track := preload("res://src/track/track.gd")
+const AiDriver := preload("res://src/cars/ai_driver.gd")
+const Powerups := preload("res://src/items/powerups.gd")
+const Fx := preload("res://src/fx/fx.gd")
+const Hud := preload("res://src/ui/hud.gd")
 
 enum State { COUNTDOWN, RACING, FINISHED }
 
