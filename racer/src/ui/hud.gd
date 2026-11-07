@@ -6,6 +6,7 @@ signal brake_changed(pressed: bool)
 signal use_pressed
 signal restart_pressed
 signal car_cycle_pressed
+signal give_item_pressed
 signal shadows_toggled(enabled: bool)
 signal glow_toggled(enabled: bool)
 signal particles_toggled(enabled: bool)
@@ -13,6 +14,7 @@ signal render_scale_changed(value: float)
 signal settings_opened(is_open: bool)
 
 const Settings := preload("res://src/core/settings.gd")
+const ItemDefs := preload("res://src/items/item_defs.gd")
 
 const BASE_STEER_RANGE: float = 110.0  ## Drag distance for full lock at sensitivity 1.
 const BUTTON_AREA: Vector2 = Vector2(380.0, 300.0)
@@ -34,6 +36,8 @@ var _cover: ColorRect
 var _panel: PanelContainer
 var _mirror_check: CheckButton
 var _slider_rows: Dictionary = {}
+var _status_view: StatusView
+var _flash: ColorRect
 
 
 class SteerView extends Control:
@@ -49,6 +53,35 @@ class SteerView extends Control:
 		draw_circle(origin + Vector2(value * reach, 0), 34.0, Color(1, 1, 1, 0.45))
 
 
+## Health bar and the three item slots, drawn at the top centre.
+class StatusView extends Control:
+	const BAR_SIZE: Vector2 = Vector2(340.0, 18.0)
+	const SLOT_SIZE: float = 74.0
+	const SLOT_GAP: float = 12.0
+
+	var health_ratio: float = 1.0
+	var items: Array[int] = []
+
+	func _draw() -> void:
+		var centre_x: float = size.x * 0.70  # clear of the stats text (left) and Settings (right)
+		var bar_origin := Vector2(centre_x - BAR_SIZE.x / 2.0, 14.0)
+		draw_rect(Rect2(bar_origin - Vector2(3, 3), BAR_SIZE + Vector2(6, 6)), Color(0, 0, 0, 0.55))
+		var fill: Color = Color(0.35, 1.0, 0.35).lerp(Color(1.0, 0.25, 0.2), 1.0 - clampf(health_ratio * 1.6, 0.0, 1.0))
+		draw_rect(Rect2(bar_origin, Vector2(BAR_SIZE.x * clampf(health_ratio, 0.0, 1.0), BAR_SIZE.y)), fill)
+		var font: Font = ThemeDB.fallback_font
+		var total: float = ItemDefs.SLOT_COUNT * SLOT_SIZE + (ItemDefs.SLOT_COUNT - 1) * SLOT_GAP
+		var left: float = centre_x - total / 2.0
+		for i in ItemDefs.SLOT_COUNT:
+			var rect := Rect2(Vector2(left + i * (SLOT_SIZE + SLOT_GAP), 46.0), Vector2(SLOT_SIZE, SLOT_SIZE))
+			draw_rect(rect, Color(0, 0, 0, 0.55))
+			if i < items.size():
+				var color: Color = ItemDefs.color(items[i])
+				draw_rect(rect.grow(-6.0), color.darkened(0.15 if i == 0 else 0.45))
+				draw_string(font, rect.position + Vector2(0, SLOT_SIZE / 2.0 + 7.0), ItemDefs.item_name(items[i]),
+					HORIZONTAL_ALIGNMENT_CENTER, SLOT_SIZE, 18, Color.BLACK if i == 0 else Color(0, 0, 0, 0.6))
+			draw_rect(rect, Color(1, 1, 1, 0.95 if i == 0 else 0.3), false, 3.0 if i == 0 else 1.5)
+
+
 func _ready() -> void:
 	_steer_view = SteerView.new()
 	_steer_view.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -58,10 +91,30 @@ func _ready() -> void:
 	_build_top_left()
 	_build_settings_button()
 	_build_settings_panel()
+	_build_status()
 	_build_message()
+	_build_flash()
 	_build_cover()
 	settings.changed.connect(_apply_settings)
 	_apply_settings()
+
+
+## Updates the health bar and item slots.
+func set_player_status(health_ratio: float, held_items: Array[int]) -> void:
+	if _status_view.health_ratio != health_ratio or _status_view.items != held_items:
+		_status_view.health_ratio = health_ratio
+		_status_view.items = held_items.duplicate()
+		_status_view.queue_redraw()
+
+
+## Tints the whole screen briefly, for hits and wrecks.
+func flash(color: Color, strength: float) -> void:
+	_flash.color = Color(color.r, color.g, color.b, clampf(strength, 0.0, 0.8))
+
+
+func _process(delta: float) -> void:
+	if _flash.color.a > 0.0:
+		_flash.color.a = move_toward(_flash.color.a, 0.0, delta * 1.8)
 
 
 func set_stats(text: String) -> void:
@@ -175,6 +228,9 @@ func _build_top_left() -> void:
 	var car_button := _plain_button("Car")
 	car_button.pressed.connect(car_cycle_pressed.emit)
 	row.add_child(car_button)
+	var item_button := _plain_button("+Item")
+	item_button.pressed.connect(give_item_pressed.emit)
+	row.add_child(item_button)
 	var restart := _plain_button("Restart")
 	restart.pressed.connect(restart_pressed.emit)
 	row.add_child(restart)
@@ -264,6 +320,21 @@ func _slider_row(key: String, label_text: String, value_format: String, display_
 	slider.value_changed.connect(func(value: float) -> void: settings.set_value(key, value))
 	_slider_rows[key] = {"slider": slider, "readout": readout, "format": value_format, "scale": display_scale}
 	return row
+
+
+func _build_status() -> void:
+	_status_view = StatusView.new()
+	_status_view.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_status_view.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_status_view)
+
+
+func _build_flash() -> void:
+	_flash = ColorRect.new()
+	_flash.color = Color(1, 1, 1, 0)
+	_flash.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_flash.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_flash)
 
 
 func _build_message() -> void:

@@ -1,6 +1,6 @@
 # Racer
 
-A Blur-style arcade racer for iPhone Safari. Godot 4.7.2 (standard build, GL Compatibility renderer), single player, 8 cars, a dusk-city track, four power-ups. Personal project, not for release.
+A Blur-style arcade racer for iPhone Safari. Godot 4.7.2 (standard build, GL Compatibility renderer), single player, 8 cars, a dusk-city track, seven items, car health. Personal project, not for release.
 
 ## Run, test, export
 
@@ -27,7 +27,8 @@ racer/
     cars/car_spec.gd     one car's real figures and the rules that derive game handling
     cars/car_catalog.gd  loads every spec in data/cars
     cars/ai_driver.gd    follows the racing line, brakes for corners
-    items/powerups.gd    pads, boost / homing shot / mine / shock (pooled)
+    items/item_defs.gd   the seven items: names, colours, balance numbers
+    items/powerups.gd    colour-coded pads, item effects, shots / mines / lightning arcs (pooled), AI item rules
     fx/fx.gd             pooled particle effects, prewarmed at startup
     fx/look.gd           sky, fog, colour grade, bloom, procedural textures
     ui/hud.gd            touch controls, stats, debug toggles, settings panel
@@ -58,8 +59,10 @@ The models are stylized low-poly cars with approximate proportions, not scans.
 
 ## Status
 
-Done: settings panel (sensitivity, dead zone, button size/opacity, swap sides, camera distance), closer default camera, arcade driving and drift, 7 AI drivers, 4 items with particle effects, touch controls, a 22 m wide looped track, dusk-city look with bloom, four modelled cars driven by real specs, hitch logger, rotate-to-landscape prompt.
+Done: seven items (nitro, bolt, shunt, mine, shock, barge, repair) in three slots, car health with wall damage and wrecks, hit feedback (flash, shake, FOV kick), settings panel (sensitivity, dead zone, button size/opacity, swap sides, camera distance), closer default camera, arcade driving and drift, 7 AI drivers, 4 items with particle effects, touch controls, a 22 m wide looped track, dusk-city look with bloom, four modelled cars driven by real specs, hitch logger, rotate-to-landscape prompt.
 
 Not verified (needs a real phone): frame rate and hitch behavior on iPhone, what the bloom costs, how the handling feels with each car.
 
-Next: the power-up pass (items and effects), a car-select screen, more tracks and biomes, engine and tyre sound, better car bodies.
+Debug: the **+Item** button hands the player the next item so every effect can be tried quickly.
+
+Next: a car-select screen, more tracks and biomes, engine and tyre sound, better car bodies.

@@ -201,15 +201,15 @@ func step(dt: float) -> void:
 
 func _make_shield() -> MeshInstance3D:
 	var mesh := SphereMesh.new()
-	mesh.radius = 3.0
-	mesh.height = 6.0
+	mesh.radius = 2.6
+	mesh.height = 5.2
 	mesh.radial_segments = 16
 	mesh.rings = 8
 	var material := StandardMaterial3D.new()
 	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	material.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
-	material.albedo_color = Color(0.3, 1.0, 0.85, 0.28)
+	material.albedo_color = Color(0.3, 1.0, 0.85, 0.13)
 	material.cull_mode = BaseMaterial3D.CULL_DISABLED
 	mesh.material = material
 	var instance := MeshInstance3D.new()

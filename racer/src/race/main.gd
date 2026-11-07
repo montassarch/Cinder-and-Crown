@@ -26,6 +26,7 @@ const CAR_RADIUS: float = 1.2
 const WALL_DAMAGE_SPEED: float = 14.0   ## Impact speed (m/s) below which a wall does no damage.
 const WALL_DAMAGE_PER_MS: float = 0.5
 const BARGE_SHOVE: float = 12.0
+const SHAKE_SECONDS: float = 0.35
 const FPS_WINDOW_SEC: float = 5.0
 const HITCH_MS: float = 40.0
 const PREWARM_FRAMES: int = 10
@@ -56,6 +57,9 @@ var _auto_player: bool = false
 var _frame_log: Array[Vector2] = []  # x = timestamp (sec), y = frame time (sec)
 var _max_lateral_seen: float = 0.0
 var _hitch_count: int = 0
+var _shake_time: float = 0.0
+var _debug_item_index: int = 0
+var _fov_kick: float = 0.0
 var _staged_uses: Dictionary = {}  ## Self-test only: item kind -> times used in staged tests.
 var _last_hitch_text: String = "-"
 var _last_event: String = "-"
@@ -75,6 +79,7 @@ func _ready() -> void:
 	_powerups = Powerups.new()
 	add_child(_powerups)
 	_powerups.event.connect(_note_event)
+	_powerups.car_hit.connect(_on_car_hit)
 	_powerups.setup(_track, _cars)
 	_build_camera()
 	_hud = Hud.new()
@@ -85,6 +90,7 @@ func _ready() -> void:
 	_hud.use_pressed.connect(func() -> void: _powerups.use_item(_player))
 	_hud.restart_pressed.connect(_restart)
 	_hud.car_cycle_pressed.connect(_cycle_player_car)
+	_hud.give_item_pressed.connect(_give_debug_item)
 	_hud.shadows_toggled.connect(func(on: bool) -> void: _sun.shadow_enabled = on)
 	_hud.glow_toggled.connect(func(on: bool) -> void: _environment.glow_enabled = on)
 	_hud.particles_toggled.connect(func(on: bool) -> void: Fx.enabled = on)
@@ -153,6 +159,12 @@ func _flat_material(color: Color) -> StandardMaterial3D:
 	var material := StandardMaterial3D.new()
 	material.albedo_color = color
 	return material
+
+
+## Debug button: hands the player the next item in the list, to try every effect quickly.
+func _give_debug_item() -> void:
+	_player.add_item(ItemDefs.ALL_KINDS[_debug_item_index % ItemDefs.ALL_KINDS.size()])
+	_debug_item_index += 1
 
 
 func _cycle_player_car() -> void:
@@ -262,7 +274,9 @@ func _keep_on_track(car: Car) -> void:
 	if into_wall < 0.0:
 		car.velocity -= inward * into_wall * 1.3
 		if -into_wall > WALL_DAMAGE_SPEED:
-			car.take_damage((-into_wall - WALL_DAMAGE_SPEED) * WALL_DAMAGE_PER_MS)
+			var hurt: bool = car.take_damage((-into_wall - WALL_DAMAGE_SPEED) * WALL_DAMAGE_PER_MS)
+			if hurt and car == _player:
+				_shake_time = SHAKE_SECONDS * 0.6
 	car.velocity *= 0.92
 	car.heading = lerp_angle(car.heading, _track.heading_at(index), 0.08)
 
@@ -324,6 +338,15 @@ func _race_place(car: Car) -> int:
 
 # --- camera and HUD -------------------------------------------------------------
 
+## Screen flash, camera shake and a field-of-view kick when the player's car is hit.
+func _on_car_hit(victim: Car, kind: int, damage: float) -> void:
+	if victim != _player:
+		return
+	_hud.flash(ItemDefs.color(kind), 0.30 + damage * 0.012)
+	_shake_time = SHAKE_SECONDS
+	_fov_kick = 8.0 + damage * 0.3
+
+
 func _update_camera(delta: float) -> void:
 	var forward: Vector3 = _player.forward()
 	var distance: float = _settings.camera_distance
@@ -331,7 +354,16 @@ func _update_camera(delta: float) -> void:
 	_camera.position = _camera.position.lerp(target, 1.0 - exp(-7.0 * delta))
 	_camera.look_at(_player.position + forward * distance * 1.1 + Vector3.UP, Vector3.UP)
 	var boost_fov: float = 10.0 if _player.boost_time > 0.0 else 0.0
-	_camera.fov = lerpf(_camera.fov, 68.0 + _player.speed() * 0.35 + boost_fov, 1.0 - exp(-4.0 * delta))
+	_fov_kick = move_toward(_fov_kick, 0.0, delta * 30.0)
+	_camera.fov = lerpf(_camera.fov, 68.0 + _player.speed() * 0.35 + boost_fov + _fov_kick, 1.0 - exp(-4.0 * delta))
+	if _shake_time > 0.0:
+		_shake_time = maxf(0.0, _shake_time - delta)
+		var amount: float = 0.35 * _shake_time / SHAKE_SECONDS
+		_camera.h_offset = _rng.randf_range(-amount, amount)
+		_camera.v_offset = _rng.randf_range(-amount, amount)
+	else:
+		_camera.h_offset = 0.0
+		_camera.v_offset = 0.0
 
 
 func _update_hud(delta: float) -> void:
@@ -353,6 +385,7 @@ func _update_hud(delta: float) -> void:
 	for kind in _player.items:
 		held.append(ItemDefs.item_name(kind))
 	var item_text: String = " ".join(held)
+	_hud.set_player_status(_player.health / Car.MAX_HEALTH, _player.items)
 	_hud.set_stats(_player.spec.summary() + "\nP %d/%d  LAP %d/%d  %d km/h  ITEM %s\nFPS %d  avg %d  worst %d ms" % [
 		_race_place(_player), CAR_COUNT, clampi(_player.lap, 1, LAPS), LAPS,
 		roundi(absf(_player.speed()) * 3.6), item_text if item_text != "" else "-",
@@ -499,6 +532,22 @@ func _run_selftest() -> void:
 	if _player.boost_time <= 0.0:
 		failures.append("USE button did not trigger the nitro item")
 	_selftest_items(failures)
+	_restart()
+	_hud.give_item_pressed.emit()
+	if _player.items.size() != 1 or _player.items[0] != ItemDefs.ALL_KINDS[(_debug_item_index - 1) % ItemDefs.ALL_KINDS.size()]:
+		failures.append("+Item button did not give the next item")
+	_hud.set_player_status(0.4, [ItemDefs.Kind.BOLT, ItemDefs.Kind.REPAIR] as Array[int])
+	if _hud._status_view.items.size() != 2 or absf(_hud._status_view.health_ratio - 0.4) > 0.001:
+		failures.append("HUD status did not receive health and items")
+	_hud.flash(Color.RED, 0.5)
+	_hud._process(1.0)
+	if _hud._flash.color.a != 0.0:
+		failures.append("screen flash did not fade out")
+	_shake_time = 0.0
+	_on_car_hit(_player, ItemDefs.Kind.SHUNT, 25.0)
+	if _shake_time <= 0.0 or _fov_kick <= 0.0 or _hud._flash.color.a <= 0.0:
+		failures.append("hitting the player did not trigger shake, FOV kick and flash")
+	_on_car_hit(_cars[0], ItemDefs.Kind.SHUNT, 25.0)
 	if failures.is_empty():
 		print("SELFTEST OK")
 		get_tree().quit(0)
