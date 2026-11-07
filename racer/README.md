@@ -59,7 +59,7 @@ The models are stylized low-poly cars with approximate proportions, not scans.
 
 ## Status
 
-Done: seven items (nitro, bolt, shunt, mine, shock, barge, repair) in three slots, car health with wall damage and wrecks, hit feedback (flash, shake, FOV kick), settings panel (sensitivity, dead zone, button size/opacity, swap sides, camera distance), closer default camera, arcade driving and drift, 7 AI drivers, 4 items with particle effects, touch controls, a 22 m wide looped track, dusk-city look with bloom, four modelled cars driven by real specs, hitch logger, rotate-to-landscape prompt.
+Done: seven items (nitro, bolt, shunt, mine, shock, barge, repair) in three slots, car health with wall damage and wrecks, hit feedback (flash, shake, FOV kick), settings panel (sensitivity, dead zone, button size/opacity, swap sides, camera distance), closer default camera, arcade driving and drift, 7 AI drivers, particle effects, touch controls, a 22 m wide looped track, dusk-city look with bloom, four modelled cars driven by real specs, hitch logger, rotate-to-landscape prompt.
 
 Not verified (needs a real phone): frame rate and hitch behavior on iPhone, what the bloom costs, how the handling feels with each car.
 
