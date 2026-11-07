@@ -1,0 +1,16 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://src/cars/car_spec.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "corvette_zr1"
+display_name = "ZR1"
+make = "Chevrolet"
+year = 2025
+power_hp = 1064
+zero_to_100_s = 2.3
+top_speed_kmh = 375
+drivetrain = "RWD"
+model_path = "res://assets/cars/zr1.glb"
+source_note = "Chevrolet claim: 1,064 hp twin-turbo V8, 0-60 mph 2.3 s (ZTK package), 233 mph track-tested top speed."

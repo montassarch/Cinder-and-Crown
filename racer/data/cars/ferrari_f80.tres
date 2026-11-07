@@ -1,0 +1,16 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://src/cars/car_spec.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "ferrari_f80"
+display_name = "F80"
+make = "Ferrari"
+year = 2025
+power_hp = 1184
+zero_to_100_s = 2.15
+top_speed_kmh = 349
+drivetrain = "AWD"
+model_path = "res://assets/cars/f80.glb"
+source_note = "Ferrari claim: ~1,184 hp (1,200 CV) hybrid V6, 0-62 mph 2.15 s, 217 mph. Dry weight ~1,525 kg."

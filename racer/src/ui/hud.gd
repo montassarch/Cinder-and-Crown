@@ -5,6 +5,7 @@ extends CanvasLayer
 signal brake_changed(pressed: bool)
 signal use_pressed
 signal restart_pressed
+signal car_cycle_pressed
 signal shadows_toggled(enabled: bool)
 signal particles_toggled(enabled: bool)
 signal render_scale_changed(value: float)
@@ -154,6 +155,9 @@ func _build_top_left() -> void:
 	var scale_button := _plain_button("Scale 100%")
 	scale_button.pressed.connect(_cycle_scale.bind(scale_button))
 	row.add_child(scale_button)
+	var car_button := _plain_button("Car")
+	car_button.pressed.connect(car_cycle_pressed.emit)
+	row.add_child(car_button)
 	var restart := _plain_button("Restart")
 	restart.pressed.connect(restart_pressed.emit)
 	row.add_child(restart)

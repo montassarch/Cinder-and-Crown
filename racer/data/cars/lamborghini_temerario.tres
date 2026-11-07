@@ -1,0 +1,16 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://src/cars/car_spec.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "lamborghini_temerario"
+display_name = "Temerario"
+make = "Lamborghini"
+year = 2025
+power_hp = 907
+zero_to_100_s = 2.7
+top_speed_kmh = 343
+drivetrain = "AWD"
+model_path = "res://assets/cars/temerario.glb"
+source_note = "Lamborghini claim: 907 hp (920 CV) twin-turbo hybrid V8, 0-62 mph about 2.7 s, 213 mph. Weight ~1,690 kg."

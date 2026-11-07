@@ -1,18 +1,17 @@
 extends Node3D
-## Arcade car: a simple velocity model with drift, boost and stun, plus a low-poly body.
-## Heading 0 faces +Z; positive steer turns right.
+## Arcade car: a simple velocity model with drift, boost and stun, driving a 3D model.
+## Heading 0 faces +Z; positive steer turns right. Handling numbers come from a CarSpec.
 
 const Fx := preload("res://src/fx/fx.gd")
+const CarSpec := preload("res://src/cars/car_spec.gd")
 
 enum Item { NONE, BOOST, SHOT, MINE, SHOCK }
 
-const MAX_SPEED: float = 46.0
-const ACCEL: float = 24.0
 const BRAKE_DECEL: float = 30.0
 const STEER_RATE: float = 2.1
-const GRIP: float = 9.0
-const DRIFT_GRIP: float = 2.4
 const BOOST_SPEED_MULT: float = 1.35
+const WHEEL_RADIUS: float = 0.35
+const MAX_WHEEL_STEER: float = 0.45
 
 var heading: float = 0.0
 var velocity: Vector3 = Vector3.ZERO
@@ -30,25 +29,45 @@ var lap: int = 0
 var finished: bool = false
 var finish_time: float = 0.0
 var display_name: String = ""
+var spec: CarSpec
 
-var _model: Node3D
+# Handling, set from the spec.
+var max_speed: float = 46.0
+var accel: float = 24.0
+var grip: float = 9.0
+var drift_grip: float = 2.4
+
+var _model_holder: Node3D
+var _wheels_front: Array[Node3D] = []
+var _wheels_rear: Array[Node3D] = []
+var _wheel_roll: float = 0.0
 var _trail: GPUParticles3D
 
 
-func setup(body_color: Color, car_name: String) -> void:
-	display_name = car_name
-	_model = Node3D.new()
-	add_child(_model)
-	_add_box(Vector3(1.8, 0.55, 4.0), Vector3(0.0, 0.5, 0.0), body_color)
-	_add_box(Vector3(1.4, 0.5, 1.8), Vector3(0.0, 1.0, -0.2), body_color.darkened(0.35))
-	_add_box(Vector3(1.5, 0.12, 0.5), Vector3(0.0, 1.05, -1.9), body_color.darkened(0.5))  # spoiler
-	_add_box(Vector3(1.2, 0.18, 0.1), Vector3(0.0, 0.55, 2.0), Color(1.0, 0.95, 0.6))      # headlights
-	_add_box(Vector3(1.2, 0.18, 0.1), Vector3(0.0, 0.55, -2.0), Color(1.0, 0.15, 0.15))    # tail lights
-	for wheel in [Vector3(-0.95, 0.35, 1.3), Vector3(0.95, 0.35, 1.3), Vector3(-0.95, 0.35, -1.3), Vector3(0.95, 0.35, -1.3)]:
-		_add_box(Vector3(0.3, 0.7, 0.7), wheel, Color(0.08, 0.08, 0.08))
+func _init() -> void:
+	_model_holder = Node3D.new()
+	add_child(_model_holder)
 	_trail = Fx.make_trail(Color(1.0, 0.5, 0.1), 60, 0.4)
 	add_child(_trail)
-	_trail.position = Vector3(0.0, 0.5, -2.2)
+	_trail.position = Vector3(0.0, 0.5, -2.5)
+
+
+## Swaps in a car model and its handling. Safe to call again to change the car.
+func apply_spec(new_spec: CarSpec, paint: Color, car_name: String) -> void:
+	spec = new_spec
+	display_name = car_name
+	max_speed = spec.game_top_speed()
+	accel = spec.game_accel()
+	grip = spec.game_grip()
+	drift_grip = spec.game_drift_grip()
+	for child in _model_holder.get_children():
+		child.queue_free()
+	_wheels_front.clear()
+	_wheels_rear.clear()
+	var packed: PackedScene = load(spec.model_path) as PackedScene
+	var model: Node3D = packed.instantiate() as Node3D
+	_model_holder.add_child(model)
+	_find_parts(model, paint)
 
 
 func forward() -> Vector3:
@@ -94,41 +113,57 @@ func step(dt: float) -> void:
 		heading -= 9.0 * dt  # spin out
 	else:
 		var low_speed_factor: float = clampf(absf(forward_speed) / 12.0, 0.0, 1.0)
-		var high_speed_damping: float = 1.0 - 0.35 * clampf(forward_speed / MAX_SPEED, 0.0, 1.0)
+		var high_speed_damping: float = 1.0 - 0.35 * clampf(forward_speed / max_speed, 0.0, 1.0)
 		var drift_assist: float = 1.35 if braking else 1.0
 		heading -= steer * STEER_RATE * low_speed_factor * high_speed_damping * drift_assist * dt
 	var fwd: Vector3 = forward()
 	var right: Vector3 = right_vector()
 	forward_speed = velocity.dot(fwd)
 	var lateral: float = velocity.dot(right)
-	var top: float = MAX_SPEED * top_speed_factor * (BOOST_SPEED_MULT if boost_time > 0.0 else 1.0)
+	var top: float = max_speed * top_speed_factor * (BOOST_SPEED_MULT if boost_time > 0.0 else 1.0)
 	var drifting: bool = braking and forward_speed > 15.0 and not stunned
 	if stunned:
 		forward_speed = move_toward(forward_speed, 0.0, 30.0 * dt)
 	elif braking and not drifting:
 		forward_speed = move_toward(forward_speed, 0.0, BRAKE_DECEL * dt)
 	else:
-		var accel: float = ACCEL * (2.2 if boost_time > 0.0 else 1.0)
-		forward_speed += accel * throttle * maxf(1.0 - forward_speed / top, 0.0) * dt
+		var push: float = accel * (2.2 if boost_time > 0.0 else 1.0)
+		forward_speed += push * throttle * maxf(1.0 - forward_speed / top, 0.0) * dt
 		if forward_speed > top:
 			forward_speed = move_toward(forward_speed, top, 40.0 * dt)
-	lateral *= exp(-(DRIFT_GRIP if drifting else GRIP) * dt)
+	lateral *= exp(-(drift_grip if drifting else grip) * dt)
 	velocity = fwd * forward_speed + right * lateral
 	position += velocity * dt
 	position.y = 0.0
 	rotation.y = heading
 	var roll: float = clampf(lateral * 0.02 + steer * 0.05, -0.25, 0.25)
-	_model.rotation.z = lerpf(_model.rotation.z, roll, 1.0 - exp(-10.0 * dt))
+	_model_holder.rotation.z = lerpf(_model_holder.rotation.z, roll, 1.0 - exp(-10.0 * dt))
+	_spin_wheels(forward_speed, dt)
 	_trail.emitting = Fx.enabled and boost_time > 0.0
 
 
-func _add_box(size: Vector3, pos: Vector3, color: Color) -> void:
-	var mesh := MeshInstance3D.new()
-	var box := BoxMesh.new()
-	box.size = size
-	mesh.mesh = box
-	mesh.position = pos
-	var material := StandardMaterial3D.new()
-	material.albedo_color = color
-	mesh.material_override = material
-	_model.add_child(mesh)
+func _spin_wheels(forward_speed: float, dt: float) -> void:
+	_wheel_roll += forward_speed / WHEEL_RADIUS * dt
+	var spin := Basis(Vector3.RIGHT, _wheel_roll)
+	var turned := Basis(Vector3.UP, -steer * MAX_WHEEL_STEER) * spin
+	for wheel in _wheels_front:
+		wheel.basis = turned
+	for wheel in _wheels_rear:
+		wheel.basis = spin
+
+
+func _find_parts(node: Node, paint: Color) -> void:
+	if node.name.begins_with("Wheel_F"):
+		_wheels_front.append(node as Node3D)
+	elif node.name.begins_with("Wheel_R"):
+		_wheels_rear.append(node as Node3D)
+	if node is MeshInstance3D:
+		var mesh_instance := node as MeshInstance3D
+		for surface in mesh_instance.mesh.get_surface_count():
+			var material: Material = mesh_instance.mesh.surface_get_material(surface)
+			if material is StandardMaterial3D and material.resource_name == "Paint":
+				var painted: StandardMaterial3D = (material as StandardMaterial3D).duplicate()
+				painted.albedo_color = paint
+				mesh_instance.set_surface_override_material(surface, painted)
+	for child in node.get_children():
+		_find_parts(child, paint)

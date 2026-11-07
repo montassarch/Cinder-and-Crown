@@ -9,6 +9,8 @@ const AiDriver := preload("res://src/cars/ai_driver.gd")
 const Powerups := preload("res://src/items/powerups.gd")
 const Fx := preload("res://src/fx/fx.gd")
 const Hud := preload("res://src/ui/hud.gd")
+const CarCatalog := preload("res://src/cars/car_catalog.gd")
+const CarSpec := preload("res://src/cars/car_spec.gd")
 
 enum State { LOADING, COUNTDOWN, RACING, FINISHED }
 
@@ -28,6 +30,8 @@ const CAR_COLORS: Array[Color] = [
 var _rng := RandomNumberGenerator.new()
 var _track: Track
 var _cars: Array[Car] = []
+var _specs: Array[CarSpec] = []
+var _player_spec_index: int = 0
 var _drivers: Array[AiDriver] = []
 var _player: Car
 var _powerups: Powerups
@@ -50,6 +54,7 @@ var _last_event_msec: int = 0
 func _ready() -> void:
 	_rng.seed = 5
 	_track = Track.new()
+	_specs = CarCatalog.load_all()
 	_build_environment()
 	_build_track_and_scenery()
 	_build_cars()
@@ -64,6 +69,7 @@ func _ready() -> void:
 	_hud.brake_changed.connect(func(pressed: bool) -> void: _player_brake = pressed)
 	_hud.use_pressed.connect(func() -> void: _powerups.use_item(_player))
 	_hud.restart_pressed.connect(_restart)
+	_hud.car_cycle_pressed.connect(_cycle_player_car)
 	_hud.shadows_toggled.connect(func(on: bool) -> void: _sun.shadow_enabled = on)
 	_hud.particles_toggled.connect(func(on: bool) -> void: Fx.enabled = on)
 	_hud.render_scale_changed.connect(func(value: float) -> void: get_viewport().scaling_3d_scale = value)
@@ -150,8 +156,9 @@ func _scatter_trees(count: int) -> void:
 func _build_cars() -> void:
 	for slot in CAR_COUNT:
 		var car := Car.new()
-		car.setup(CAR_COLORS[slot], "YOU" if slot == PLAYER_GRID_SLOT else "CPU %d" % slot)
 		car.is_player = slot == PLAYER_GRID_SLOT
+		var spec: CarSpec = _specs[_player_spec_index if car.is_player else slot % _specs.size()]
+		car.apply_spec(spec, CAR_COLORS[slot], "YOU" if car.is_player else "CPU %d" % slot)
 		car.top_speed_factor = 1.0 if car.is_player else _rng.randf_range(0.92, 1.0)
 		add_child(car)
 		_cars.append(car)
@@ -174,6 +181,12 @@ func _flat_material(color: Color) -> StandardMaterial3D:
 	var material := StandardMaterial3D.new()
 	material.albedo_color = color
 	return material
+
+
+func _cycle_player_car() -> void:
+	_player_spec_index = (_player_spec_index + 1) % _specs.size()
+	_player.apply_spec(_specs[_player_spec_index], CAR_COLORS[PLAYER_GRID_SLOT], "YOU")
+	_restart()
 
 
 func _restart() -> void:
@@ -345,7 +358,7 @@ func _update_hud(delta: float) -> void:
 		_last_hitch_text = "%d ms, %.1f s after %s" % [
 			roundi(delta * 1000.0), float(Time.get_ticks_msec() - _last_event_msec) / 1000.0, _last_event]
 	var item_text: String = _powerups.item_name(_player.item)
-	_hud.set_stats("P %d/%d  LAP %d/%d  %d km/h  ITEM %s\nFPS %d  avg %d  worst %d ms" % [
+	_hud.set_stats(_player.spec.summary() + "\nP %d/%d  LAP %d/%d  %d km/h  ITEM %s\nFPS %d  avg %d  worst %d ms" % [
 		_race_place(_player), CAR_COUNT, clampi(_player.lap, 1, LAPS), LAPS,
 		roundi(absf(_player.speed()) * 3.6), item_text if item_text != "" else "-",
 		Engine.get_frames_per_second(), roundi(average_fps), roundi(worst * 1000.0)]
@@ -395,6 +408,26 @@ func _run_selftest() -> void:
 	print("SELFTEST stats: sim=%.0fs finishers=%d collected=%d used=%d hits=%d max_lateral=%.2f min_turn_radius=%.1fm track=%.0fm" % [
 		elapsed, finishers, _powerups.collected_count, _powerups.used_count, _powerups.hit_count,
 		_max_lateral_seen, radius, _track.length])
+	# Car data and models: every spec loads, maps to sane handling, and its model has four wheels.
+	if _specs.size() < 4:
+		failures.append("expected at least 4 car specs, found %d" % _specs.size())
+	for spec in _specs:
+		if spec.game_top_speed() < 35.0 or spec.game_top_speed() > 55.0:
+			failures.append("%s game top speed %.1f out of range" % [spec.id, spec.game_top_speed()])
+		if spec.game_accel() < 15.0 or spec.game_accel() > 40.0:
+			failures.append("%s game accel %.1f out of range" % [spec.id, spec.game_accel()])
+		var probe := Car.new()
+		probe.apply_spec(spec, Color.RED, "probe")
+		if probe._wheels_front.size() != 2 or probe._wheels_rear.size() != 2:
+			failures.append("%s model has %d front / %d rear wheels, expected 2 / 2" % [spec.id, probe._wheels_front.size(), probe._wheels_rear.size()])
+		probe.free()
+	for spec in _specs:
+		if spec.id == "ferrari_f80" and absf(spec.game_accel() - 30.1) > 0.3:
+			failures.append("F80 accel mapping changed: %.2f" % spec.game_accel())
+	var before: String = _player.spec.id
+	_cycle_player_car()
+	if _player.spec.id == before:
+		failures.append("car cycle button did not change the player's car")
 	# Player input path: steering and the USE button must change the player's state.
 	_restart()
 	_auto_player = false

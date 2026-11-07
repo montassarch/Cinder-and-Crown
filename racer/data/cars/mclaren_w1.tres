@@ -1,0 +1,16 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://src/cars/car_spec.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "mclaren_w1"
+display_name = "W1"
+make = "McLaren"
+year = 2025
+power_hp = 1258
+zero_to_100_s = 2.7
+top_speed_kmh = 349
+drivetrain = "RWD"
+model_path = "res://assets/cars/w1.glb"
+source_note = "McLaren claim: ~1,258 hp hybrid V8, 0-62 mph about 2.7 s, 217 mph (limited). Dry weight ~1,399 kg."
