@@ -1,6 +1,6 @@
 extends Node3D
 ## Throwaway feasibility probe for a Blur-style arcade racer on iPhone Safari.
-## One player car and seven AI cars race three laps with four items and particle effects.
+## One player car and seven AI cars race three laps with seven items, car health and particle effects.
 ## Not game code; do not build on it.
 
 const Car := preload("res://src/cars/car.gd")
@@ -14,6 +14,7 @@ const CarSpec := preload("res://src/cars/car_spec.gd")
 const Look := preload("res://src/fx/look.gd")
 const TrackScenery := preload("res://src/track/track_scenery.gd")
 const Settings := preload("res://src/core/settings.gd")
+const ItemDefs := preload("res://src/items/item_defs.gd")
 
 enum State { LOADING, COUNTDOWN, RACING, FINISHED }
 
@@ -22,6 +23,9 @@ const CAR_COUNT: int = 8
 const PLAYER_GRID_SLOT: int = 5
 const COUNTDOWN_SECONDS: float = 3.0
 const CAR_RADIUS: float = 1.2
+const WALL_DAMAGE_SPEED: float = 14.0   ## Impact speed (m/s) below which a wall does no damage.
+const WALL_DAMAGE_PER_MS: float = 0.5
+const BARGE_SHOVE: float = 12.0
 const FPS_WINDOW_SEC: float = 5.0
 const HITCH_MS: float = 40.0
 const PREWARM_FRAMES: int = 10
@@ -52,6 +56,7 @@ var _auto_player: bool = false
 var _frame_log: Array[Vector2] = []  # x = timestamp (sec), y = frame time (sec)
 var _max_lateral_seen: float = 0.0
 var _hitch_count: int = 0
+var _staged_uses: Dictionary = {}  ## Self-test only: item kind -> times used in staged tests.
 var _last_hitch_text: String = "-"
 var _last_event: String = "-"
 var _last_event_msec: int = 0
@@ -185,9 +190,11 @@ func _prewarm() -> void:
 	var spot: Vector3 = _camera.global_position - _camera.global_transform.basis.z * 6.0
 	Fx.prewarm(spot)
 	_powerups.prewarm(spot)
+	_player.prewarm_shield(true)
 	for frame in PREWARM_FRAMES:
 		await get_tree().process_frame
 	_powerups.end_prewarm()
+	_player.prewarm_shield(false)
 	_hud.set_cover(false)
 
 
@@ -232,11 +239,12 @@ func _apply_player_input(car: Car) -> void:
 
 
 func _ai_use_items(car: Car, dt: float) -> void:
-	if car.item == Car.Item.NONE:
+	if car.items.is_empty():
 		return
 	car.item_use_timer -= dt
-	if car.item_use_timer <= 0.0:
+	if car.item_use_timer <= 0.0 and _powerups.ai_wants_to_use(car):
 		_powerups.use_item(car)
+		car.item_use_timer = _rng.randf_range(0.6, 1.6)
 
 
 func _keep_on_track(car: Car) -> void:
@@ -253,6 +261,8 @@ func _keep_on_track(car: Car) -> void:
 	var into_wall: float = car.velocity.dot(inward)
 	if into_wall < 0.0:
 		car.velocity -= inward * into_wall * 1.3
+		if -into_wall > WALL_DAMAGE_SPEED:
+			car.take_damage((-into_wall - WALL_DAMAGE_SPEED) * WALL_DAMAGE_PER_MS)
 	car.velocity *= 0.92
 	car.heading = lerp_angle(car.heading, _track.heading_at(index), 0.08)
 
@@ -283,10 +293,24 @@ func _collide_cars() -> void:
 			var push: float = (min_gap - distance) * 0.5
 			_cars[i].position -= normal * push
 			_cars[j].position += normal * push
+			if _barge_ram(_cars[i], _cars[j], normal) or _barge_ram(_cars[j], _cars[i], -normal):
+				continue
 			var closing: float = (_cars[j].velocity - _cars[i].velocity).dot(normal)
 			if closing < 0.0:
 				_cars[i].velocity += normal * closing * 0.5
 				_cars[j].velocity -= normal * closing * 0.5
+
+
+## A shielded car shoves its victim aside and damages it, and loses no speed itself.
+## `away` points from the rammer toward the victim. Returns true if `rammer` had a shield.
+func _barge_ram(rammer: Car, victim: Car, away: Vector3) -> bool:
+	if not rammer.has_shield():
+		return false
+	victim.velocity += away * BARGE_SHOVE
+	if victim.stun_time <= 0.0:
+		_powerups.hit_car(victim, ItemDefs.Kind.BARGE, ItemDefs.value(ItemDefs.Kind.BARGE, "ram_damage"),
+			ItemDefs.value(ItemDefs.Kind.BARGE, "ram_stun"))
+	return true
 
 
 func _race_place(car: Car) -> int:
@@ -325,7 +349,10 @@ func _update_hud(delta: float) -> void:
 		_hitch_count += 1
 		_last_hitch_text = "%d ms, %.1f s after %s" % [
 			roundi(delta * 1000.0), float(Time.get_ticks_msec() - _last_event_msec) / 1000.0, _last_event]
-	var item_text: String = _powerups.item_name(_player.item)
+	var held: PackedStringArray = []
+	for kind in _player.items:
+		held.append(ItemDefs.item_name(kind))
+	var item_text: String = " ".join(held)
 	_hud.set_stats(_player.spec.summary() + "\nP %d/%d  LAP %d/%d  %d km/h  ITEM %s\nFPS %d  avg %d  worst %d ms" % [
 		_race_place(_player), CAR_COUNT, clampi(_player.lap, 1, LAPS), LAPS,
 		roundi(absf(_player.speed()) * 3.6), item_text if item_text != "" else "-",
@@ -467,10 +494,11 @@ func _run_selftest() -> void:
 	_sim_step(step)
 	if not _player.braking:
 		failures.append("brake input did not reach the player car")
-	_player.item = Car.Item.BOOST
+	_player.add_item(ItemDefs.Kind.NITRO)
 	_hud.use_pressed.emit()
 	if _player.boost_time <= 0.0:
-		failures.append("USE button did not trigger the boost item")
+		failures.append("USE button did not trigger the nitro item")
+	_selftest_items(failures)
 	if failures.is_empty():
 		print("SELFTEST OK")
 		get_tree().quit(0)
@@ -478,6 +506,118 @@ func _run_selftest() -> void:
 		for failure in failures:
 			push_error("SELFTEST FAIL: " + failure)
 		get_tree().quit(1)
+
+
+## Each item's effect, shields, wrecks, wall damage and the AI's item rules, on staged cars.
+func _selftest_items(failures: Array[String]) -> void:
+	_restart()
+	_state = State.RACING
+	var user: Car = _cars[0]
+	var other: Car = _cars[1]
+	for k in 4:
+		user.add_item(ItemDefs.Kind.NITRO)
+	if user.items.size() != ItemDefs.SLOT_COUNT:
+		failures.append("item slots hold %d items, expected %d" % [user.items.size(), ItemDefs.SLOT_COUNT])
+	user.items.clear()
+	user.add_item(ItemDefs.Kind.NITRO)
+	user.add_item(ItemDefs.Kind.BOLT)
+	if user.pop_item() != ItemDefs.Kind.NITRO or user.first_item() != ItemDefs.Kind.BOLT:
+		failures.append("items are not used first in, first out")
+	user.items.clear()
+	_use_staged(user, ItemDefs.Kind.NITRO)
+	if user.boost_time <= 0.0:
+		failures.append("nitro did not boost")
+	user.health = 40.0
+	_use_staged(user, ItemDefs.Kind.REPAIR)
+	if absf(user.health - 90.0) > 0.01:
+		failures.append("repair gave %.1f health, expected 90" % user.health)
+	_use_staged(user, ItemDefs.Kind.BARGE)
+	var shielded_health: float = user.health
+	if not user.has_shield() or user.take_damage(30.0) or user.health != shielded_health:
+		failures.append("barge shield did not block damage")
+	user.barge_time = 0.0
+	user.health = 5.0
+	var wrecks: int = user.wreck_count
+	user.take_damage(10.0)
+	if user.wreck_count != wrecks + 1 or user.health != Car.WRECK_RESPAWN_HEALTH or user.stun_time <= 0.0:
+		failures.append("a car at zero health did not wreck and recover")
+	for kind in [ItemDefs.Kind.BOLT, ItemDefs.Kind.SHUNT, ItemDefs.Kind.MINE, ItemDefs.Kind.SHOCK]:
+		_stage_pair(user, other, 20.0)
+		if kind == ItemDefs.Kind.MINE:
+			other.position = user.position - user.forward() * 3.5
+		_use_staged(user, kind)
+		for frame in 90:
+			_powerups.update(1.0 / 60.0)
+		if other.health >= Car.MAX_HEALTH:
+			failures.append("%s did not damage the car it should hit" % ItemDefs.item_name(kind))
+		if kind != ItemDefs.Kind.BOLT and other.stun_time <= 0.0 and other.health >= Car.MAX_HEALTH:
+			failures.append("%s did not stun" % ItemDefs.item_name(kind))
+		_stage_pair(user, other, 20.0)
+		other.barge_time = 4.0
+		if kind == ItemDefs.Kind.MINE:
+			other.position = user.position - user.forward() * 3.5
+		_use_staged(user, kind)
+		for frame in 90:
+			_powerups.update(1.0 / 60.0)
+		if other.health < Car.MAX_HEALTH:
+			failures.append("a shielded car was hurt by %s" % ItemDefs.item_name(kind))
+	_stage_pair(user, other, 1.5)
+	user.barge_time = 4.0
+	_collide_cars()
+	if other.health >= Car.MAX_HEALTH:
+		failures.append("a shielded car ramming another did no damage")
+	_stage_pair(user, other, 20.0)
+	var right: Vector3 = _track.rights[user.track_index]
+	user.position += right * (Track.HALF_WIDTH + 1.0)
+	user.velocity = right * 30.0  # outward, into the wall on the right side
+	_keep_on_track(user)
+	if user.health >= Car.MAX_HEALTH:
+		failures.append("a hard wall hit did no damage")
+	_stage_pair(user, other, 20.0)
+	user.velocity = right * 5.0
+	user.position += right * (Track.HALF_WIDTH + 1.0)
+	_keep_on_track(user)
+	if user.health < Car.MAX_HEALTH:
+		failures.append("a gentle wall scrape should not damage")
+	# AI item rules
+	_stage_pair(user, other, 20.0)
+	user.health = 40.0
+	user.add_item(ItemDefs.Kind.REPAIR)
+	if not _powerups.ai_wants_to_use(user):
+		failures.append("AI should repair at low health")
+	user.health = 100.0
+	if _powerups.ai_wants_to_use(user):
+		failures.append("AI should not repair at full health")
+	user.items.clear()
+	user.add_item(ItemDefs.Kind.SHOCK)
+	if not _powerups.ai_wants_to_use(user):
+		failures.append("AI should shock with a car 20 m away")
+	other.position += user.forward() * 80.0
+	if _powerups.ai_wants_to_use(user):
+		failures.append("AI should not shock with nobody near")
+	for kind in ItemDefs.ALL_KINDS:
+		if int(_staged_uses.get(kind, 0)) == 0:
+			failures.append("%s was never used in the item tests" % ItemDefs.item_name(kind))
+	_restart()
+
+
+## Puts `user` on the track with `other` `gap` metres directly ahead, both with fresh state.
+func _stage_pair(user: Car, other: Car, gap: float) -> void:
+	_restart()
+	_state = State.RACING
+	var index: int = 100
+	var heading: float = _track.heading_at(index)
+	user.place(_track.points[index], heading)
+	user.track_index = index
+	other.place(_track.points[index] + user.forward() * gap, heading)
+	other.track_index = _track.nearest_index(other.position, index)
+
+
+func _use_staged(car: Car, kind: int) -> void:
+	car.items.clear()
+	car.add_item(kind)
+	_staged_uses[kind] = int(_staged_uses.get(kind, 0)) + 1
+	_powerups.use_item(car)
 
 
 func _all_finished() -> bool:

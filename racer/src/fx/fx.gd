@@ -3,13 +3,17 @@ extends RefCounted
 ## allocated or shader-compiled in the middle of a race (a first-use compile is a visible hitch
 ## in browsers). Call setup() once, then prewarm() behind a loading cover.
 
-enum Kind { SPARK_ORANGE, SPARK_BLUE, SPARK_WHITE, RING_BLUE }
+enum Kind { SPARK_ORANGE, SPARK_BLUE, SPARK_WHITE, RING_BLUE, SPARK_GREEN, SPARK_MINT, SPARK_PINK, SPARK_YELLOW }
 
 const DEFINITIONS: Dictionary = {
 	Kind.SPARK_ORANGE: {"color": Color(1.0, 0.5, 0.15), "amount": 120, "lifetime": 0.7, "speed": 8.0, "ring": false, "pool": 6},
 	Kind.SPARK_BLUE: {"color": Color(0.55, 0.75, 1.0), "amount": 60, "lifetime": 0.5, "speed": 6.0, "ring": false, "pool": 6},
 	Kind.SPARK_WHITE: {"color": Color(1.0, 1.0, 0.9), "amount": 30, "lifetime": 0.4, "speed": 5.0, "ring": false, "pool": 4},
 	Kind.RING_BLUE: {"color": Color(0.5, 0.7, 1.0), "amount": 300, "lifetime": 0.7, "speed": 30.0, "ring": true, "pool": 2},
+	Kind.SPARK_GREEN: {"color": Color(0.35, 1.0, 0.35), "amount": 70, "lifetime": 0.7, "speed": 5.0, "ring": false, "pool": 3},
+	Kind.SPARK_MINT: {"color": Color(0.3, 1.0, 0.85), "amount": 60, "lifetime": 0.5, "speed": 6.0, "ring": false, "pool": 4},
+	Kind.SPARK_PINK: {"color": Color(0.95, 0.15, 0.55), "amount": 120, "lifetime": 0.7, "speed": 8.0, "ring": false, "pool": 3},
+	Kind.SPARK_YELLOW: {"color": Color(1.0, 0.95, 0.3), "amount": 70, "lifetime": 0.45, "speed": 7.0, "ring": false, "pool": 4},
 }
 
 static var enabled: bool = true

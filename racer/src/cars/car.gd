@@ -4,14 +4,18 @@ extends Node3D
 
 const Fx := preload("res://src/fx/fx.gd")
 const CarSpec := preload("res://src/cars/car_spec.gd")
+const ItemDefs := preload("res://src/items/item_defs.gd")
 
-enum Item { NONE, BOOST, SHOT, MINE, SHOCK }
+signal wrecked
 
 const BRAKE_DECEL: float = 30.0
 const STEER_RATE: float = 2.1
 const BOOST_SPEED_MULT: float = 1.35
 const WHEEL_RADIUS: float = 0.35
 const MAX_WHEEL_STEER: float = 0.45
+const MAX_HEALTH: float = 100.0
+const WRECK_STUN: float = 2.0
+const WRECK_RESPAWN_HEALTH: float = 50.0
 
 var heading: float = 0.0
 var velocity: Vector3 = Vector3.ZERO
@@ -21,8 +25,11 @@ var throttle: float = 1.0
 var braking: bool = false
 var boost_time: float = 0.0
 var stun_time: float = 0.0
-var item: int = Item.NONE
+var items: Array[int] = []  ## Held items, first in first out. At most ItemDefs.SLOT_COUNT.
 var item_use_timer: float = 0.0
+var health: float = MAX_HEALTH
+var barge_time: float = 0.0
+var wreck_count: int = 0
 var is_player: bool = false
 var track_index: int = 0
 var lap: int = 0
@@ -42,6 +49,7 @@ var _wheels_front: Array[Node3D] = []
 var _wheels_rear: Array[Node3D] = []
 var _wheel_roll: float = 0.0
 var _trail: GPUParticles3D
+var _shield: MeshInstance3D
 
 
 func _init() -> void:
@@ -50,6 +58,8 @@ func _init() -> void:
 	_trail = Fx.make_trail(Color(1.0, 0.5, 0.1), 60, 0.4)
 	add_child(_trail)
 	_trail.position = Vector3(0.0, 0.5, -2.5)
+	_shield = _make_shield()
+	add_child(_shield)
 
 
 ## Swaps in a car model and its handling. Safe to call again to change the car.
@@ -82,10 +92,52 @@ func speed() -> float:
 	return velocity.dot(forward())
 
 
+func has_free_slot() -> bool:
+	return items.size() < ItemDefs.SLOT_COUNT
+
+
+func add_item(kind: int) -> bool:
+	if not has_free_slot():
+		return false
+	items.append(kind)
+	return true
+
+
+## Removes and returns the first held item, or NONE.
+func pop_item() -> int:
+	return ItemDefs.Kind.NONE if items.is_empty() else items.pop_front()
+
+
+func first_item() -> int:
+	return ItemDefs.Kind.NONE if items.is_empty() else items[0]
+
+
 func apply_stun(seconds: float) -> void:
 	stun_time = maxf(stun_time, seconds)
 	boost_time = 0.0
 	velocity *= 0.5
+
+
+func has_shield() -> bool:
+	return barge_time > 0.0
+
+
+## Removes health. A shielded car takes nothing. At zero the car wrecks: it spins out and
+## comes back with half health. Returns true if any damage was taken.
+func take_damage(amount: float) -> bool:
+	if has_shield() or stun_time > WRECK_STUN or amount <= 0.0:
+		return false
+	health -= amount
+	if health <= 0.0:
+		health = WRECK_RESPAWN_HEALTH
+		wreck_count += 1
+		apply_stun(WRECK_STUN + 0.5)
+		wrecked.emit()
+	return true
+
+
+func heal(amount: float) -> void:
+	health = minf(MAX_HEALTH, health + amount)
 
 
 func apply_boost(seconds: float) -> void:
@@ -98,7 +150,10 @@ func place(pos: Vector3, new_heading: float) -> void:
 	velocity = Vector3.ZERO
 	boost_time = 0.0
 	stun_time = 0.0
-	item = Item.NONE
+	barge_time = 0.0
+	items.clear()
+	health = MAX_HEALTH
+	wreck_count = 0
 	finished = false
 	lap = 0
 	rotation.y = heading
@@ -106,6 +161,8 @@ func place(pos: Vector3, new_heading: float) -> void:
 
 func step(dt: float) -> void:
 	boost_time = maxf(0.0, boost_time - dt)
+	barge_time = maxf(0.0, barge_time - dt)
+	_shield.visible = barge_time > 0.0
 	var stunned: bool = stun_time > 0.0
 	stun_time = maxf(0.0, stun_time - dt)
 	var forward_speed: float = speed()
@@ -140,6 +197,31 @@ func step(dt: float) -> void:
 	_model_holder.rotation.z = lerpf(_model_holder.rotation.z, roll, 1.0 - exp(-10.0 * dt))
 	_spin_wheels(forward_speed, dt)
 	_trail.emitting = Fx.enabled and boost_time > 0.0
+
+
+func _make_shield() -> MeshInstance3D:
+	var mesh := SphereMesh.new()
+	mesh.radius = 3.0
+	mesh.height = 6.0
+	mesh.radial_segments = 16
+	mesh.rings = 8
+	var material := StandardMaterial3D.new()
+	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	material.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	material.albedo_color = Color(0.3, 1.0, 0.85, 0.28)
+	material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	mesh.material = material
+	var instance := MeshInstance3D.new()
+	instance.mesh = mesh
+	instance.position = Vector3(0.0, 0.7, 0.0)
+	instance.visible = false
+	return instance
+
+
+## Shows the shield for one frame so its shader compiles during the loading cover.
+func prewarm_shield(on: bool) -> void:
+	_shield.visible = on
 
 
 func _spin_wheels(forward_speed: float, dt: float) -> void:
