@@ -1,0 +1,59 @@
+# Builds the Racer game for iPhone on a GitHub Mac, WITHOUT code signing.
+# The resulting Racer-unsigned.ipa must be signed on your own computer (for example with
+# Sideloadly and a free Apple ID) before it will install on a phone.
+name: iOS build (unsigned)
+
+on:
+  push:
+    branches: [racer/dev]
+    paths:
+      - "racer/**"
+      - ".github/workflows/ios-build.yml"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14
+    timeout-minutes: 45
+    env:
+      GODOT_VERSION: 4.7.2-stable
+      TEMPLATE_DIR: 4.7.2.stable
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Godot and the export templates
+        run: |
+          curl -sSL -o godot.zip "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}/Godot_v${GODOT_VERSION}_macos.universal.zip"
+          unzip -q godot.zip
+          curl -sSL -o templates.tpz "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}/Godot_v${GODOT_VERSION}_export_templates.tpz"
+          unzip -q templates.tpz -d tpl
+          mkdir -p "$HOME/Library/Application Support/Godot/export_templates/${TEMPLATE_DIR}"
+          cp tpl/templates/ios.zip tpl/templates/version.txt "$HOME/Library/Application Support/Godot/export_templates/${TEMPLATE_DIR}/"
+          ls -la "$HOME/Library/Application Support/Godot/export_templates/${TEMPLATE_DIR}"
+
+      - name: Export the Xcode project
+        run: |
+          GODOT="$PWD/Godot.app/Contents/MacOS/Godot"
+          cp racer/tools/export_presets.template.cfg racer/export_presets.cfg
+          "$GODOT" --headless --path racer --import || true
+          mkdir -p build/ios
+          "$GODOT" --headless --path racer --export-release "iOS" ../build/ios/Racer.ipa
+          echo "--- exported files"
+          find build/ios -maxdepth 2 | head -40
+
+      - name: Build the app without signing
+        run: |
+          cd build/ios
+          xcodebuild -project Racer.xcodeproj -scheme Racer -configuration Release \
+            -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath dd \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGN_IDENTITY="" build
+          mkdir -p Payload
+          cp -R dd/Build/Products/Release-iphoneos/*.app Payload/
+          zip -qry Racer-unsigned.ipa Payload
+          ls -la Racer-unsigned.ipa
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Racer-unsigned-ipa
+          path: build/ios/Racer-unsigned.ipa
+          retention-days: 14
