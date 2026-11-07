@@ -1,1 +1,1 @@
-racer build from source commit cd724aa (branch racer/dev), published 2026-11-07T17:48Z
+racer build from source commit 5451880 (branch racer/dev), published 2026-11-07T19:17Z
