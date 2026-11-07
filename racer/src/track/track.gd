@@ -80,10 +80,10 @@ func build_mesh() -> ArrayMesh:
 	var lift := Vector3.UP * 0.02
 	for i in SAMPLE_COUNT:
 		var j: int = wrap_index(i + 1)
-		var shade: float = 0.30 if (i % 12) < 6 else 0.34
+		var shade: float = 0.10 if (i % 12) < 6 else 0.125
 		var road_color := Color(shade, shade, shade + 0.02)
 		if i < 2:
-			road_color = Color(0.9, 0.9, 0.9)  # start line
+			road_color = Color(0.8, 0.8, 0.8)  # start line
 		_quad(st,
 			points[i] - rights[i] * HALF_WIDTH + lift, points[i] + rights[i] * HALF_WIDTH + lift,
 			points[j] + rights[j] * HALF_WIDTH + lift, points[j] - rights[j] * HALF_WIDTH + lift,

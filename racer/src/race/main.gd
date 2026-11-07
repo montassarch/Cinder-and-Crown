@@ -11,6 +11,8 @@ const Fx := preload("res://src/fx/fx.gd")
 const Hud := preload("res://src/ui/hud.gd")
 const CarCatalog := preload("res://src/cars/car_catalog.gd")
 const CarSpec := preload("res://src/cars/car_spec.gd")
+const Look := preload("res://src/fx/look.gd")
+const TrackScenery := preload("res://src/track/track_scenery.gd")
 
 enum State { LOADING, COUNTDOWN, RACING, FINISHED }
 
@@ -38,6 +40,7 @@ var _powerups: Powerups
 var _hud: Node
 var _camera: Camera3D
 var _sun: DirectionalLight3D
+var _environment: Environment
 var _state: State = State.LOADING
 var _countdown: float = COUNTDOWN_SECONDS
 var _race_time: float = 0.0
@@ -71,6 +74,7 @@ func _ready() -> void:
 	_hud.restart_pressed.connect(_restart)
 	_hud.car_cycle_pressed.connect(_cycle_player_car)
 	_hud.shadows_toggled.connect(func(on: bool) -> void: _sun.shadow_enabled = on)
+	_hud.glow_toggled.connect(func(on: bool) -> void: _environment.glow_enabled = on)
 	_hud.particles_toggled.connect(func(on: bool) -> void: Fx.enabled = on)
 	_hud.render_scale_changed.connect(func(value: float) -> void: get_viewport().scaling_3d_scale = value)
 	await _prewarm()
@@ -88,69 +92,24 @@ func _process(delta: float) -> void:
 # --- setup ----------------------------------------------------------------------
 
 func _build_environment() -> void:
-	var environment := Environment.new()
-	environment.background_mode = Environment.BG_COLOR
-	environment.background_color = Color(0.6, 0.75, 0.9)
-	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	environment.ambient_light_color = Color(0.8, 0.85, 0.95)
-	environment.ambient_light_energy = 0.6
-	environment.fog_enabled = true
-	environment.fog_light_color = Color(0.6, 0.75, 0.9)
-	environment.fog_density = 0.004
+	_environment = Look.make_environment()
 	var world := WorldEnvironment.new()
-	world.environment = environment
+	world.environment = _environment
 	add_child(world)
-	_sun = DirectionalLight3D.new()
-	_sun.rotation_degrees = Vector3(-55.0, 35.0, 0.0)
-	_sun.shadow_enabled = true
-	_sun.directional_shadow_mode = DirectionalLight3D.SHADOW_ORTHOGONAL
-	_sun.directional_shadow_max_distance = 60.0
+	_sun = Look.make_sun()
 	add_child(_sun)
 
 
 func _build_track_and_scenery() -> void:
-	var ground_mesh := PlaneMesh.new()
-	ground_mesh.size = Vector2(900.0, 900.0)
-	ground_mesh.material = _flat_material(Color(0.32, 0.52, 0.28))
-	var ground := MeshInstance3D.new()
-	ground.mesh = ground_mesh
-	ground.position.y = -0.02
-	add_child(ground)
 	var road := MeshInstance3D.new()
 	road.mesh = _track.build_mesh()
 	var road_material := StandardMaterial3D.new()
 	road_material.vertex_color_use_as_albedo = true
 	road_material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	road_material.roughness = 0.55
 	road.material_override = road_material
 	add_child(road)
-	_scatter_trees(300)
-
-
-func _scatter_trees(count: int) -> void:
-	var cone := CylinderMesh.new()
-	cone.top_radius = 0.0
-	cone.bottom_radius = 1.6
-	cone.height = 5.0
-	cone.radial_segments = 6
-	cone.rings = 1
-	var multimesh := MultiMesh.new()
-	multimesh.transform_format = MultiMesh.TRANSFORM_3D
-	multimesh.mesh = cone
-	var placed: Array[Transform3D] = []
-	while placed.size() < count:
-		var pos := Vector3(_rng.randf_range(-380.0, 380.0), 0.0, _rng.randf_range(-380.0, 380.0))
-		if _track.distance_to_track(pos) < Track.HALF_WIDTH + 12.0:
-			continue
-		var s: float = _rng.randf_range(0.8, 1.6)
-		var rot := Basis(Vector3.UP, _rng.randf() * TAU).scaled(Vector3(s, s, s))
-		placed.append(Transform3D(rot, pos + Vector3(0.0, 2.5 * s, 0.0)))
-	multimesh.instance_count = placed.size()
-	for i in placed.size():
-		multimesh.set_instance_transform(i, placed[i])
-	var instance := MultiMeshInstance3D.new()
-	instance.multimesh = multimesh
-	instance.material_override = _flat_material(Color(0.12, 0.38, 0.16))
-	add_child(instance)
+	TrackScenery.build(self, _track, _rng)
 
 
 func _build_cars() -> void:
@@ -173,7 +132,7 @@ func _build_cars() -> void:
 func _build_camera() -> void:
 	_camera = Camera3D.new()
 	_camera.fov = 68.0
-	_camera.far = 500.0
+	_camera.far = 600.0
 	add_child(_camera)
 
 

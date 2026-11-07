@@ -7,6 +7,7 @@ signal use_pressed
 signal restart_pressed
 signal car_cycle_pressed
 signal shadows_toggled(enabled: bool)
+signal glow_toggled(enabled: bool)
 signal particles_toggled(enabled: bool)
 signal render_scale_changed(value: float)
 
@@ -151,6 +152,7 @@ func _build_top_left() -> void:
 	var row := HBoxContainer.new()
 	box.add_child(row)
 	row.add_child(_toggle("Shadows", shadows_toggled))
+	row.add_child(_toggle("Glow", glow_toggled))
 	row.add_child(_toggle("Particles", particles_toggled))
 	var scale_button := _plain_button("Scale 100%")
 	scale_button.pressed.connect(_cycle_scale.bind(scale_button))
