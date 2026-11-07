@@ -13,6 +13,7 @@ const CarCatalog := preload("res://src/cars/car_catalog.gd")
 const CarSpec := preload("res://src/cars/car_spec.gd")
 const Look := preload("res://src/fx/look.gd")
 const TrackScenery := preload("res://src/track/track_scenery.gd")
+const Settings := preload("res://src/core/settings.gd")
 
 enum State { LOADING, COUNTDOWN, RACING, FINISHED }
 
@@ -38,6 +39,8 @@ var _drivers: Array[AiDriver] = []
 var _player: Car
 var _powerups: Powerups
 var _hud: Node
+var _settings: Settings
+var _settings_open: bool = false
 var _camera: Camera3D
 var _sun: DirectionalLight3D
 var _environment: Environment
@@ -57,6 +60,8 @@ var _last_event_msec: int = 0
 func _ready() -> void:
 	_rng.seed = 5
 	_track = Track.new()
+	var testing: bool = "--selftest" in OS.get_cmdline_user_args()
+	_settings = Settings.new("user://racer_settings_selftest.cfg" if testing else Settings.DEFAULT_PATH)
 	_specs = CarCatalog.load_all()
 	_build_environment()
 	_build_track_and_scenery()
@@ -68,7 +73,9 @@ func _ready() -> void:
 	_powerups.setup(_track, _cars)
 	_build_camera()
 	_hud = Hud.new()
+	_hud.settings = _settings
 	add_child(_hud)
+	_hud.settings_opened.connect(func(is_open: bool) -> void: _settings_open = is_open)
 	_hud.brake_changed.connect(func(pressed: bool) -> void: _player_brake = pressed)
 	_hud.use_pressed.connect(func() -> void: _powerups.use_item(_player))
 	_hud.restart_pressed.connect(_restart)
@@ -84,7 +91,8 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	_sim_step(minf(delta, 1.0 / 30.0))
+	if not _settings_open:
+		_sim_step(minf(delta, 1.0 / 30.0))
 	_update_camera(delta)
 	_update_hud(delta)
 
@@ -294,9 +302,10 @@ func _race_place(car: Car) -> int:
 
 func _update_camera(delta: float) -> void:
 	var forward: Vector3 = _player.forward()
-	var target: Vector3 = _player.position - forward * 7.5 + Vector3(0.0, 3.2, 0.0)
+	var distance: float = _settings.camera_distance
+	var target: Vector3 = _player.position - forward * distance + Vector3(0.0, _settings.camera_height(), 0.0)
 	_camera.position = _camera.position.lerp(target, 1.0 - exp(-7.0 * delta))
-	_camera.look_at(_player.position + forward * 8.0 + Vector3.UP, Vector3.UP)
+	_camera.look_at(_player.position + forward * distance * 1.1 + Vector3.UP, Vector3.UP)
 	var boost_fov: float = 10.0 if _player.boost_time > 0.0 else 0.0
 	_camera.fov = lerpf(_camera.fov, 68.0 + _player.speed() * 0.35 + boost_fov, 1.0 - exp(-4.0 * delta))
 
@@ -387,6 +396,69 @@ func _run_selftest() -> void:
 	_cycle_player_car()
 	if _player.spec.id == before:
 		failures.append("car cycle button did not change the player's car")
+	# Settings: values clamp, persist across instances, and drive the HUD and camera.
+	var path: String = "user://racer_settings_unit_test.cfg"
+	var stored := Settings.new(path)
+	stored.reset()
+	stored.set_value("steer_sensitivity", 9.0)
+	stored.set_value("camera_distance", 6.0)
+	var reloaded := Settings.new(path)
+	if not is_equal_approx(reloaded.steer_sensitivity, 2.5):
+		failures.append("sensitivity was not clamped to its limit: %.2f" % reloaded.steer_sensitivity)
+	if not is_equal_approx(reloaded.camera_distance, 6.0):
+		failures.append("camera distance did not persist: %.2f" % reloaded.camera_distance)
+	stored.reset()
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+	_settings.reset()
+	_hud._steer_index = -1
+	var touch := InputEventScreenTouch.new()
+	touch.index = 0
+	touch.pressed = true
+	touch.position = Vector2(200, 500)
+	_hud._input(touch)
+	var drag := InputEventScreenDrag.new()
+	drag.index = 0
+	drag.position = Vector2(255, 500)
+	_hud._input(drag)
+	var expected: float = (0.5 - 0.08) / (1.0 - 0.08)
+	if absf(_hud.steer_input - expected) > 0.01:
+		failures.append("steer at default sensitivity: %.3f, expected %.3f" % [_hud.steer_input, expected])
+	_settings.set_value("steer_sensitivity", 2.0)
+	_hud._input(drag)
+	if absf(_hud.steer_input - 1.0) > 0.01:
+		failures.append("double sensitivity should give full lock for a half-range drag, got %.3f" % _hud.steer_input)
+	drag.position = Vector2(203, 500)  # 3 px of a 55 px range: inside the 8% dead zone
+	_hud._input(drag)
+	if _hud.steer_input != 0.0:
+		failures.append("a drag inside the dead zone should not steer, got %.3f" % _hud.steer_input)
+	touch.pressed = false
+	_hud._input(touch)
+	_settings.set_value("mirror_layout", true)
+	touch.pressed = true
+	_hud._input(touch)
+	if _hud._steer_index != -1:
+		failures.append("a touch on the button side started steering after swapping sides")
+	touch.position = Vector2(1000, 500)
+	_hud._input(touch)
+	if _hud._steer_index != 0:
+		failures.append("a touch on the right half did not start steering after swapping sides")
+	touch.pressed = false
+	_hud._input(touch)
+	_settings.set_value("button_scale", 1.4)
+	_settings.set_value("button_opacity", 0.5)
+	if not is_equal_approx(_hud._button_holder.scale.x, 1.4) or not is_equal_approx(_hud._button_holder.modulate.a, 0.5):
+		failures.append("button size or opacity did not reach the HUD")
+	if _hud._button_holder.anchor_left != 0.0:
+		failures.append("buttons did not move to the left when sides were swapped")
+	_settings.reset()
+	var horizontal_distances: Array[float] = []
+	for distance in [4.0, 8.0]:
+		_settings.set_value("camera_distance", distance)
+		_update_camera(10.0)
+		horizontal_distances.append(Vector2(_camera.position.x - _player.position.x, _camera.position.z - _player.position.z).length())
+	if absf(horizontal_distances[0] - 4.0) > 0.3 or absf(horizontal_distances[1] - 8.0) > 0.3:
+		failures.append("camera distance setting not applied: %s" % [horizontal_distances])
+	_settings.reset()
 	# Player input path: steering and the USE button must change the player's state.
 	_restart()
 	_auto_player = false
